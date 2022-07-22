@@ -15,7 +15,7 @@ Don't restrain yourself to just black & white! Change the visualization's style,
 Powerful and easy to use configuration options. 
 - Filter normal keys and only display shortcuts like <kbd>Ctrl</kbd> + <kbd>S</kbd>
 - Adjust visualization position on the screen
-- Decide from how much the visualization lingers on the screen before animating out
+- Decide for how much the visualization lingers on the screen before animating out
 - Switch between animation presets to animate your visualization in & out
 
 # Installation
