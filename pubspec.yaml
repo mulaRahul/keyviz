@@ -1,0 +1,60 @@
+name: keyviz
+description: Visualize your keypress in realtime
+
+publish_to: 'none'
+
+version: 0.1.0-b
+
+environment:
+  sdk: ">=2.17.1 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  keyboard_event:
+    git:
+      url: https://github.com/Krysl/keyboard_event.git
+      ref: main
+
+  provider: ^6.0.3
+  flutter_svg: ^1.1.0
+  tray_manager: ^0.1.8
+  url_launcher: ^6.1.5
+  window_manager: ^0.2.5
+  flutter_acrylic: ^1.0.0
+  screen_retriever: ^0.1.2
+  shared_preferences: ^2.0.15
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^2.0.0
+  msix: ^3.6.2
+
+flutter:
+
+  uses-material-design: true
+
+  assets:
+    - assets/img/
+    - assets/symbols/
+  
+  fonts:
+    - family: Poppins
+      fonts:
+        - asset: fonts/Poppins-Light.ttf
+          weight: 300
+        - asset: fonts/Poppins-Regular.ttf
+          weight: 600
+        - asset: fonts/Poppins-SemiBold.ttf
+          weight: 900
+  
+msix_config:
+  display_name: Keyviz
+  publisher_display_name: Rahul Mula
+  identity_name: dev.rahulmula.keyviz
+  msix_version: 0.1.0
+  logo_path: X:\dev\keypress\keyviz\assets\img\icon.png
+  capabilities: inputObservation

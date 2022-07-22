@@ -1,0 +1,185 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:keyviz/data/properties.dart';
+
+class OptionMenu extends StatefulWidget {
+  final bool isColorOptions;
+  final List<String> options;
+  final String? selectedOption;
+  final Function(String) onChanged;
+
+  const OptionMenu({
+    Key? key,
+    this.selectedOption,
+    required this.options,
+    required this.onChanged,
+    this.isColorOptions = false,
+  }) : super(key: key);
+
+  @override
+  State<OptionMenu> createState() => _OptionMenuState();
+}
+
+class _OptionMenuState extends State<OptionMenu> {
+  late String selectedOption;
+
+  @override
+  void initState() {
+    selectedOption = widget.selectedOption ?? widget.options[0];
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 256,
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: const <BoxShadow>[
+            BoxShadow(
+              color: grey,
+              spreadRadius: 1,
+              blurRadius: 8,
+            )
+          ]),
+      clipBehavior: Clip.antiAlias,
+      child: DropdownButton<String>(
+        value: selectedOption,
+        items: widget.options
+            .map(
+              (String option) => DropdownMenuItem(
+                value: option,
+                child: widget.isColorOptions
+                    ? Row(
+                        children: [
+                          Container(
+                            margin: const EdgeInsets.only(right: 12),
+                            width: 24,
+                            height: 24,
+                            decoration: BoxDecoration(
+                              color: colorFromHex(
+                                  hexcodes[option] ?? "0xff000000"),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          Text(option)
+                        ],
+                      )
+                    : Text(option),
+              ),
+            )
+            .toList(),
+        onChanged: (String? option) {
+          setState(
+            () => selectedOption = option ?? selectedOption,
+          );
+          widget.onChanged(selectedOption);
+        },
+        menuMaxHeight: 512,
+        borderRadius: BorderRadius.circular(16),
+        dropdownColor: Colors.white,
+        underline: const SizedBox(),
+        focusColor: Colors.white,
+        isExpanded: true,
+        icon: SvgPicture.asset(
+          "assets/img/filled-arrow-down.svg",
+          width: 22,
+          color: Colors.black,
+        ),
+      ),
+    );
+  }
+}
+
+class ColorMenu extends StatefulWidget {
+  final List<String> options;
+  final String? selectedOption;
+  final Function(String) onChanged;
+
+  const ColorMenu({
+    Key? key,
+    required this.onChanged,
+    this.selectedOption,
+    required this.options,
+  }) : super(key: key);
+
+  @override
+  State<ColorMenu> createState() => _ColorMenuState();
+}
+
+class _ColorMenuState extends State<ColorMenu> {
+  late String selectedOption;
+
+  @override
+  void initState() {
+    selectedOption = widget.selectedOption ?? widget.options[0];
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 256,
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: const <BoxShadow>[
+            BoxShadow(
+              color: grey,
+              spreadRadius: 1,
+              blurRadius: 8,
+            )
+          ]),
+      clipBehavior: Clip.antiAlias,
+      child: DropdownButton<String>(
+        value: selectedOption,
+        items: widget.options
+            .map(
+              (String option) => DropdownMenuItem(
+                  value: option,
+                  child: Row(
+                    children: [
+                      Container(
+                        margin: const EdgeInsets.only(right: 12),
+                        width: 24,
+                        height: 24,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          color: keyvizThemes[option]!.baseColor,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Text("A",
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: keyvizThemes[option]!.fontColor,
+                            )),
+                      ),
+                      Text(option)
+                    ],
+                  )),
+            )
+            .toList(),
+        onChanged: (String? option) {
+          setState(
+            () => selectedOption = option ?? selectedOption,
+          );
+          widget.onChanged(selectedOption);
+        },
+        menuMaxHeight: 512,
+        borderRadius: BorderRadius.circular(16),
+        dropdownColor: Colors.white,
+        underline: const SizedBox(),
+        focusColor: Colors.white,
+        isExpanded: true,
+        icon: SvgPicture.asset(
+          "assets/img/filled-arrow-down.svg",
+          width: 22,
+          color: Colors.black,
+        ),
+      ),
+    );
+  }
+}
