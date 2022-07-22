@@ -1,7 +1,8 @@
 # Keyviz
-![keyviz-preview](previews/container.png)
 
 Keyviz is a free and open-source software to visualize your ⌨️ keystrokes in realtime!
+
+![keyviz-preview](previews/container.png)
 
 Let your audience know what handy shortcuts/keys you're pressing during screencasts, presentations, collaborations, or whenever you need it.
 
