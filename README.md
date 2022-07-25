@@ -24,7 +24,7 @@ You can download the installer from the [Github Releases](https://github.com/mul
 # Quickstart
 Watch the below videos to get started with Keyviz.
 - [Promotional video](https://youtu.be/zb1WYWm_zuk)
-- Basic Setup
+- [Full Overview](https://youtu.be/PR8BzKdHfIY)
 
 # Feature Requests
 If you want to request any features, join our [discord](https://discord.gg/qyrKWCvtEq) community and let us know about your suggestions. You can also vote for the requested features by others and see the future development plans.
