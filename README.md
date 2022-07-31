@@ -19,12 +19,14 @@ Powerful and easy to use configuration options.
 - Switch between animation presets to animate your visualization in & out
 
 # Installation
-You can download the installer from the [Github Releases](https://github.com/mulaRahul/keyviz/releases) and start to visualize your keystrokes in realtime.
+You can download the latest version of keyviz from the [Github Releases](https://github.com/mulaRahul/keyviz/releases) page. Unzip the downloaded file, run the installer and follow the familiar steps to install keyviz.
 
 # Quickstart
-Watch the below videos to get started with Keyviz.
-- [Promotional video](https://youtu.be/zb1WYWm_zuk)
-- [Full Overview](https://youtu.be/PR8BzKdHfIY)
+You can check out this [video tutorial](https://youtu.be/PR8BzKdHfIY) as well.
+
+To get started, follow the above [installation](#installation) process. You can start visualizing your keystrokes by just running the application.
+
+To open the settings window, find the keyviz icon on the right side of the **Taskbar** or **Taskbar > Hidden Icons <kbd>^</kbd>**. Then click on the icon and select **Settings**. The settings window will appear from which, you customize the style, appearance, and other general settings of the visualization.
 
 # Feature Requests
 If you want to request any features, join our [discord](https://discord.gg/qyrKWCvtEq) community and let us know about your suggestions. You can also vote for the requested features by others and see the future development plans.
