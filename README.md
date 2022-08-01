@@ -4,8 +4,8 @@ Keyviz is a free and open-source software to visualize your ⌨️ keystrokes in
 
 ![keyviz-preview](previews/container.png)
 
-<a href="https://www.producthunt.com/posts/keyviz?utm_source=badge-featured&utm_medium=badge&utm_souce=badge-keyviz" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=354216&theme=neutral" alt="Keyviz - Visualize&#0032;your&#0032;keystrokes&#0032;in&#0032;real&#0045;time&#0033; | Product Hunt" style="width: 92.6px; height: 20px;" width="92.6" height="20"/>
-</a>
+<!-- <a href="https://www.producthunt.com/posts/keyviz?utm_source=badge-featured&utm_medium=badge&utm_souce=badge-keyviz" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=354216&theme=neutral" alt="Keyviz - Visualize&#0032;your&#0032;keystrokes&#0032;in&#0032;real&#0045;time&#0033; | Product Hunt" style="width: 92.6px; height: 20px;" width="92.6" height="20"/></a> -->
+<a href="https://www.producthunt.com/posts/keyviz?utm_source=badge-featured&utm_medium=badge&utm_souce=badge-keyviz" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=354216&theme=light" alt="Keyviz - Visualize&#0032;your&#0032;keystrokes&#0032;in&#0032;real&#0045;time&#0033; | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
 ![downloads](https://img.shields.io/github/downloads/mulaRahul/keyviz/total?color=fff)
 
 ## 🦄 Style
