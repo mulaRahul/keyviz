@@ -57,7 +57,7 @@ class _SettingsViewState extends State<SettingsView> {
                   ),
                   const SizedBox(width: 8),
                   TabItem(
-                    label: 'Apperance',
+                    label: 'Appearance',
                     iconPath: "assets/img/monitor.svg",
                     selected: currentTab == 'appearance',
                     onTap: () => setTab('appearance'),
