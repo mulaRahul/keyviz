@@ -59,8 +59,8 @@ void main() async {
   // ? change the window to see-through with flutter_acrylic
   await Window.initialize();
   await Window.setEffect(
-    effect: WindowEffect.tabbed,
-    color: Colors.black,
+    effect: WindowEffect.transparent,
+    color: Colors.transparent,
   );
   // initialize
   initKeymaps();
