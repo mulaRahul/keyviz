@@ -30,7 +30,7 @@ const TextStyle captionStyle = TextStyle(
 );
 
 // ? options
-const List<String> keycapStyles = ["solid", "flat", "isometric"];
+const List<String> keycapStyles = ["default", "solid", "isometric"];
 const List<String> sizeOptions = ["32 px", "36 px", "40 px", "44 px", "48 px"];
 
 class KeycapTheme {
