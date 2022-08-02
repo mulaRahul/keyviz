@@ -166,7 +166,7 @@ class _ColorMenuState extends State<ColorMenu> {
         },
         menuMaxHeight: 512,
         borderRadius: BorderRadius.circular(16),
-        dropdownColor: Colors.white,
+        dropdownColor: darkerGrey,
         underline: const SizedBox(),
         focusColor: Colors.white,
         isExpanded: true,
