@@ -32,20 +32,15 @@ class _OptionMenuState extends State<OptionMenu> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 256,
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      width: 196,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: const <BoxShadow>[
-            BoxShadow(
-              color: grey,
-              spreadRadius: 1,
-              blurRadius: 8,
-            )
-          ]),
+        color: darkerGrey,
+        borderRadius: BorderRadius.circular(12),
+      ),
       clipBehavior: Clip.antiAlias,
       child: DropdownButton<String>(
+        isDense: true,
         value: selectedOption,
         items: widget.options
             .map(
@@ -64,10 +59,16 @@ class _OptionMenuState extends State<OptionMenu> {
                               borderRadius: BorderRadius.circular(10),
                             ),
                           ),
-                          Text(option)
+                          Text(
+                            option,
+                            style: const TextStyle(color: Colors.white),
+                          )
                         ],
                       )
-                    : Text(option),
+                    : Text(
+                        option,
+                        style: const TextStyle(color: Colors.white),
+                      ),
               ),
             )
             .toList(),
@@ -79,14 +80,14 @@ class _OptionMenuState extends State<OptionMenu> {
         },
         menuMaxHeight: 512,
         borderRadius: BorderRadius.circular(16),
-        dropdownColor: Colors.white,
+        dropdownColor: darkerGrey,
         underline: const SizedBox(),
         focusColor: Colors.white,
         isExpanded: true,
         icon: SvgPicture.asset(
-          "assets/img/filled-arrow-down.svg",
-          width: 22,
-          color: Colors.black,
+          "assets/img/arrow-down.svg",
+          width: 12,
+          color: darkGrey,
         ),
       ),
     );
@@ -121,20 +122,15 @@ class _ColorMenuState extends State<ColorMenu> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 256,
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      width: 196,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8.0),
       decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: const <BoxShadow>[
-            BoxShadow(
-              color: grey,
-              spreadRadius: 1,
-              blurRadius: 8,
-            )
-          ]),
+        color: darkerGrey,
+        borderRadius: BorderRadius.circular(12),
+      ),
       clipBehavior: Clip.antiAlias,
       child: DropdownButton<String>(
+        isDense: true,
         value: selectedOption,
         items: widget.options
             .map(
@@ -148,16 +144,16 @@ class _ColorMenuState extends State<ColorMenu> {
                         height: 24,
                         alignment: Alignment.center,
                         decoration: BoxDecoration(
-                          color: keyvizThemes[option]!.baseColor,
+                          color: keycapThemes[option]!.baseColor,
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Text("A",
                             style: TextStyle(
                               fontSize: 12,
-                              color: keyvizThemes[option]!.fontColor,
+                              color: keycapThemes[option]!.fontColor,
                             )),
                       ),
-                      Text(option)
+                      Text(option, style: const TextStyle(color: Colors.white))
                     ],
                   )),
             )
@@ -175,9 +171,9 @@ class _ColorMenuState extends State<ColorMenu> {
         focusColor: Colors.white,
         isExpanded: true,
         icon: SvgPicture.asset(
-          "assets/img/filled-arrow-down.svg",
-          width: 22,
-          color: Colors.black,
+          "assets/img/arrow-down.svg",
+          width: 12,
+          color: darkGrey,
         ),
       ),
     );

@@ -9,18 +9,18 @@ const Color lightGrey = Color(0xffF0F0F0);
 const Color grey = Color(0xffE0E0E0);
 const Color darkGrey = Color(0xff808080);
 const Color darkerGrey = Color(0xff404040);
+const Color veryDarkGrey = Color(0xff1a1a1a);
 
 // ? text styles
 final ButtonStyle elevatedButtonStyle = ButtonStyle(
   backgroundColor: MaterialStateProperty.all(Colors.black),
 );
 const TextStyle headingStyle = TextStyle(
-  fontWeight: FontWeight.w600,
-  color: darkerGrey,
+  color: Colors.white,
   fontSize: 18,
 );
 const TextStyle paragraphStyle = TextStyle(
-  color: darkerGrey,
+  color: grey,
   fontSize: 16,
 );
 const TextStyle captionStyle = TextStyle(
@@ -40,7 +40,7 @@ class KeycapTheme {
   KeycapTheme(this.name, this.baseColor, this.fontColor);
 }
 
-final Map<String, KeycapTheme> keyvizThemes = {
+final Map<String, KeycapTheme> keycapThemes = {
   "silver": KeycapTheme(
     "silver",
     const Color(0xfff8f8f8),

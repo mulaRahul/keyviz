@@ -35,6 +35,11 @@ class _ToggleButtonState extends State<ToggleButton> {
   Widget build(BuildContext context) {
     return Row(
       children: [
+        Text(
+          value ? widget.onLabel : widget.offLabel,
+          style: paragraphStyle,
+        ),
+        const SizedBox(width: 16),
         GestureDetector(
           onTap: () {
             setState(() => value = !value);
@@ -48,37 +53,23 @@ class _ToggleButtonState extends State<ToggleButton> {
             padding: const EdgeInsets.all(4),
             alignment: value ? Alignment.centerRight : Alignment.centerLeft,
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: value ? darkGrey : Colors.transparent,
               borderRadius: BorderRadius.circular(14),
-              // border: Border.all(color: grey, width: 2),
-              boxShadow: const <BoxShadow>[
-                BoxShadow(
-                  color: grey,
-                  spreadRadius: 1,
-                  blurRadius: 6,
-                ),
-              ],
+              border: Border.all(color: darkGrey, width: 1),
             ),
             child: Container(
               width: 24,
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                color: value ? Colors.black : grey,
+                color: value ? Colors.white : darkGrey,
                 borderRadius: BorderRadius.circular(10),
               ),
               child: SvgPicture.asset(
                 value ? "assets/img/tick.svg" : "assets/img/cross.svg",
-                color: value ? Colors.white : darkerGrey,
+                color: value ? Colors.black : darkerGrey,
                 width: 8,
               ),
             ),
-          ),
-        ),
-        const SizedBox(width: 16),
-        Text(
-          value ? widget.onLabel : widget.offLabel,
-          style: headingStyle.copyWith(
-            fontWeight: FontWeight.normal,
           ),
         ),
       ],

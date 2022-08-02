@@ -20,24 +20,28 @@ class AppearanceTab extends StatelessWidget {
         Provider.of<ConfigDataProvider>(context);
 
     return Padding(
-      padding: const EdgeInsets.all(48.0),
+      padding: const EdgeInsets.symmetric(vertical: 36.0, horizontal: 16.0),
       child: Column(
         children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          ListItem(
+            topRadius: 12,
+            alignment: CrossAxisAlignment.start,
             children: [
-              Label(
+              SizedBox(
+                width: 262,
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: const [
                     Text(
                       "Alignment",
                       style: headingStyle,
                     ),
+                    Space(),
                     Text(
                       "Choose the side from the bottom where the keys will be displayed.",
                       style: captionStyle,
-                      textAlign: TextAlign.right,
+                      textAlign: TextAlign.left,
                     ),
                   ],
                 ),
@@ -47,80 +51,49 @@ class AppearanceTab extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 24),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          ListItem(
+            description: "From the bottom and side of the screen.",
             children: [
-              const Label(text: "Margin", topMargin: 8),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Scale(
-                    min: 16,
-                    max: 128,
-                    suffix: "px",
-                    divisions: 7,
-                    defaultValue: configDataProvider.margin,
-                    onChanged: (double value) {
-                      configDataProvider.margin = value;
-                      configData.margin = value;
-                    },
-                  ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                    width: 240,
-                    child: const Text(
-                      "From the bottom and side of the screen.",
-                      style: captionStyle,
-                    ),
-                  ),
-                ],
+              const Text("Margin", style: headingStyle),
+              Scale(
+                min: 16,
+                max: 128,
+                suffix: "px",
+                divisions: 7,
+                defaultValue: configDataProvider.margin,
+                onChanged: (double value) {
+                  configDataProvider.margin = value;
+                  configData.margin = value;
+                },
               ),
             ],
           ),
-          const Space(),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          ListItem(
+            description: "For how much time keys will linger on the screen",
             children: [
-              const Label(
-                text: "Duration",
-                topMargin: 8,
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Scale(
-                    min: 1,
-                    max: 8,
-                    suffix: "s",
-                    divisions: 7,
-                    defaultValue:
-                        configData.lingerDuration.inSeconds.toDouble(),
-                    onChanged: (double value) {
-                      configData.lingerDuration = Duration(
-                        seconds: value.toInt(),
-                      );
-                      configData.transitionDuration = Duration(
-                        milliseconds: (200 + (value * 50)).toInt(),
-                      );
-                    },
-                  ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                    width: 240,
-                    child: const Text(
-                      "For how much time keys will linger on the screen",
-                      style: captionStyle,
-                    ),
-                  ),
-                ],
+              const Text("Duration", style: headingStyle),
+              Scale(
+                min: 1,
+                max: 8,
+                suffix: "s",
+                divisions: 7,
+                defaultValue: configData.lingerDuration.inSeconds.toDouble(),
+                onChanged: (double value) {
+                  configData.lingerDuration = Duration(
+                    seconds: value.toInt(),
+                  );
+                  configData.transitionDuration = Duration(
+                    milliseconds: (200 + (value * 50)).toInt(),
+                  );
+                },
               ),
             ],
           ),
-          const SizedBox(height: 32),
-          Row(
+          ListItem(
+            bottomMargin: 0,
+            bottomRadius: 12,
             children: [
-              const Label(text: "Animation"),
+              const Text("Animation", style: headingStyle),
               OptionMenu(
                 options: const ["none", "fade", "slide", "grow"],
                 selectedOption: animationTypeStringFrom[configData.animation],

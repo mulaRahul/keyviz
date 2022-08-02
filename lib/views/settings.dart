@@ -30,18 +30,19 @@ class _SettingsViewState extends State<SettingsView> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.transparent,
-      body: Column(
+      body: Row(
         children: [
           GestureDetector(
             onPanStart: (details) => windowManager.startDragging(),
             child: Container(
-              color: lightGrey,
+              width: 180,
+              color: veryDarkGrey,
               padding: const EdgeInsets.all(8.0),
-              child: Row(
+              child: Column(
                 mainAxisSize: MainAxisSize.max,
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  const Spacer(),
                   TabItem(
                     label: 'General',
                     iconPath: "assets/img/setting.svg",
@@ -57,7 +58,7 @@ class _SettingsViewState extends State<SettingsView> {
                   ),
                   const SizedBox(width: 8),
                   TabItem(
-                    label: 'Appearance',
+                    label: 'Apperance',
                     iconPath: "assets/img/monitor.svg",
                     selected: currentTab == 'appearance',
                     onTap: () => setTab('appearance'),
@@ -69,73 +70,97 @@ class _SettingsViewState extends State<SettingsView> {
                     selected: currentTab == 'about',
                     onTap: () => setTab('about'),
                   ),
-                  const Spacer(),
-                  GestureDetector(
-                    onTap: () => showDialog(
-                        context: context,
-                        builder: (context) {
-                          return AlertDialog(
-                            content:
-                                const Text("Do you want to save the changes?"),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.of(context).pop(),
-                                child: const Text("Cancel"),
-                              ),
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-
-                                  configData.configuring = false;
-                                  configData.saveToPrefs();
-
-                                  widget.exitSettings();
-                                },
-                                child: const Text("Save"),
-                              ),
-                            ],
-                          );
-                        }),
-                    child: SvgPicture.asset(
-                      "assets/img/cross.svg",
-                      color: darkGrey,
-                      width: 12,
-                    ),
-                  )
                 ],
               ),
             ),
           ),
-          currentTab == "about"
-              ? const SizedBox()
-              : Container(
-                  height: 64 * 5, // 64*5
-                  alignment: Alignment.center,
-                  child: currentTab == 'style'
-                      ? const KeycapStyler()
-                      : const KeycaptureView(noPadding: true),
-                ),
           Expanded(
-            child: Container(
-              // height: 394,
-              color: currentTab == "about" ? grey : lightGrey,
-              child: SingleChildScrollView(
-                child: () {
-                  switch (currentTab) {
-                    case "general":
-                      return const GeneralTab();
+            child: Stack(
+              children: [
+                Column(
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    currentTab == "about"
+                        ? const SizedBox()
+                        : Container(
+                            height: 64 * 4, // 64*5
+                            alignment: Alignment.center,
+                            child: currentTab == 'style'
+                                ? const KeycapStyler()
+                                : const KeycaptureView(noPadding: true),
+                          ),
+                    Expanded(
+                      child: Container(
+                        color: const Color(0xff1e1e1e),
+                        child: SingleChildScrollView(
+                          child: () {
+                            switch (currentTab) {
+                              case "general":
+                                return const GeneralTab();
 
-                    case "style":
-                      return const StyleTab();
+                              case "style":
+                                return const StyleTab();
 
-                    case "appearance":
-                      return const AppearanceTab();
+                              case "appearance":
+                                return const AppearanceTab();
 
-                    case "about":
-                      return const AboutTab();
-                  }
-                }(),
-              ),
+                              case "about":
+                                return const AboutTab();
+                            }
+                          }(),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                GestureDetector(
+                  onTap: () => showDialog(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          content: const Text(
+                            "Do you want to save the changes or discard the changes?",
+                            style: paragraphStyle,
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.of(context).pop(),
+                              child: const Text("Cancel"),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+
+                                configData.configuring = false;
+                                configData.saveToPrefs();
+
+                                widget.exitSettings();
+                              },
+                              child: const Text("Save"),
+                            ),
+                          ],
+                        );
+                      }),
+                  child: Row(
+                    children: [
+                      const Spacer(),
+                      Container(
+                        margin: const EdgeInsets.all(6.0),
+                        padding: const EdgeInsets.all(4.0),
+                        decoration: BoxDecoration(
+                          color: darkerGrey,
+                          borderRadius: BorderRadius.circular(4.0),
+                        ),
+                        child: SvgPicture.asset(
+                          "assets/img/cross.svg",
+                          color: darkGrey,
+                          width: 14,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           )
         ],
@@ -167,24 +192,24 @@ class TabItem extends StatelessWidget {
       child: AnimatedContainer(
         duration: configData.transitionDuration,
         curve: Curves.easeOutExpo,
-        width: 90,
-        padding: const EdgeInsets.all(8),
+        // width: 90,
+        padding: const EdgeInsets.symmetric(vertical: 8.0),
         decoration: BoxDecoration(
-          color: selected ? darkerGrey : Colors.transparent,
+          color: selected ? Colors.white.withOpacity(0.1) : Colors.transparent,
           borderRadius: BorderRadius.circular(8),
         ),
-        child: Column(
+        child: Row(
           children: [
-            SvgPicture.asset(
-              iconPath,
-              color: selected ? Colors.white : darkerGrey,
-            ),
-            FittedBox(
-              fit: BoxFit.contain,
-              child: Text(
-                label,
-                style: TextStyle(color: selected ? Colors.white : darkerGrey),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: SvgPicture.asset(
+                iconPath,
+                color: selected ? Colors.white : darkGrey,
               ),
+            ),
+            Text(
+              label,
+              style: TextStyle(color: selected ? Colors.white : darkGrey),
             ),
           ],
         ),

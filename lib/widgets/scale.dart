@@ -36,14 +36,15 @@ class _ScaleState extends State<Scale> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
+      height: 32,
       width: 256,
       child: Slider(
         value: _value,
         min: widget.min,
         max: widget.max,
         divisions: widget.divisions,
-        inactiveColor: grey,
-        activeColor: Colors.black,
+        inactiveColor: darkerGrey,
+        activeColor: grey,
         label: "${_value.toInt()}${widget.suffix}",
         onChanged: (value) => setState(() => _value = value),
         onChangeEnd: (value) => widget.onChanged(_value),

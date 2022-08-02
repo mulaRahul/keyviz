@@ -36,9 +36,9 @@ class ConfigData {
     shiftOEM = prefs.getBool("shiftOEM") ?? true;
     replaceNew = prefs.getBool("replaceNew") ?? true;
     style = styleFrom[prefs.getString("style")] ?? KeycapStyle.isometric;
-    keyColor = keyvizThemes[prefs.getString("keyColor") ?? "stone"]!;
+    keyColor = keycapThemes[prefs.getString("keyColor") ?? "stone"]!;
     modifierColor =
-        keyvizThemes[prefs.getString("modifierColor") ?? "charcoal"]!;
+        keycapThemes[prefs.getString("modifierColor") ?? "charcoal"]!;
     size = prefs.getDouble("size") ?? 36.0;
     showIcon = prefs.getBool("showIcon") ?? true;
     showSymbol = prefs.getBool("showSymbol") ?? true;

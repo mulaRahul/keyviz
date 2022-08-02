@@ -19,7 +19,7 @@ Future<void> prepareSettingsWindow() async {
     center: true,
     skipTaskbar: true,
     alwaysOnTop: true,
-    size: Size(640, 800),
+    size: Size(832, 640),
     title: "Keyviz Settings",
     titleBarStyle: TitleBarStyle.hidden,
   );
@@ -144,10 +144,18 @@ class _RootAppState extends State<RootApp> with TrayListener {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         fontFamily: 'Poppins',
+        dialogBackgroundColor: veryDarkGrey,
+        scrollbarTheme: ScrollbarThemeData(
+            thumbColor: MaterialStateProperty.resolveWith((states) {
+          if (states.contains(MaterialState.hovered)) {
+            return darkerGrey;
+          }
+          return Colors.transparent;
+        })),
         textButtonTheme: TextButtonThemeData(
           style: ButtonStyle(
-            overlayColor: MaterialStateProperty.all<Color>(lightGrey),
-            foregroundColor: MaterialStateProperty.all<Color>(Colors.black),
+            overlayColor: MaterialStateProperty.all<Color>(darkerGrey),
+            foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
           ),
         ),
       ),

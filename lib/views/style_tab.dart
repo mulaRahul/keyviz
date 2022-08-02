@@ -18,12 +18,13 @@ class StyleTab extends StatelessWidget {
     final ConfigDataProvider configDataProvider =
         Provider.of<ConfigDataProvider>(context);
     return Padding(
-      padding: const EdgeInsets.all(48.0),
+      padding: const EdgeInsets.symmetric(vertical: 36.0, horizontal: 16.0),
       child: Column(
         children: [
-          Row(
+          ListItem(
+            topRadius: 12,
             children: [
-              const Label(text: "Style"),
+              const Text("Style", style: headingStyle),
               OptionMenu(
                 options: keycapStyles,
                 selectedOption: styleStringFrom[configData.style],
@@ -34,10 +35,9 @@ class StyleTab extends StatelessWidget {
               ),
             ],
           ),
-          const Space(),
-          Row(
+          ListItem(
             children: [
-              const Label(text: "Size"),
+              const Text("Size", style: headingStyle),
               OptionMenu(
                 options: sizeOptions,
                 selectedOption: "${configDataProvider.size.toInt()} px",
@@ -48,38 +48,37 @@ class StyleTab extends StatelessWidget {
               ),
             ],
           ),
-          const Space(),
-          Row(
+          ListItem(
             children: [
-              const Label(text: "Key Color"),
+              const Text("Key Color", style: headingStyle),
               ColorMenu(
-                options: keyvizThemes.keys.toList(),
+                options: keycapThemes.keys.toList(),
                 selectedOption: configDataProvider.keyColor.name,
                 onChanged: (String option) {
-                  configDataProvider.keyColor = keyvizThemes[option]!;
-                  configData.keyColor = keyvizThemes[option]!;
+                  configDataProvider.keyColor = keycapThemes[option]!;
+                  configData.keyColor = keycapThemes[option]!;
                 },
               ),
             ],
           ),
-          const Space(),
-          Row(
+          ListItem(
             children: [
-              const Label(text: "Modifier Color"),
+              const Text("Modifier Color", style: headingStyle),
               ColorMenu(
-                options: keyvizThemes.keys.toList(),
+                options: keycapThemes.keys.toList(),
                 selectedOption: configDataProvider.modifierColor.name,
                 onChanged: (String option) {
-                  configDataProvider.modifierColor = keyvizThemes[option]!;
-                  configData.modifierColor = keyvizThemes[option]!;
+                  configDataProvider.modifierColor = keycapThemes[option]!;
+                  configData.modifierColor = keycapThemes[option]!;
                 },
               ),
             ],
           ),
-          const Space(),
-          Row(
+          ListItem(
+            bottomMargin: 0,
+            bottomRadius: 12,
             children: [
-              const Label(text: "Border Color"),
+              const Text("Border Color", style: headingStyle),
               OptionMenu(
                 isColorOptions: true,
                 selectedOption:
@@ -92,15 +91,11 @@ class StyleTab extends StatelessWidget {
               ),
             ],
           ),
-          Container(
-            margin: const EdgeInsets.symmetric(vertical: 32),
-            height: 2,
-            color: grey,
-          ),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          const SizedBox(height: 32),
+          ListItem(
+            topRadius: 12,
             children: [
-              const Label(text: "Show Icon"),
+              const Text("Show Icon", style: headingStyle),
               ToggleButton(
                 offLabel: "Display only text",
                 onLabel: "Display text with icon",
@@ -112,11 +107,13 @@ class StyleTab extends StatelessWidget {
               ),
             ],
           ),
-          const Space(),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          ListItem(
+            bottomMargin: 0,
+            bottomRadius: 12,
+            description:
+                "For keys like 1, =, or -, associated symbols will be displayed along with them.",
             children: [
-              const Label(text: "Show Symbol"),
+              const Text("Show Symbol", style: headingStyle),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -129,14 +126,6 @@ class StyleTab extends StatelessWidget {
                       configData.showSymbol = value;
                     },
                   ),
-                  const Space(),
-                  const SizedBox(
-                    width: 296,
-                    child: Text(
-                      "For keys like 1, =, or -, associated symbols will be displayed along with them.",
-                      style: captionStyle,
-                    ),
-                  )
                 ],
               ),
             ],

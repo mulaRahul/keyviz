@@ -52,13 +52,6 @@ class _AlignmentPickerState extends State<AlignmentPicker> {
                   image: AssetImage("assets/img/wallpaper.jpg"),
                   fit: BoxFit.cover),
               borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-              boxShadow: <BoxShadow>[
-                BoxShadow(
-                  color: grey,
-                  spreadRadius: 2,
-                  blurRadius: 8,
-                ),
-              ],
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
