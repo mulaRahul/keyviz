@@ -57,13 +57,6 @@ class AboutTab extends StatelessWidget {
             children: [
               ElevatedButton(
                 onPressed: () => launchUrl(
-                    Uri.parse("https://www.producthunt.com/posts/keyviz")),
-                style: elevatedButtonStyle,
-                child: const Text("Upvote on ProductHunt"),
-              ),
-              const SizedBox(width: 24),
-              ElevatedButton(
-                onPressed: () => launchUrl(
                   Uri.parse("https://www.paypal.com/paypalme/ral162"),
                 ),
                 style: elevatedButtonStyle,
