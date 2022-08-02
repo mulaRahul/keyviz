@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 enum AnimationType { none, slide, fade, grow }
 
-enum KeycapStyle { solid, flat, isometric }
+enum KeycapStyle { solid, isometric }
 
 // ? colors
 const Color lightGrey = Color(0xffF0F0F0);
@@ -165,12 +165,10 @@ final Map<Alignment, String> alignmentStringFrom = {
 };
 const Map<String, KeycapStyle> styleFrom = {
   "solid": KeycapStyle.solid,
-  "flat": KeycapStyle.flat,
   "isometric": KeycapStyle.isometric,
 };
 const Map<KeycapStyle, String> styleStringFrom = {
   KeycapStyle.solid: "solid",
-  KeycapStyle.flat: "flat",
   KeycapStyle.isometric: "isometric",
 };
 const Map<String, AnimationType> animationTypeFrom = {

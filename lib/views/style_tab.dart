@@ -28,7 +28,7 @@ class StyleTab extends StatelessWidget {
                 options: keycapStyles,
                 selectedOption: styleStringFrom[configData.style],
                 onChanged: (String option) {
-                  configData.style = styleFrom[option] ?? KeycapStyle.flat;
+                  configData.style = styleFrom[option] ?? KeycapStyle.isometric;
                   configDataProvider.style = configData.style;
                 },
               ),

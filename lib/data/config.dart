@@ -59,7 +59,7 @@ class ConfigData {
     prefs.setBool("shiftOEM", shiftOEM);
     prefs.setBool("replaceNew", replaceNew);
     prefs.setBool("filterHotkeys", filterHotkeys);
-    prefs.setString("style", styleStringFrom[style] ?? "flat");
+    prefs.setString("style", styleStringFrom[style] ?? "isometric");
     prefs.setDouble("size", size);
     prefs.setBool("showIcon", showIcon);
     prefs.setBool("showSymbol", showSymbol);

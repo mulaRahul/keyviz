@@ -4,7 +4,6 @@ import 'package:provider/provider.dart';
 
 import '../data/config.dart';
 import '../providers/config.dart';
-import '../widgets/flat_keycap.dart';
 import '../widgets/iso_keycap.dart';
 import '../widgets/solid_keycap.dart';
 
@@ -61,40 +60,6 @@ class KeycapStyler extends StatelessWidget {
                   fontSize: configDataProvider.size,
                 ),
                 SolidStyleKey(
-                  keyName: "3",
-                  symbol: configDataProvider.showSymbol ? "#" : null,
-                  width: configDataProvider.size * 2.5,
-                  baseColor: configDataProvider.keyColor.baseColor,
-                  fontColor: configDataProvider.keyColor.fontColor,
-                  fontSize: configDataProvider.size,
-                ),
-              ];
-
-            case KeycapStyle.flat:
-              return [
-                FlatStyleKey(
-                  width: configDataProvider.size * 4,
-                  iconPath: configDataProvider.showIcon
-                      ? "assets/symbols/control.svg"
-                      : null,
-                  keyName: configDataProvider.showIcon ? "control" : "Ctrl",
-                  textAlignment: alignment,
-                  baseColor: configDataProvider.modifierColor.baseColor,
-                  fontColor: configDataProvider.modifierColor.fontColor,
-                  fontSize: configDataProvider.size,
-                ),
-                FlatStyleKey(
-                  width: configDataProvider.size * 4,
-                  iconPath: configDataProvider.showIcon
-                      ? "assets/symbols/shift.svg"
-                      : null,
-                  keyName: configDataProvider.showIcon ? "shift" : "Shift",
-                  textAlignment: alignment,
-                  baseColor: configDataProvider.modifierColor.baseColor,
-                  fontColor: configDataProvider.modifierColor.fontColor,
-                  fontSize: configDataProvider.size,
-                ),
-                FlatStyleKey(
                   keyName: "3",
                   symbol: configDataProvider.showSymbol ? "#" : null,
                   width: configDataProvider.size * 2.5,

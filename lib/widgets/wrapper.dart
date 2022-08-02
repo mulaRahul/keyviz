@@ -5,7 +5,6 @@ import '../animations/slide.dart';
 import '../data/config.dart';
 import '../animations/fade.dart';
 import '../data/properties.dart';
-import 'flat_keycap.dart';
 import 'iso_keycap.dart';
 import 'solid_keycap.dart';
 
@@ -63,24 +62,6 @@ class AnimatedkeyvizState extends State<Animatedkeyviz> {
       case KeycapStyle.solid:
         keyvizKey = GlobalKey<SolidkeyvizState>();
         keyvizWidget = Solidkeyviz(
-          key: keyvizKey,
-          iconPath: widget.iconPath,
-          symbol: widget.symbol,
-          width: widget.width,
-          onlyIcon: widget.onlyIcon,
-          isNumpad: widget.isNumpad,
-          keyName: widget.keyName,
-          onlySymbol: widget.onlySymbol,
-          fontSize: widget.fontSize,
-          baseColor: widget.baseColor,
-          fontColor: widget.fontColor,
-          textAlignment: widget.textAlignment,
-        );
-        break;
-
-      case KeycapStyle.flat:
-        keyvizKey = GlobalKey<FlatkeyvizState>();
-        keyvizWidget = Flatkeyviz(
           key: keyvizKey,
           iconPath: widget.iconPath,
           symbol: widget.symbol,
