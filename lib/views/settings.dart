@@ -136,7 +136,18 @@ class _SettingsViewState extends State<SettingsView> {
 
                                 widget.exitSettings();
                               },
-                              child: const Text("Save"),
+                              child: const Text("Save and Exit"),
+                            ),
+                            TextButton(
+                              onPressed: () async {
+                                Navigator.of(context).pop();
+
+                                configData.configuring = false;
+                                await configData.loadFromPrefs();
+
+                                widget.exitSettings();
+                              },
+                              child: const Text("Exit Without Saving"),
                             ),
                           ],
                         );
