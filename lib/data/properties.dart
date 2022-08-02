@@ -183,7 +183,23 @@ const Map<AnimationType, String> animationTypeStringFrom = {
   AnimationType.fade: "fade",
   AnimationType.grow: "grow",
 };
-
+// ? defaults
+final Map<String, dynamic> defaultConfigData = {
+  "filterHotkeys": false,
+  "shiftOEM": true,
+  "replaceNew": true,
+  "style": KeycapStyle.isometric,
+  "keyColor": "stone",
+  "modifierColor": "charcoal",
+  "size": 36.0,
+  "showIcon": true,
+  "showSymbol": true,
+  "alignment": Alignment.bottomRight,
+  "margin": 64.0,
+  "animation": AnimationType.fade,
+  "borderColor": "0x33f8f8f8",
+  "lingerDuration": 4,
+};
 // ? utility functions
 Color colorFromHex(String hex) {
   return Color(int.parse(hex));

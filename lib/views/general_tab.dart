@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../data/config.dart';
 import '../data/properties.dart';
+import '../providers/config.dart';
 import '../widgets/switch.dart';
 import '../widgets/utils.dart';
 
@@ -66,6 +68,24 @@ class GeneralTab extends StatelessWidget {
                 onLabel: "Replace",
                 offLabel: "Append",
                 onChanged: (bool value) => configData.replaceNew = value,
+              ),
+            ],
+          ),
+          const SizedBox(height: 32),
+          ListItem(
+            topRadius: 12,
+            bottomMargin: 0,
+            bottomRadius: 12,
+            children: [
+              const Text("Revert to Defaults", style: headingStyle),
+              TextButton(
+                onPressed: () async {
+                  configData.revertToDefaults();
+                  Provider.of<ConfigDataProvider>(context, listen: false)
+                      .revert();
+                },
+                child: Text("Revert",
+                    style: paragraphStyle.copyWith(color: Colors.red)),
               ),
             ],
           ),

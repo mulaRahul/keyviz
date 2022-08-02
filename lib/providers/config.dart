@@ -15,6 +15,10 @@ class ConfigDataProvider extends ChangeNotifier {
   late Color _borderColor;
 
   ConfigDataProvider() {
+    _init();
+  }
+
+  void _init() {
     _style = configData.style;
     _keyColor = configData.keyColor;
     _modifierColor = configData.modifierColor;
@@ -24,6 +28,11 @@ class ConfigDataProvider extends ChangeNotifier {
     _alignment = configData.alignment;
     _margin = configData.margin;
     _borderColor = configData.borderColor;
+  }
+
+  void revert() {
+    _init();
+    notifyListeners();
   }
 
   // getters

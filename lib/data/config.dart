@@ -29,29 +29,55 @@ class ConfigData {
   bool configuring = false;
 
   Future<void> init() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
     screenSize = (await screenRetriever.getPrimaryDisplay()).size;
+    await loadFromPrefs();
+  }
 
-    filterHotkeys = prefs.getBool("filterHotkeys") ?? false;
-    shiftOEM = prefs.getBool("shiftOEM") ?? true;
-    replaceNew = prefs.getBool("replaceNew") ?? true;
-    style = styleFrom[prefs.getString("style")] ?? KeycapStyle.isometric;
-    keyColor = keycapThemes[prefs.getString("keyColor") ?? "stone"]!;
-    modifierColor =
-        keycapThemes[prefs.getString("modifierColor") ?? "charcoal"]!;
-    size = prefs.getDouble("size") ?? 36.0;
-    showIcon = prefs.getBool("showIcon") ?? true;
-    showSymbol = prefs.getBool("showSymbol") ?? true;
-    alignment =
-        alignmentFrom[prefs.getString("alignment")] ?? Alignment.bottomRight;
-    margin = prefs.getDouble("margin") ?? 64.0;
-    animation =
-        animationTypeFrom[prefs.getString("animation")] ?? AnimationType.fade;
-    borderColor = colorFromHex(prefs.getString("borderColor") ?? "0x33f8f8f8");
-    lingerDuration = Duration(seconds: prefs.getInt("lingerDuration") ?? 4);
+  Future<void> loadFromPrefs() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    filterHotkeys =
+        prefs.getBool("filterHotkeys") ?? defaultConfigData["filterHotkeys"];
+    shiftOEM = prefs.getBool("shiftOEM") ?? defaultConfigData["shiftOEM"];
+    replaceNew = prefs.getBool("replaceNew") ?? defaultConfigData["replaceNew"];
+    style = styleFrom[prefs.getString("style")] ?? defaultConfigData["style"];
+    keyColor = keycapThemes[
+        prefs.getString("keyColor") ?? defaultConfigData["keyColor"]]!;
+    modifierColor = keycapThemes[prefs.getString("modifierColor") ??
+        defaultConfigData["modifierColor"]]!;
+    size = prefs.getDouble("size") ?? defaultConfigData["size"];
+    showIcon = prefs.getBool("showIcon") ?? defaultConfigData["showIcon"];
+    showSymbol = prefs.getBool("showSymbol") ?? defaultConfigData["showSymbol"];
+    alignment = alignmentFrom[prefs.getString("alignment")] ??
+        defaultConfigData["alignment"];
+    margin = prefs.getDouble("margin") ?? defaultConfigData["margin"];
+    animation = animationTypeFrom[prefs.getString("animation")] ??
+        defaultConfigData["animation"];
+    borderColor = colorFromHex(
+        prefs.getString("borderColor") ?? defaultConfigData["borderColor"]);
+    lingerDuration = Duration(
+        seconds: prefs.getInt("lingerDuration") ??
+            defaultConfigData["lingerDuration"]);
     transitionDuration = Duration(
       milliseconds: (200 + (prefs.getInt("lingerDuration") ?? 4) * 50).toInt(),
     );
+  }
+
+  void revertToDefaults() {
+    filterHotkeys = defaultConfigData["filterHotkeys"];
+    shiftOEM = defaultConfigData["shiftOEM"];
+    replaceNew = defaultConfigData["replaceNew"];
+    style = defaultConfigData["style"];
+    keyColor = keycapThemes[defaultConfigData["keyColor"]]!;
+    modifierColor = keycapThemes[defaultConfigData["modifierColor"]]!;
+    size = defaultConfigData["size"];
+    showIcon = defaultConfigData["showIcon"];
+    showSymbol = defaultConfigData["showSymbol"];
+    alignment = defaultConfigData["alignment"];
+    margin = defaultConfigData["margin"];
+    animation = defaultConfigData["animation"];
+    borderColor = colorFromHex(defaultConfigData["borderColor"]);
+    lingerDuration = Duration(seconds: defaultConfigData["lingerDuration"]);
   }
 
   void saveToPrefs() async {
