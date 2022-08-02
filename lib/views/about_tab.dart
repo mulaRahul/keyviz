@@ -16,11 +16,11 @@ class AboutTab extends StatelessWidget {
         children: [
           Image.asset("assets/img/icon.png"),
           const Space(),
-          const Text("Keyviz v0.1.0b", style: paragraphStyle),
+          const Text("Keyviz v1.0.0", style: paragraphStyle),
           const Text("©️ Rahul Mula", style: paragraphStyle),
           const SizedBox(height: 32),
           const Text(
-            "Please be advised, this software is currently in beta version (v0.1.0-beta). Do contact if you find any issue/bug or have any suggestion/feature-requests.",
+            "If you find any issue/bug or have any suggestion/feature-requests, please contact with the below links.",
             style: paragraphStyle,
             textAlign: TextAlign.center,
           ),
