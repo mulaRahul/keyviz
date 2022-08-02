@@ -148,7 +148,7 @@ class _RootAppState extends State<RootApp> with TrayListener {
         scrollbarTheme: ScrollbarThemeData(
             thumbColor: MaterialStateProperty.resolveWith((states) {
           if (states.contains(MaterialState.hovered)) {
-            return darkerGrey;
+            return darkGrey;
           }
           return Colors.transparent;
         })),
