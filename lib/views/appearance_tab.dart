@@ -82,8 +82,23 @@ class AppearanceTab extends StatelessWidget {
                   configData.lingerDuration = Duration(
                     seconds: value.toInt(),
                   );
+                },
+              ),
+            ],
+          ),
+          ListItem(
+            children: [
+              const Text("Animation Speed", style: headingStyle),
+              Scale(
+                min: 200,
+                max: 800,
+                suffix: "ms",
+                divisions: 6,
+                defaultValue:
+                    configData.transitionDuration.inMilliseconds.toDouble(),
+                onChanged: (double value) {
                   configData.transitionDuration = Duration(
-                    milliseconds: (200 + (value * 50)).toInt(),
+                    milliseconds: value.toInt(),
                   );
                 },
               ),

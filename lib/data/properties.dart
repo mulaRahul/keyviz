@@ -199,6 +199,7 @@ final Map<String, dynamic> defaultConfigData = {
   "animation": AnimationType.fade,
   "borderColor": "0x33f8f8f8",
   "lingerDuration": 4,
+  "transitionDuration": 400,
 };
 // ? utility functions
 Color colorFromHex(String hex) {

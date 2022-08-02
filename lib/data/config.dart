@@ -59,7 +59,8 @@ class ConfigData {
         seconds: prefs.getInt("lingerDuration") ??
             defaultConfigData["lingerDuration"]);
     transitionDuration = Duration(
-      milliseconds: (200 + (prefs.getInt("lingerDuration") ?? 4) * 50).toInt(),
+      milliseconds: prefs.getInt("transitionDuration") ??
+          defaultConfigData["transitionDuration"],
     );
   }
 
@@ -78,6 +79,8 @@ class ConfigData {
     animation = defaultConfigData["animation"];
     borderColor = colorFromHex(defaultConfigData["borderColor"]);
     lingerDuration = Duration(seconds: defaultConfigData["lingerDuration"]);
+    transitionDuration =
+        Duration(milliseconds: defaultConfigData["transitionDuration"]);
   }
 
   void saveToPrefs() async {
@@ -96,6 +99,7 @@ class ConfigData {
     prefs.setString("alignment", alignmentStringFrom[alignment] ?? "left");
     prefs.setString("animation", animationTypeStringFrom[animation] ?? "fade");
     prefs.setInt("lingerDuration", lingerDuration.inSeconds);
+    prefs.setInt("transitionDuration", transitionDuration.inMilliseconds);
   }
 }
 
