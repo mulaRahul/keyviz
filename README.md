@@ -3,15 +3,15 @@
 
 Keyviz is a free and open-source software to visualize your ⌨️ keystrokes in realtime! Let your audience know what handy shortcuts/keys you're pressing during screencasts, presentations, collaborations, or whenever you need it.
 
-![keyviz-preview](previews/container.png)
+![keyviz-preview](previews/key-visual.png)
 
 ## 🦄 Style
-![multiple-styles](previews/reel.png)
+![multiple-styles](previews/multiple-styles.png)
 
 Don't restrain yourself to just black & white! Change the visualization's style, size, color (modifier and normal keys), border, icon, and symbols.
 
 ## ⚙️ Fully Customizable
-![keyviz-settings](previews/style-tab.png)
+![keyviz-settings](previews/settings-window.png)
 
 Powerful and easy to use configuration options. 
 - Filter normal keys and only display shortcuts like <kbd>Ctrl</kbd> + <kbd>S</kbd>
@@ -23,7 +23,7 @@ Powerful and easy to use configuration options.
 You can download the latest version of keyviz from the [Github Releases](https://github.com/mulaRahul/keyviz/releases) page. Unzip the downloaded file, run the installer and follow the familiar steps to install keyviz.
 
 # Quickstart
-You can check out this [video tutorial](https://youtu.be/PR8BzKdHfIY) as well.
+You can check out this [video tutorial](https://youtu.be/FwuTqWzlRSc) as well.
 
 To get started, follow the above [installation](#installation) process. You can start visualizing your keystrokes by just running the application.
 
