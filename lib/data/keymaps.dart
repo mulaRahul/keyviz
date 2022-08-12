@@ -72,7 +72,7 @@ const Map<String, String> lockKeys = {
 };
 const Map<String, String> normalKeys = {
   "SPACE": "Space",
-  "RETURN": "Return",
+  "RETURN": "Enter",
   "BACK": "Backspace",
 };
 final Map<String, String> functionKeys = {
