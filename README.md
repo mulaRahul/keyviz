@@ -1,6 +1,6 @@
 # Keyviz
 
-<a href="https://www.producthunt.com/products/keyviz?utm_source=badge-top-post-topic-badge&utm_medium=badge&utm_souce=badge-keyviz" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/top-post-topic-badge.svg?post_id=354216&theme=neutral&period=weekly&topic=Developer+Tools" alt="Keyviz - Visualize&#0032;your&#0032;keystrokes&#0032;in&#0032;real&#0045;time | Product Hunt" style="width: 96px; height: 20px;" width="96" height="20" /></a>
+<a href="https://www.producthunt.com/posts/keyviz?utm_source=badge-featured&utm_medium=badge&utm_souce=badge-keyviz" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=354216&theme=neutral" alt="Keyviz - Visualize&#0032;your&#0032;keystrokes&#0032;in&#0032;real&#0045;time | Product Hunt" style="width: 96px; height: 20px;" width="96" height="20" /></a>
 ![downloads](https://img.shields.io/github/downloads/mulaRahul/keyviz/total?color=fff)
 
 Keyviz is a free and open-source software to visualize your ⌨️ keystrokes in realtime! Let your audience know what handy shortcuts/keys you're pressing during screencasts, presentations, collaborations, or whenever you need it.
