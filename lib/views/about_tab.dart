@@ -16,7 +16,7 @@ class AboutTab extends StatelessWidget {
         children: [
           Image.asset("assets/img/icon.png"),
           const Space(),
-          const Text("Keyviz v1.0.0", style: paragraphStyle),
+          const Text("Keyviz v1.0.2", style: paragraphStyle),
           const Text("©️ Rahul Mula", style: paragraphStyle),
           const SizedBox(height: 32),
           const Text(
