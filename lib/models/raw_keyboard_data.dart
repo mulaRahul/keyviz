@@ -11,7 +11,7 @@ extension StringExtension on String {
 }
 
 class RawKeyboardData {
-  // * intialization
+  // * initialization
   final String vkName;
 
   late final String name;
