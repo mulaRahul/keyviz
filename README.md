@@ -34,6 +34,6 @@ To get started, follow the above [installation](#installation) process. You can 
 To open the settings window, find the keyviz icon on the right side of the **Taskbar** or **Taskbar > Hidden Icons <kbd>^</kbd>**. Then click on the icon and select **Settings**. The settings window will appear from which, you customize the style, appearance, and other general settings of the visualization.
 
 # Feature Requests
-You can **vote** for planned features in this 📃 poll #36.
+You can **vote** for planned features in this [📃 poll](https://github.com/mulaRahul/keyviz/discussions/36).
 
 If you want to request features, start a discussion or join our [discord](https://discord.gg/qyrKWCvtEq) community and let us know about your suggestions. You can vote for the requested features by others and see the future development plans.
