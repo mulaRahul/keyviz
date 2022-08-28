@@ -25,6 +25,7 @@ class SettingsView extends StatefulWidget {
 
 class _SettingsViewState extends State<SettingsView> {
   String currentTab = "style";
+  bool _hovered = false;
 
   @override
   Widget build(BuildContext context) {
@@ -34,43 +35,53 @@ class _SettingsViewState extends State<SettingsView> {
         children: [
           GestureDetector(
             onPanStart: (details) => windowManager.startDragging(),
-            child: Container(
-              width: 180,
-              color: veryDarkGrey,
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                mainAxisSize: MainAxisSize.max,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  TabItem(
-                    label: 'General',
-                    iconPath: "assets/img/setting.svg",
-                    onTap: () => setTab('general'),
-                    selected: currentTab == 'general',
-                  ),
-                  const SizedBox(width: 8),
-                  TabItem(
-                    label: 'Style',
-                    iconPath: "assets/img/magicpen.svg",
-                    selected: currentTab == 'style',
-                    onTap: () => setTab("style"),
-                  ),
-                  const SizedBox(width: 8),
-                  TabItem(
-                    label: 'Apperance',
-                    iconPath: "assets/img/monitor.svg",
-                    selected: currentTab == 'appearance',
-                    onTap: () => setTab('appearance'),
-                  ),
-                  const SizedBox(width: 8),
-                  TabItem(
-                    label: 'About',
-                    iconPath: "assets/img/info.svg",
-                    selected: currentTab == 'about',
-                    onTap: () => setTab('about'),
-                  ),
-                ],
+            child: MouseRegion(
+              onEnter: (event) => setState(() => _hovered = true),
+              onExit: (event) => setState(() => _hovered = false),
+              child: AnimatedContainer(
+                duration: configData.transitionDuration,
+                curve: Curves.easeOutExpo,
+                width: _hovered ? 180 : 60,
+                color: veryDarkGrey,
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.max,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    TabItem(
+                      label: 'General',
+                      iconPath: "assets/img/setting.svg",
+                      onTap: () => setTab('general'),
+                      selected: currentTab == 'general',
+                      expanded: _hovered,
+                    ),
+                    const SizedBox(width: 8),
+                    TabItem(
+                      label: 'Style',
+                      iconPath: "assets/img/magicpen.svg",
+                      selected: currentTab == 'style',
+                      onTap: () => setTab("style"),
+                      expanded: _hovered,
+                    ),
+                    const SizedBox(width: 8),
+                    TabItem(
+                      label: 'Apperance',
+                      iconPath: "assets/img/monitor.svg",
+                      selected: currentTab == 'appearance',
+                      onTap: () => setTab('appearance'),
+                      expanded: _hovered,
+                    ),
+                    const SizedBox(width: 8),
+                    TabItem(
+                      label: 'About',
+                      iconPath: "assets/img/info.svg",
+                      selected: currentTab == 'about',
+                      onTap: () => setTab('about'),
+                      expanded: _hovered,
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -187,9 +198,11 @@ class TabItem extends StatelessWidget {
   final String iconPath;
   final bool selected;
   final Function onTap;
+  final bool expanded;
 
   const TabItem({
     Key? key,
+    this.expanded = false,
     required this.label,
     required this.iconPath,
     required this.selected,
@@ -203,24 +216,34 @@ class TabItem extends StatelessWidget {
       child: AnimatedContainer(
         duration: configData.transitionDuration,
         curve: Curves.easeOutExpo,
-        // width: 90,
+        width: expanded ? 164 : 40,
         padding: const EdgeInsets.symmetric(vertical: 8.0),
         decoration: BoxDecoration(
           color: selected ? Colors.white.withOpacity(0.1) : Colors.transparent,
           borderRadius: BorderRadius.circular(8),
         ),
+        alignment: Alignment.centerLeft,
+        clipBehavior: Clip.hardEdge,
         child: Row(
           children: [
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               child: SvgPicture.asset(
                 iconPath,
+                height: 24,
+                width: 24,
                 color: selected ? Colors.white : darkGrey,
               ),
             ),
-            Text(
-              label,
-              style: TextStyle(color: selected ? Colors.white : darkGrey),
+            AnimatedContainer(
+              duration: configData.transitionDuration,
+              curve: Curves.easeOutExpo,
+              height: 24,
+              width: expanded ? 88 : 0,
+              child: Text(
+                label,
+                style: TextStyle(color: selected ? Colors.white : darkGrey),
+              ),
             ),
           ],
         ),
