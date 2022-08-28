@@ -10,9 +10,9 @@ class KeyboardEventProvider extends ChangeNotifier {
   // ? [vkName]
   final List<String> _down = [];
   // ? Map<vkName, Widget>
-  final Map<String, Animatedkeyviz> _widgets = {};
+  final Map<String, AnimatedKeycap> _widgets = {};
   // ? Map<vkName, Key>
-  final Map<String, GlobalKey<AnimatedkeyvizState>> _janitor = {};
+  final Map<String, GlobalKey<AnimatedKeycapState>> _janitor = {};
   // ? vkName
   String _lastPressed = "";
 
@@ -34,7 +34,7 @@ class KeyboardEventProvider extends ChangeNotifier {
       _janitor[vkName]?.currentState?.press();
       _janitor[vkName]?.currentState?.id = id;
 
-      if (_down.length == 1 && pressedHotKey) {
+      if (_down.length == 1) {
         for (final String key in _widgets.keys.toList(growable: false)) {
           key == vkName ? null : _removeWithoutAnimation(key);
         }
@@ -45,9 +45,7 @@ class KeyboardEventProvider extends ChangeNotifier {
 
     // * replace new key
     if (configData.replaceNew && _widgets.isNotEmpty) {
-      if (pressedHotKey &&
-          modifiers.containsKey(_widgets.keys.first) &&
-          _down.isNotEmpty) {
+      if (_down.isNotEmpty) {
         skipTransition = false;
       } else {
         skipTransition = true;
@@ -72,7 +70,7 @@ class KeyboardEventProvider extends ChangeNotifier {
     // * register keypress
     _lastPressed = vkName;
     _down.add(vkName);
-    _janitor[vkName] = GlobalKey<AnimatedkeyvizState>();
+    _janitor[vkName] = GlobalKey<AnimatedKeycapState>();
     _widgets[vkName] = rawKeyData.toWidget(
       id: id,
       key: _janitor[vkName],
