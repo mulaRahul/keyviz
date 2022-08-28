@@ -19,6 +19,7 @@ const Map<String, String> modifiers = {
   "LMENU": "Alt",
   "RMENU": "Alt",
   "LWIN": "Win",
+  "RWIN": "Win",
   "TAB": "Tab",
 };
 const Map<String, String> oemKeySymbols = {
