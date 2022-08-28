@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-class Solidkeyviz extends StatefulWidget {
+class SolidKeycap extends StatefulWidget {
   final double width;
   final bool onlyIcon;
   final bool isNumpad;
@@ -14,7 +14,7 @@ class Solidkeyviz extends StatefulWidget {
   final String? iconPath;
   final Alignment textAlignment;
 
-  const Solidkeyviz({
+  const SolidKeycap({
     Key? key,
     this.symbol,
     this.iconPath,
@@ -30,10 +30,10 @@ class Solidkeyviz extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<Solidkeyviz> createState() => SolidkeyvizState();
+  State<SolidKeycap> createState() => SolidKeycapState();
 }
 
-class SolidkeyvizState extends State<Solidkeyviz> {
+class SolidKeycapState extends State<SolidKeycap> {
   bool pressed = true;
   late final BorderRadius borderRadius;
   late final BoxConstraints constraints;

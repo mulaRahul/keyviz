@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart' hide KeyEvent;
 
 import '../data/keymaps.dart';
-import '../widgets/wrapper.dart';
+import '../widgets/keycaps/wrapper.dart';
 import '../data/config.dart';
 
 extension StringExtension on String {
@@ -82,7 +82,7 @@ class RawKeyboardData {
   @override
   String toString() => "[ RawKeyboardData ] $vkName: $name($symbol)";
 
-  Animatedkeyviz toWidget({
+  AnimatedKeycap toWidget({
     Key? key,
     int id = 0,
     bool onlySymbol = false,
@@ -90,7 +90,7 @@ class RawKeyboardData {
   }) {
     final double width = configData.size * getWidthCoefficient();
     if (configData.showIcon && hasIcon) {
-      return Animatedkeyviz(
+      return AnimatedKeycap(
         id: id,
         key: key,
         width: width,
@@ -116,7 +116,7 @@ class RawKeyboardData {
         onlyIcon: isArrowKey || vkName.endsWith("WIN"),
       );
     } else if (vkName.startsWith("NUMPAD")) {
-      return Animatedkeyviz(
+      return AnimatedKeycap(
         id: id,
         key: key,
         width: width,
@@ -133,7 +133,7 @@ class RawKeyboardData {
             : configData.keyColor.fontColor,
       );
     } else {
-      return Animatedkeyviz(
+      return AnimatedKeycap(
         id: id,
         key: key,
         width: width,

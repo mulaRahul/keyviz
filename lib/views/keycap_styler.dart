@@ -4,8 +4,8 @@ import 'package:provider/provider.dart';
 
 import '../data/config.dart';
 import '../providers/config.dart';
-import '../widgets/iso_keycap.dart';
-import '../widgets/solid_keycap.dart';
+import '../widgets/keycaps/iso_keycap.dart';
+import '../widgets/keycaps/solid_keycap.dart';
 
 class KeycapStyler extends StatelessWidget {
   const KeycapStyler({

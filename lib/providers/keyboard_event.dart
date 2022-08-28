@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart' hide KeyEvent;
 import 'package:keyviz/models/raw_keyboard_data.dart';
-import 'package:keyviz/widgets/wrapper.dart';
+import 'package:keyviz/widgets/keycaps/wrapper.dart';
 
 import '../data/keymaps.dart';
 import '../data/config.dart';

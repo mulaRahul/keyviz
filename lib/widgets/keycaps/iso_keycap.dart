@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:keyviz/data/config.dart';
 
-import '../data/properties.dart';
+import '../../data/properties.dart';
 
 class Isokeyviz extends StatefulWidget {
   final double width;

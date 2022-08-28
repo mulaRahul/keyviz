@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 
-import '../animations/grow.dart';
-import '../animations/slide.dart';
-import '../data/config.dart';
-import '../animations/fade.dart';
-import '../data/properties.dart';
+import '../../animations/grow.dart';
+import '../../animations/slide.dart';
+import '../../data/config.dart';
+import '../../animations/fade.dart';
+import '../../data/properties.dart';
 import 'iso_keycap.dart';
 import 'solid_keycap.dart';
 
-class Animatedkeyviz extends StatefulWidget {
+class AnimatedKeycap extends StatefulWidget {
   final int id;
   final double width;
   final bool onlyIcon;
@@ -23,7 +23,7 @@ class Animatedkeyviz extends StatefulWidget {
   final bool skipTransition;
   final Alignment textAlignment;
 
-  const Animatedkeyviz({
+  const AnimatedKeycap({
     Key? key,
     this.symbol,
     this.iconPath,
@@ -41,10 +41,10 @@ class Animatedkeyviz extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<Animatedkeyviz> createState() => AnimatedkeyvizState();
+  State<AnimatedKeycap> createState() => AnimatedKeycapState();
 }
 
-class AnimatedkeyvizState extends State<Animatedkeyviz> {
+class AnimatedKeycapState extends State<AnimatedKeycap> {
   int _pressedCount = 1; // ? `cuz keyviz comes pressed
   late int id;
   GlobalKey<dynamic>? containerKey;
@@ -60,8 +60,8 @@ class AnimatedkeyvizState extends State<Animatedkeyviz> {
 
     switch (configData.style) {
       case KeycapStyle.solid:
-        keyvizKey = GlobalKey<SolidkeyvizState>();
-        keyvizWidget = Solidkeyviz(
+        keyvizKey = GlobalKey<SolidKeycapState>();
+        keyvizWidget = SolidKeycap(
           key: keyvizKey,
           iconPath: widget.iconPath,
           symbol: widget.symbol,
