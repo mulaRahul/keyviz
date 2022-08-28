@@ -16,7 +16,7 @@ class AboutTab extends StatelessWidget {
         children: [
           Image.asset("assets/img/icon.png"),
           const Space(),
-          const Text("Keyviz v1.0.2", style: paragraphStyle),
+          const Text("Keyviz v1.0.6", style: paragraphStyle),
           const Text("©️ Rahul Mula", style: paragraphStyle),
           const SizedBox(height: 32),
           const Text(
@@ -45,9 +45,9 @@ class AboutTab extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 32),
+          const SizedBox(height: 24),
           const Text(
-            "Keyviz is free and open-source software and if it provides value to you, then that's all that matters ✨. If you'd like to donate/sponsor the project then you're most welcome 💖!\nIt doesn't matter how much you donate, it's your initiative that brings a smile to my face 😁. Either you donate, sponsor, or just drop in to say thanks - it reminds me of the fact that it's not my fun project anymore, it's our project!",
+            "Keyviz is free and open-source software and if it provides value to you, then that's all that matters ✨. If you'd like to donate/sponsor the project then you're most welcome 💖! It doesn't matter how much you donate, it's your initiative that brings a smile to my face 😁.Either you donate, sponsor, or just drop in to say thanks - it reminds me of the fact that it's not my fun project anymore, it's our project!",
             style: paragraphStyle,
             textAlign: TextAlign.center,
           ),
@@ -57,10 +57,20 @@ class AboutTab extends StatelessWidget {
             children: [
               ElevatedButton(
                 onPressed: () => launchUrl(
-                  Uri.parse("https://www.paypal.com/paypalme/ral162"),
+                  Uri.parse(
+                    "https://www.producthunt.com/products/keyviz-2/reviews/new",
+                  ),
                 ),
                 style: elevatedButtonStyle,
-                child: const Text("PayPal"),
+                child: const Text("Feedback"),
+              ),
+              const SizedBox(width: 24),
+              ElevatedButton(
+                onPressed: () => launchUrl(
+                  Uri.parse("https://opencollective.com/keyviz"),
+                ),
+                style: elevatedButtonStyle,
+                child: const Text("Open Collective"),
               ),
               const SizedBox(width: 24),
               ElevatedButton(
