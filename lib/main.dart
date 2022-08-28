@@ -184,8 +184,9 @@ class _RootAppState extends State<RootApp> with TrayListener {
   }
 
   @override
-  void onTrayIconMouseDown() {
+  void onTrayIconRightMouseDown() {
     _configuring ? null : trayManager.popUpContextMenu();
+    super.onTrayIconRightMouseDown();
   }
 
   @override
