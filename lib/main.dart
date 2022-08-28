@@ -108,13 +108,7 @@ class _RootAppState extends State<RootApp> with TrayListener {
             toolTip: _listening
                 ? "Stop displaying keystrokes"
                 : "Display keystrokes",
-            onClick: (_) {
-              _listenerKey.currentState?.toggleListener();
-              trayManager.setIcon(_listening
-                  ? "assets/img/tray.ico"
-                  : "assets/img/tray-bw.ico");
-              _setContextMenu();
-            },
+            onClick: (menuItem) => toggleListener(),
           ),
           MenuItem(
             label: "Settings",
@@ -125,11 +119,18 @@ class _RootAppState extends State<RootApp> with TrayListener {
           MenuItem(
             label: "Quit",
             toolTip: "Close Keyviz",
-            onClick: (_) => windowManager.close(),
+            onClick: (menuItem) => windowManager.close(),
           ),
         ],
       ),
     );
+  }
+
+  void toggleListener() {
+    _listenerKey.currentState?.toggleListener();
+    trayManager
+        .setIcon(_listening ? "assets/img/tray.ico" : "assets/img/tray-bw.ico");
+    _setContextMenu();
   }
 
   void launchSettingsWindow(MenuItem _) async {
@@ -182,6 +183,9 @@ class _RootAppState extends State<RootApp> with TrayListener {
       ),
     );
   }
+
+  @override
+  void onTrayIconMouseDown() => toggleListener();
 
   @override
   void onTrayIconRightMouseDown() {
