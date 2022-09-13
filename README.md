@@ -31,7 +31,9 @@ You can check out this [video tutorial](https://youtu.be/FwuTqWzlRSc) as well.
 
 To get started, follow the above [installation](#installation) process. You can start visualizing your keystrokes by just running the application.
 
-To open the settings window, find the keyviz icon on the right side of the **Taskbar** or **Taskbar > Hidden Icons <kbd>^</kbd>**. Then click on the icon and select **Settings**. The settings window will appear from which, you customize the style, appearance, and other general settings of the visualization.
+To open the settings window, find the keyviz icon on the right side of the **Taskbar** or **Taskbar > Hidden Icons <kbd>^</kbd>**. Then right click on the icon and select **Settings**. 
+
+The settings window will appear from which, you customize the style, appearance, and other general settings of the visualization. You can also pause the visualizations temporarily by left clicking on the tray icon.
 
 # Feature Requests
 You can **vote** for planned features in this [📃 poll](https://github.com/mulaRahul/keyviz/discussions/36).
