@@ -4,7 +4,7 @@ import 'package:screen_retriever/screen_retriever.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 extension ColorExtension on Color {
-  String toHex() => toString().substring(6, 16);
+  String toHex() => toString().substring(6, 16).toLowerCase();
 }
 
 class ConfigData {
