@@ -35,6 +35,12 @@ To open the settings window, find the keyviz icon on the right side of the **Tas
 
 The settings window will appear from which, you customize the style, appearance, and other general settings of the visualization. You can also pause the visualizations temporarily by left clicking on the tray icon.
 
+## `*.dll` Missing Error?
+
+![57611-error](https://user-images.githubusercontent.com/96373135/208227804-315e4ab9-b846-4266-87f7-789bf6ef1922.png)
+
+If you're getting a `.dll` missing error after installing the application, then you're missing the requried Visual C++ redistributables. You can get the same from here [VSC++ Redist](https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170).
+
 # Feature Requests
 You can **vote** for planned features in this [📃 poll](https://github.com/mulaRahul/keyviz/discussions/36).
 
