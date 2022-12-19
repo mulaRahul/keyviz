@@ -22,7 +22,12 @@ Powerful and easy to use configuration options.
 - Switch between animation presets to animate your visualization in & out
 
 # Installation
-You can download the latest version of keyviz from the [Github Releases](https://github.com/mulaRahul/keyviz/releases) page. For the installer, unzip the downloaded file, run the installer and follow the familiar steps to install keyviz. 
+You can download the latest version of keyviz from the [Github Releases](https://github.com/mulaRahul/keyviz/releases) page. For the installer, unzip the downloaded file, run the installer and follow the familiar steps to install keyviz.
+
+You also get keyviz from [Winget](https://learn.microsoft.com/en-us/windows/package-manager/):
+```
+winget install mulaRahul.Keyviz
+```
 
 Alternatively, you can get the portable version which doesn't require installation but may or may not work on every system.
 
