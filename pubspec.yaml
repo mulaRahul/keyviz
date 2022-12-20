@@ -23,7 +23,7 @@ dependencies:
   url_launcher: ^6.1.7
   window_manager: ^0.2.5
   flutter_acrylic: ^1.0.0
-  screen_retriever: ^0.1.2
+  screen_retriever: ^0.1.4
   shared_preferences: ^2.0.15
 
 dev_dependencies:
