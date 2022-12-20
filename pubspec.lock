@@ -168,10 +168,10 @@ packages:
     description:
       path: "."
       ref: main
-      resolved-ref: "8064b281fe31f5b5fc6a827a3190d2106210113e"
+      resolved-ref: "5630cef4990f25c2fc70bc497a4c8cbfed4cf2cf"
       url: "https://github.com/Krysl/keyboard_event.git"
     source: git
-    version: "0.3.3"
+    version: "0.3.4"
   lints:
     dependency: transitive
     description:
