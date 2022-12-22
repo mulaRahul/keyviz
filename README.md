@@ -25,8 +25,14 @@ Powerful and easy to use configuration options.
 You can download the latest version of keyviz from the [Github Releases](https://github.com/mulaRahul/keyviz/releases) page. For the installer, unzip the downloaded file, run the installer and follow the familiar steps to install keyviz.
 
 Or, install keyviz using [Winget](https://learn.microsoft.com/en-us/windows/package-manager/):
-```
+```powershell
 winget install mulaRahul.Keyviz
+```
+
+Or from [Scoop](https://scoop.sh/):
+```powershell
+scoop bucket add extras # Ensure bucket is added first
+scoop install keyviz
 ```
 
 Alternatively, you can get the portable version which doesn't require installation but may or may not work on every system.
