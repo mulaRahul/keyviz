@@ -22,7 +22,7 @@ dependencies:
   flutter_svg: ^1.1.0
   tray_manager: ^0.1.8
   url_launcher: ^6.1.7
-  window_manager: ^0.2.5
+  window_manager: ^0.2.8
   flutter_acrylic: ^1.0.0
   screen_retriever: ^0.1.2
   shared_preferences: ^2.0.15
