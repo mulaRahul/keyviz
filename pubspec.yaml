@@ -16,6 +16,7 @@ dependencies:
     git:
       url: https://github.com/Krysl/keyboard_event.git
       ref: main
+    version: ^0.3.4
 
   provider: ^6.0.3
   flutter_svg: ^1.1.0
