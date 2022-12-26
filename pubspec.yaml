@@ -19,7 +19,7 @@ dependencies:
     version: ^0.3.4
 
   provider: ^6.0.5
-  flutter_svg: ^1.1.0
+  flutter_svg: ^1.1.6
   tray_manager: ^0.2.0
   url_launcher: ^6.1.7
   window_manager: ^0.2.8
