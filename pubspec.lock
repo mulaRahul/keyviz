@@ -36,13 +36,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.2.1"
-  cli_dialog:
-    dependency: transitive
-    description:
-      name: cli_dialog
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.5.0"
   cli_util:
     dependency: transitive
     description:
@@ -64,6 +57,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.16.0"
+  console:
+    dependency: transitive
+    description:
+      name: console
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "4.1.0"
   crypto:
     dependency: transitive
     description:
@@ -71,13 +71,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "3.0.2"
-  dart_console:
-    dependency: transitive
-    description:
-      name: dart_console
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.1.1"
   fake_async:
     dependency: transitive
     description:
@@ -149,13 +142,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "3.2.0"
-  intl:
-    dependency: transitive
-    description:
-      name: intl
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.17.0"
   js:
     dependency: transitive
     description:
@@ -220,7 +206,7 @@ packages:
       name: msix
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "3.6.2"
+    version: "3.7.0"
   nested:
     dependency: transitive
     description:
