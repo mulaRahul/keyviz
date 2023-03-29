@@ -25,7 +25,7 @@ dependencies:
   window_manager: ^0.3.0
   flutter_acrylic: ^1.1.2
   screen_retriever: ^0.1.5
-  shared_preferences: ^2.0.17
+  shared_preferences: ^2.0.20
 
 dev_dependencies:
   flutter_test:
