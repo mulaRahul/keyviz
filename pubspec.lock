@@ -103,7 +103,7 @@ packages:
       name: flutter_acrylic
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.0.0+2"
+    version: "1.1.2"
   flutter_lints:
     dependency: "direct dev"
     description:
@@ -117,7 +117,7 @@ packages:
       name: flutter_svg
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.0.1"
+    version: "2.0.4"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -172,6 +172,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.1.0"
+  macos_window_utils:
+    dependency: transitive
+    description:
+      name: macos_window_utils
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.1.2"
   matcher:
     dependency: transitive
     description:
@@ -206,7 +213,7 @@ packages:
       name: msix
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "3.8.1"
+    version: "3.9.1"
   nested:
     dependency: transitive
     description:
@@ -311,7 +318,7 @@ packages:
       name: shared_preferences
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.0.17"
+    version: "2.0.20"
   shared_preferences_android:
     dependency: transitive
     description:
@@ -484,21 +491,21 @@ packages:
       name: vector_graphics
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.0.1"
+    version: "1.1.4"
   vector_graphics_codec:
     dependency: transitive
     description:
       name: vector_graphics_codec
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.0.1"
+    version: "1.1.4"
   vector_graphics_compiler:
     dependency: transitive
     description:
       name: vector_graphics_compiler
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.0.1"
+    version: "1.1.4"
   vector_math:
     dependency: transitive
     description:
@@ -543,4 +550,4 @@ packages:
     version: "3.1.1"
 sdks:
   dart: ">=2.19.0-0 <3.0.0"
-  flutter: ">=3.7.0-0"
+  flutter: ">=3.7.0"
