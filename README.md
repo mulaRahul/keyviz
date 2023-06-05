@@ -37,6 +37,28 @@ scoop install keyviz
 
 Alternatively, you can get the portable version which doesn't require installation but may or may not work on every system.
 
+# Build Instructions
+You can always further develop/build the project by yourself. First of all ensure that you've setup **Flutter** on your system. If not follow this [guide](https://docs.flutter.dev/get-started/install/windows).
+
+After setting up flutter, clone the repository or download the zip and unpack the same.
+
+```powershell
+mkdir keyviz
+git clone https://github.com/mulaRahul/keyviz.git .
+```
+
+Move inside the flutter project and run the `build` command to create an executable -
+
+```powershell
+cd keyviz
+# get required dependencies
+flutter pub get
+# build executable
+flutter build windows
+```
+
+You can find the executable here `keyviz\build\windows\runner\<build mode>\`. Learn more [here](https://docs.flutter.dev/platform-integration/windows/building).
+
 # Quickstart
 You can also check out this [video tutorial](https://youtu.be/FwuTqWzlRSc).
 
