@@ -22,3 +22,16 @@ extension HexColor on Color {
       '${green.toRadixString(16).padLeft(2, '0').toUpperCase()}'
       '${blue.toRadixString(16).padLeft(2, '0').toUpperCase()}';
 }
+
+extension HexCode on HSVColor {
+  /// Prefixes a hash sign if [leadingHashSign] is set to `true` (default is `true`).
+  String toHex({bool leadingHashSign = true}) {
+    final rgb = toColor();
+
+    return '${leadingHashSign ? '#' : ''}'
+        // '${alpha.toRadixString(16).padLeft(2, '0')}'
+        '${rgb.red.toRadixString(16).padLeft(2, '0').toUpperCase()}'
+        '${rgb.green.toRadixString(16).padLeft(2, '0').toUpperCase()}'
+        '${rgb.blue.toRadixString(16).padLeft(2, '0').toUpperCase()}';
+  }
+}
