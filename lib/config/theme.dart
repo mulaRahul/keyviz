@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'style.dart';
+
 // colors
 const darkerGrey = Color(0xff1a1a1a);
 const darkGrey = Color(0xff545454);
@@ -28,34 +30,45 @@ final _bodyStyle = _baseTextStyle.copyWith(
 );
 
 final lightTheme = ThemeData(
-  useMaterial3: true,
-  colorScheme: const ColorScheme.light(
-    // font and highlights
-    primary: Colors.black,
-    secondary: darkerGrey,
-    tertiary: grey,
-    // containers
-    // *container: fill
-    // on*Container: border
-    primaryContainer: Colors.white,
-    onPrimaryContainer: lightGrey,
-    secondaryContainer: lighterGrey,
-    background: lightGrey,
-    onBackground: Color(0xffd9d9d9),
-  ),
-  fontFamily: "IBM Plex Sans",
-  textTheme: TextTheme(
-    // title
-    titleLarge: _titleStyle,
-    titleMedium: _titleStyle.copyWith(fontSize: 16),
-    titleSmall: _titleStyle.copyWith(fontSize: 14),
-    // label
-    labelLarge: _labelStyle,
-    labelMedium: _labelStyle.copyWith(fontSize: 16),
-    labelSmall: _labelStyle.copyWith(fontSize: 14),
-    // body
-    bodyLarge: _bodyStyle,
-    bodyMedium: _bodyStyle.copyWith(fontSize: 12),
-    bodySmall: _bodyStyle.copyWith(fontSize: 10),
-  ),
-);
+    useMaterial3: true,
+    colorScheme: const ColorScheme.light(
+      // font and highlights
+      primary: Colors.black,
+      onPrimary: Colors.white,
+      secondary: darkerGrey,
+      onSecondary: lightGrey,
+      tertiary: darkGrey,
+      outline: Color(0xffd9d9d9),
+      // containers
+      // *container: fill
+      // on*Container: border
+      primaryContainer: Colors.white,
+      secondaryContainer: lighterGrey,
+      background: lightGrey,
+    ),
+    fontFamily: "IBM Plex Sans",
+    textTheme: TextTheme(
+      // title
+      titleLarge: _titleStyle,
+      titleMedium: _titleStyle.copyWith(fontSize: 16),
+      titleSmall:
+          _titleStyle.copyWith(fontSize: 14, fontWeight: FontWeight.w600),
+      // label
+      labelLarge: _labelStyle,
+      labelMedium: _labelStyle.copyWith(fontSize: 16),
+      labelSmall: _labelStyle.copyWith(fontSize: 12),
+      // body
+      bodyLarge: _bodyStyle,
+      bodyMedium: _bodyStyle.copyWith(fontSize: 12),
+      bodySmall: _bodyStyle.copyWith(fontSize: 10),
+    ),
+    dividerTheme: const DividerThemeData(
+      space: defaultPadding * 2,
+      color: grey,
+    ),
+    inputDecorationTheme: const InputDecorationTheme(
+      border: InputBorder.none,
+      enabledBorder: InputBorder.none,
+      focusedBorder: InputBorder.none,
+      errorBorder: InputBorder.none,
+    ));
