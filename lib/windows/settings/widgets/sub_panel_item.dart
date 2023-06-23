@@ -1,30 +1,42 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 
 import 'package:keyviz/config/config.dart';
 import 'package:keyviz/windows/shared/shared.dart';
 
+import 'color_swatches.dart';
+import 'color_picker.dart';
+import 'gradient_picker.dart';
+
 class SubPanelItem extends StatelessWidget {
   const SubPanelItem({
     super.key,
+    this.enabled = true,
     required this.title,
     required this.child,
   });
 
+  final bool enabled;
   final String title;
   final Widget child;
 
   @override
   Widget build(BuildContext context) {
-    return _Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: defaultPadding,
-        vertical: defaultPadding * .5,
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [Text(title, style: context.textTheme.titleSmall), child],
+    return AnimatedOpacity(
+      duration: transitionDuration,
+      opacity: enabled ? 1 : .25,
+      child: _Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: defaultPadding,
+          vertical: defaultPadding * .5,
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(title, style: context.textTheme.titleSmall),
+            IgnorePointer(ignoring: !enabled, child: child),
+          ],
+        ),
       ),
     );
   }
@@ -91,15 +103,15 @@ class RawInputSubPanelItem extends StatefulWidget {
   State<RawInputSubPanelItem> createState() => _RawInputSubPanelItemState();
 }
 
-// TODO: add ability to increase/decrease number with up/down arrows
 class _RawInputSubPanelItemState extends State<RawInputSubPanelItem> {
-  final _focusNode = FocusNode();
+  late final FocusNode _focusNode;
   late final TextEditingController _ctrl;
 
   @override
   void initState() {
     super.initState();
     _ctrl = TextEditingController(text: widget.defaultValue.toString());
+    _focusNode = FocusNode(onKeyEvent: _onKeyEvent);
   }
 
   @override
@@ -149,6 +161,28 @@ class _RawInputSubPanelItemState extends State<RawInputSubPanelItem> {
     _focusNode.unfocus();
   }
 
+  KeyEventResult _onKeyEvent(_, KeyEvent event) {
+    if (["Arrow Up", "Arrow Down"].contains(event.logicalKey.keyLabel) &&
+        event is KeyDownEvent) {
+      try {
+        // input value
+        final n = int.parse(_ctrl.text);
+        // increase
+        if (event.logicalKey.keyLabel == "Arrow Up") {
+          _ctrl.text = "${n + 1}";
+          // decrease
+        } else if (event.logicalKey.keyLabel == "Arrow Down") {
+          _ctrl.text = "${n - 1}";
+        }
+      } on FormatException {
+        // catch it
+      }
+      // event handled
+      return KeyEventResult.handled;
+    }
+    return KeyEventResult.ignored;
+  }
+
   @override
   void dispose() {
     _focusNode.dispose();
@@ -160,11 +194,13 @@ class _RawInputSubPanelItemState extends State<RawInputSubPanelItem> {
 class RawColorInputSubPanelItem extends StatefulWidget {
   const RawColorInputSubPanelItem({
     super.key,
-    required this.defaultValue,
-    required this.onChanged,
+    this.label,
     this.enabled = true,
+    required this.onChanged,
+    required this.defaultValue,
   });
 
+  final String? label;
   final bool enabled;
   final Color defaultValue;
   final ValueChanged<Color> onChanged;
@@ -179,7 +215,8 @@ class _RawColorInputSubPanelItemState extends State<RawColorInputSubPanelItem> {
   final _focusNode = FocusNode();
   late final TextEditingController _ctrl;
 
-  bool _showOverlay = false;
+  bool _showSwatches = false;
+  bool _showPicker = false;
   OverlayEntry? _overlayEntry;
 
   @override
@@ -229,9 +266,9 @@ class _RawColorInputSubPanelItemState extends State<RawColorInputSubPanelItem> {
           ),
         ),
         const Spacer(),
-        GestureDetector(
-          onTap: _toggleColorPicker,
-          child: const SvgIcon.chevronDown(size: defaultPadding * .4),
+        IconButton(
+          onPressed: _toggleColorSwatches,
+          icon: const SvgIcon.chevronDown(size: defaultPadding * .32),
         ),
       ],
     );
@@ -246,9 +283,15 @@ class _RawColorInputSubPanelItemState extends State<RawColorInputSubPanelItem> {
   }
 
   _onChanged([_]) {
+    if (!_focusNode.hasPrimaryFocus) return;
+
     if (_ctrl.text.length >= 6) {
       try {
-        setState(() => _color = HexColor.fromHex(_ctrl.text));
+        final color = HexColor.fromHex(_ctrl.text);
+        if (color != _color) {
+          setState(() => _color = color);
+          widget.onChanged(_color);
+        }
       } on FormatException {
         // invalid hex code
         debugPrint("Invalid hex code: ${_ctrl.text}");
@@ -259,21 +302,21 @@ class _RawColorInputSubPanelItemState extends State<RawColorInputSubPanelItem> {
     _focusNode.unfocus();
   }
 
-  _showColorPicker() {
+  _showColorSwatches() {
     final overlay = Overlay.of(context);
 
     final renderBox = context.findRenderObject() as RenderBox;
     final size = renderBox.size;
     final offset = renderBox.localToGlobal(Offset.zero);
 
-    _showOverlay = true;
+    _showSwatches = true;
     _overlayEntry = OverlayEntry(
       builder: (context) => Positioned(
         left: offset.dx,
         top: offset.dy + size.height + (defaultPadding),
-        child: _ColorSelector(
+        child: ColorSwatches(
           onSelected: _onSelected,
-          show: _showOverlay,
+          show: _showSwatches,
         ),
       ),
     );
@@ -281,8 +324,8 @@ class _RawColorInputSubPanelItemState extends State<RawColorInputSubPanelItem> {
     overlay.insert(_overlayEntry!);
   }
 
-  _removeColorPicker() async {
-    _showOverlay = false;
+  Future _removeColorSwatches() async {
+    _showSwatches = false;
     _overlayEntry?.markNeedsBuild();
     await Future.delayed(transitionDuration);
 
@@ -290,8 +333,68 @@ class _RawColorInputSubPanelItemState extends State<RawColorInputSubPanelItem> {
     _overlayEntry = null;
   }
 
-  _toggleColorPicker() {
+  _toggleColorSwatches() async {
     if (_overlayEntry == null) {
+      _showColorSwatches();
+    } else if (_showPicker) {
+      await _removeColorPicker();
+      _showColorSwatches();
+    } else {
+      _removeColorSwatches();
+    }
+  }
+
+  _showColorPicker() {
+    final overlay = Overlay.of(context);
+
+    final renderBox = context.findRenderObject() as RenderBox;
+    final offset = renderBox.localToGlobal(Offset.zero);
+
+    _showPicker = true;
+    _overlayEntry = OverlayEntry(
+      builder: (context) => Positioned(
+        left: offset.dx - defaultPadding,
+        top: offset.dy - (defaultPadding * .5),
+        child: Material(
+          type: MaterialType.transparency,
+          child: ColorPicker(
+            show: _showPicker,
+            title: widget.label,
+            initialColor: _color,
+            onClose: _removeColorPicker,
+            onChanged: _onPickerChanged,
+          ),
+        ),
+      ),
+    );
+
+    overlay.insert(_overlayEntry!);
+  }
+
+  Future _removeColorPicker() async {
+    // update preview
+    setState(() {});
+    // update hex
+    _ctrl.text = _color.toHex();
+
+    _showPicker = false;
+    _overlayEntry?.markNeedsBuild();
+    await Future.delayed(transitionDuration);
+
+    _overlayEntry?.remove();
+    _overlayEntry = null;
+  }
+
+  _onPickerChanged(Color color) {
+    _color = color;
+    widget.onChanged(color);
+  }
+
+  _toggleColorPicker() async {
+    if (_overlayEntry == null) {
+      _showColorPicker();
+    } else if (_showSwatches) {
+      await _removeColorSwatches();
       _showColorPicker();
     } else {
       _removeColorPicker();
@@ -300,10 +403,11 @@ class _RawColorInputSubPanelItemState extends State<RawColorInputSubPanelItem> {
 
   _onSelected(Color color) {
     setState(() => _color = color);
-    _ctrl.text = _color.toHex();
 
+    _ctrl.text = _color.toHex();
+    widget.onChanged(_color);
     // remove overlay
-    _removeColorPicker();
+    _removeColorSwatches();
   }
 
   @override
@@ -312,6 +416,133 @@ class _RawColorInputSubPanelItemState extends State<RawColorInputSubPanelItem> {
 
     _ctrl.dispose();
     _focusNode.dispose();
+    super.dispose();
+  }
+}
+
+class RawGradientInputSubPanelItem extends StatefulWidget {
+  const RawGradientInputSubPanelItem({
+    super.key,
+    this.title,
+    this.initialColor1,
+    this.initialColor2,
+    required this.onColor1Changed,
+    required this.onColor2Changed,
+  });
+
+  final String? title;
+  final Color? initialColor1;
+  final Color? initialColor2;
+  final ValueChanged<Color> onColor1Changed;
+  final ValueChanged<Color> onColor2Changed;
+
+  @override
+  State<RawGradientInputSubPanelItem> createState() =>
+      _RawGradientInputSubPanelItemState();
+}
+
+class _RawGradientInputSubPanelItemState
+    extends State<RawGradientInputSubPanelItem> {
+  late Color _color1;
+  late Color _color2;
+
+  bool _showPicker = false;
+
+  OverlayEntry? _overlayEntry;
+
+  @override
+  void initState() {
+    super.initState();
+    _color1 = widget.initialColor1 ?? Colors.purple;
+    _color2 = widget.initialColor2 ?? Colors.deepPurple;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return RawSubPanelItem(
+      title: widget.title,
+      child: GestureDetector(
+        onTap: _togglePicker,
+        child: SizedBox.square(
+          dimension: defaultPadding * 2,
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [_color1, _color2],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+              ),
+              borderRadius: BorderRadius.circular(defaultPadding * .5),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  _togglePicker() {
+    if (_overlayEntry == null) {
+      _showOverlay();
+    } else {
+      _removeOverlay();
+    }
+  }
+
+  _showOverlay() {
+    final overlay = Overlay.of(context);
+
+    final renderBox = context.findRenderObject() as RenderBox;
+    final offset = renderBox.localToGlobal(Offset.zero);
+
+    _showPicker = true;
+    _overlayEntry = OverlayEntry(
+      builder: (context) => Positioned(
+        left: offset.dx - defaultPadding,
+        top: offset.dy - (defaultPadding * .5),
+        child: Material(
+          type: MaterialType.transparency,
+          child: GradientPicker(
+            show: _showPicker,
+            title: widget.title,
+            initialColor1: widget.initialColor1,
+            initialColor2: widget.initialColor2,
+            onClose: _removeOverlay,
+            onColor1Changed: _onColor1Changed,
+            onColor2Changed: _onColor2Changed,
+          ),
+        ),
+      ),
+    );
+
+    overlay.insert(_overlayEntry!);
+  }
+
+  _onColor1Changed(Color color) {
+    _color1 = color;
+    widget.onColor1Changed(color);
+  }
+
+  _onColor2Changed(Color color) {
+    _color2 = color;
+    widget.onColor2Changed(color);
+  }
+
+  _removeOverlay() async {
+    // reflect color changes
+    setState(() {});
+
+    _showPicker = false;
+    _overlayEntry?.markNeedsBuild();
+
+    await Future.delayed(transitionDuration);
+
+    _overlayEntry?.remove();
+    _overlayEntry = null;
+  }
+
+  @override
+  void dispose() {
+    if (_overlayEntry != null) _removeOverlay();
     super.dispose();
   }
 }
@@ -343,66 +574,6 @@ class RawSubPanelItem extends StatelessWidget {
         child,
       ],
     );
-  }
-}
-
-class _ColorSelector extends StatefulWidget {
-  const _ColorSelector({required this.onSelected, required this.show});
-
-  final void Function(Color color) onSelected;
-  final bool show;
-
-  @override
-  State<_ColorSelector> createState() => _ColorSelectorState();
-}
-
-class _ColorSelectorState extends State<_ColorSelector> {
-  double get _target => widget.show ? 1 : 0;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: defaultPadding * 16.65,
-      padding: const EdgeInsets.all(defaultPadding),
-      decoration: BoxDecoration(
-        color: context.colorScheme.primaryContainer,
-        borderRadius: defaultBorderRadius,
-        border: Border.all(color: context.colorScheme.outline),
-        boxShadow: const [
-          BoxShadow(
-            offset: Offset(0, defaultPadding * 0.5),
-            color: Colors.black12,
-            blurRadius: defaultPadding * 2,
-          )
-        ],
-      ),
-      child: Wrap(
-        spacing: defaultPadding * .5,
-        runSpacing: defaultPadding * .5,
-        children: [
-          for (final color in Colors.primaries)
-            GestureDetector(
-              onTap: () => widget.onSelected(color),
-              child: SizedBox.square(
-                dimension: defaultPadding * 2,
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: color,
-                    borderRadius: BorderRadius.circular(defaultPadding * .5),
-                  ),
-                ),
-              ),
-            ),
-        ],
-      ),
-    )
-        .animate(target: _target)
-        .effect(
-          duration: transitionDuration,
-          curve: Curves.easeInOutCubicEmphasized,
-        )
-        .scaleXY(begin: .6, end: 1)
-        .fade();
   }
 }
 

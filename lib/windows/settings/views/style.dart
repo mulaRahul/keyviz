@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:keyviz/config/config.dart';
+import 'package:keyviz/windows/settings/widgets/cross_slider.dart';
 import 'package:keyviz/windows/shared/shared.dart';
 import '../widgets/widgets.dart';
 
@@ -9,16 +10,25 @@ class StyleTabView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const bool linked = true;
+    const bool isFlat = false;
+    const bool isSolid = false;
+    const div = Divider(height: defaultPadding);
+
     return Column(
       children: [
-        const PanelItem(
-          title: "Preset",
-          action: XDropdown(
-            option: "Elevated",
-            options: ["Minimal", "Flat", "Elevated", "Isometric"],
+        // preset
+        const Padding(
+          padding: EdgeInsets.only(bottom: defaultPadding),
+          child: PanelItem(
+            title: "Preset",
+            action: XDropdown(
+              option: "Elevated",
+              options: ["Minimal", "Flat", "Elevated", "Isometric"],
+            ),
           ),
         ),
-        const Divider(),
+        div,
         // typography
         XExpansionTile(
           title: "Typography",
@@ -32,6 +42,7 @@ class StyleTabView extends StatelessWidget {
                   onChanged: (value) {},
                 ),
                 RawColorInputSubPanelItem(
+                  label: "Font Color",
                   defaultValue: Colors.amber,
                   onChanged: (color) {},
                 ),
@@ -83,10 +94,9 @@ class StyleTabView extends StatelessWidget {
                 ),
               ],
             ),
-            const VerySmallColumnGap(),
           ],
         ),
-        const Divider(),
+        div,
         // layout
         XExpansionTile(
           title: "Layout",
@@ -152,6 +162,7 @@ class StyleTabView extends StatelessWidget {
                   ),
                 ),
                 RawColorInputSubPanelItem(
+                  label: "Icon Color",
                   defaultValue: Colors.black,
                   onChanged: (color) {},
                 ),
@@ -167,9 +178,10 @@ class StyleTabView extends StatelessWidget {
                   ),
                 ),
                 RawColorInputSubPanelItem(
+                  enabled: false,
+                  label: "Symbol Color",
                   defaultValue: Colors.black,
                   onChanged: (color) {},
-                  enabled: false,
                 ),
               ],
             ),
@@ -182,7 +194,7 @@ class StyleTabView extends StatelessWidget {
             ),
           ],
         ),
-        const Divider(),
+        div,
         // color
         XExpansionTile(
           title: "Color",
@@ -206,42 +218,110 @@ class StyleTabView extends StatelessWidget {
               ),
             ),
             const VerySmallColumnGap(),
-            // Padding(
-            //   padding: const EdgeInsets.only(
-            //     left: defaultPadding * .5,
-            //     bottom: defaultPadding * .5,
-            //   ),
-            //   child: Text(
-            //     "Normal Keys",
-            //     style: context.textTheme.titleSmall?.copyWith(
-            //       color: context.colorScheme.tertiary,
-            //     ),
-            //   ),
-            // ),
-            SubPanelItem(
-              title: "Normal",
-              child: SizedBox(
-                width: defaultPadding * 10,
-                child: RawColorInputSubPanelItem(
-                  defaultValue: Colors.purple,
-                  onChanged: (Color value) {},
-                ),
+            // normal & modifiers title
+            Padding(
+              padding: const EdgeInsets.only(
+                left: defaultPadding * .5,
+                bottom: defaultPadding * .5,
+              ),
+              child: Row(
+                children: [
+                  Text(
+                    "Normal",
+                    style: context.textTheme.titleSmall?.copyWith(
+                      color: context.colorScheme.tertiary,
+                    ),
+                  ),
+                  const VerySmallRowGap(),
+                  IconButton(
+                    onPressed: () {},
+                    icon: const SvgIcon(
+                      icon: linked ? VuesaxIcons.linked : VuesaxIcons.unlinked,
+                    ),
+                  ),
+                  const VerySmallRowGap(),
+                  Text(
+                    "Modifier",
+                    style: context.textTheme.titleSmall?.copyWith(
+                      color: context.colorScheme.tertiary
+                          .withOpacity(linked ? 1 : .25),
+                    ),
+                  ),
+                ],
               ),
             ),
+            // color options
+            if (isSolid) ...[
+              SubPanelItem(
+                title: "Color",
+                child: SizedBox(
+                  width: defaultPadding * 10,
+                  child: RawColorInputSubPanelItem(
+                    defaultValue: Colors.purple,
+                    onChanged: (Color value) {},
+                  ),
+                ),
+              ),
+              if (!isFlat) ...[
+                const VerySmallColumnGap(),
+                SubPanelItem(
+                  title: "Shadow",
+                  child: SizedBox(
+                    width: defaultPadding * 10,
+                    child: RawColorInputSubPanelItem(
+                      defaultValue: Colors.purple,
+                      onChanged: (Color value) {},
+                    ),
+                  ),
+                )
+              ]
+            ]
+            // gradient
+            else
+              SubPanelItemGroup(
+                items: [
+                  RawGradientInputSubPanelItem(
+                    title: "Primary Color",
+                    onColor1Changed: (Color color) {},
+                    onColor2Changed: (Color color) {},
+                  ),
+                  RawGradientInputSubPanelItem(
+                    title: "Shadow Color",
+                    onColor1Changed: (Color color) {},
+                    onColor2Changed: (Color color) {},
+                  ),
+                ],
+              ),
             const VerySmallColumnGap(),
-            SubPanelItem(
-              title: "Modifier",
-              child: SizedBox(
-                width: defaultPadding * 10,
-                child: RawColorInputSubPanelItem(
-                  defaultValue: Colors.purple,
-                  onChanged: (Color value) {},
+            if (!linked) ...[
+              Padding(
+                padding: const EdgeInsets.only(
+                  top: defaultPadding * .5,
+                  left: defaultPadding * .5,
+                  bottom: defaultPadding * .5,
+                ),
+                child: Text(
+                  "Modifier",
+                  style: context.textTheme.titleSmall?.copyWith(
+                    color: context.colorScheme.tertiary,
+                  ),
                 ),
               ),
-            ),
+              SubPanelItem(
+                title: "Color",
+                child: SizedBox(
+                  width: defaultPadding * 10,
+                  child: RawColorInputSubPanelItem(
+                    defaultValue: Colors.purple,
+                    onChanged: (Color value) {},
+                  ),
+                ),
+              ),
+            ]
           ],
         ),
-        const Divider(),
+        div,
+        // border
         XExpansionTile(
           title: "Border",
           children: [
@@ -254,18 +334,34 @@ class StyleTabView extends StatelessWidget {
                   ),
                 ),
                 RawColorInputSubPanelItem(
+                  enabled: false,
+                  label: "Border Color",
                   defaultValue: Colors.blueGrey,
                   onChanged: (color) {},
-                  enabled: false,
                 ),
               ],
             ),
-            VerySmallColumnGap(),
-            // TODO SliderInputSubPanelItem
-            VerySmallColumnGap(),
+            const VerySmallColumnGap(),
+            SubPanelItem(
+              title: "Width",
+              child: XSlider(
+                onChanged: (int value) {},
+                suffix: "px",
+              ),
+            ),
+            const VerySmallColumnGap(),
+            SubPanelItem(
+              title: "Corner Radius",
+              child: XSlider(
+                max: 100,
+                onChanged: (int value) {},
+                suffix: "%",
+              ),
+            ),
           ],
         ),
-        const Divider(),
+        div,
+        // background
         XExpansionTile(
           title: "Background",
           children: [
@@ -279,14 +375,24 @@ class StyleTabView extends StatelessWidget {
                   ),
                 ),
                 RawColorInputSubPanelItem(
+                  label: "Background Color",
                   defaultValue: Colors.lime,
                   onChanged: (Color value) {},
                 ),
               ],
             ),
+            const VerySmallColumnGap(),
+            SubPanelItem(
+              title: "Opacity",
+              child: XSlider(
+                max: 100,
+                suffix: "%",
+                onChanged: (int value) {},
+              ),
+            ),
           ],
         ),
-        const ColumnGap(),
+        const SmallColumnGap(),
       ],
     );
   }

@@ -16,4 +16,8 @@ class VuesaxIcons {
   static const alignLeft = "$_imgDir/align-left.svg";
   static const alignHorizontally = "$_imgDir/align-horizontally.svg";
   static const alignRight = "$_imgDir/align-right.svg";
+  static const linked = "$_imgDir/linked.svg";
+  static const unlinked = "$_imgDir/unlinked.svg";
+  static const clipboard = "$_imgDir/clipboard.svg";
+  static const clipboardTick = "$_imgDir/clipboard-tick.svg";
 }

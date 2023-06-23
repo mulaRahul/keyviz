@@ -13,7 +13,9 @@ class KeyvizApp extends StatelessWidget {
       theme: lightTheme,
       home: const Material(
         color: Colors.white,
-        child: Center(child: SettingsWindow()),
+        child: Center(
+          child: SettingsWindow(),
+        ),
       ),
     );
   }

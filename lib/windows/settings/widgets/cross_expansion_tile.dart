@@ -40,7 +40,10 @@ class _XExpansionTileState extends State<XExpansionTile> {
           curve: Curves.easeOutCubic,
           child: const SvgIcon.chevronDown(size: defaultPadding * .4),
         ),
-        childrenPadding: const EdgeInsets.only(left: defaultPadding * 2.25),
+        childrenPadding: const EdgeInsets.only(
+          left: defaultPadding * 2.25,
+          bottom: defaultPadding,
+        ),
         expandedAlignment: Alignment.centerLeft,
         expandedCrossAxisAlignment: CrossAxisAlignment.start,
         children: [
