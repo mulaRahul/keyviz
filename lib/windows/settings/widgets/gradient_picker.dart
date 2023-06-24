@@ -5,7 +5,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:keyviz/config/config.dart';
 import 'package:keyviz/windows/shared/shared.dart';
 
-enum ColorSpace { hue, saturation, brightness }
+enum _ColorSpace { hue, saturation, brightness }
 
 class GradientPicker extends StatefulWidget {
   const GradientPicker({
@@ -73,15 +73,15 @@ class _GradientPickerState extends State<GradientPicker> {
     );
 
     _hueFocusNode = FocusNode(
-      onKeyEvent: (_, event) => _onKeyEvent(event, _hueCtrl, ColorSpace.hue),
+      onKeyEvent: (_, event) => _onKeyEvent(event, _hueCtrl, _ColorSpace.hue),
     );
     _saturationFocusNode = FocusNode(
       onKeyEvent: (_, event) =>
-          _onKeyEvent(event, _saturationCtrl, ColorSpace.saturation),
+          _onKeyEvent(event, _saturationCtrl, _ColorSpace.saturation),
     );
     _brightnessFocusNode = FocusNode(
       onKeyEvent: (_, event) =>
-          _onKeyEvent(event, _brightnessCtrl, ColorSpace.brightness),
+          _onKeyEvent(event, _brightnessCtrl, _ColorSpace.brightness),
     );
   }
 
@@ -501,7 +501,7 @@ class _GradientPickerState extends State<GradientPicker> {
   KeyEventResult _onKeyEvent(
     KeyEvent event,
     TextEditingController ctrl,
-    ColorSpace colorSpace,
+    _ColorSpace colorSpace,
   ) {
     if (["Arrow Up", "Arrow Down"].contains(event.logicalKey.keyLabel) &&
         event is KeyDownEvent) {
@@ -512,7 +512,7 @@ class _GradientPickerState extends State<GradientPicker> {
         // increase
         if (event.logicalKey.keyLabel == "Arrow Up") {
           // max limit
-          if (colorSpace == ColorSpace.hue) {
+          if (colorSpace == _ColorSpace.hue) {
             if (n >= 255) return KeyEventResult.ignored;
           } else {
             if (n >= 100) return KeyEventResult.ignored;
@@ -526,15 +526,15 @@ class _GradientPickerState extends State<GradientPicker> {
         // update color
         setState(() {
           switch (colorSpace) {
-            case ColorSpace.hue:
+            case _ColorSpace.hue:
               _hsvColor = _hsvColor.withHue((n / 255) * 360);
               break;
 
-            case ColorSpace.saturation:
+            case _ColorSpace.saturation:
               _hsvColor = _hsvColor.withSaturation(n / 100);
               break;
 
-            case ColorSpace.brightness:
+            case _ColorSpace.brightness:
               _hsvColor = _hsvColor.withValue(n / 100);
               break;
           }

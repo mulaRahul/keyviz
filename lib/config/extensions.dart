@@ -1,9 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import 'package:keyviz/providers/key_event.dart';
+import 'package:keyviz/providers/key_style.dart';
+
+extension Cap on String {
+  String capitalize() {
+    return "${this[0].toUpperCase()}${substring(1).toLowerCase()}";
+  }
+}
 
 extension Ease on BuildContext {
   ThemeData get theme => Theme.of(this);
   ColorScheme get colorScheme => theme.colorScheme;
   TextTheme get textTheme => theme.textTheme;
+  KeyEventProvider get keyEvent => read<KeyEventProvider>();
+  KeyStyleProvider get keyStyle => read<KeyStyleProvider>();
 }
 
 extension HexColor on Color {

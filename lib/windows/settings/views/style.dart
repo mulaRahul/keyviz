@@ -152,38 +152,20 @@ class StyleTabView extends StatelessWidget {
               ],
             ),
             const VerySmallColumnGap(),
-            SubPanelItemGroup(
-              items: [
-                RawSubPanelItem(
-                  title: "Icon",
-                  child: XSwitch(
-                    defaultValue: true,
-                    onChange: (v) {},
-                  ),
-                ),
-                RawColorInputSubPanelItem(
-                  label: "Icon Color",
-                  defaultValue: Colors.black,
-                  onChanged: (color) {},
-                ),
-              ],
+            SubPanelItem(
+              title: "Icon",
+              child: XSwitch(
+                defaultValue: true,
+                onChange: (v) {},
+              ),
             ),
             const VerySmallColumnGap(),
-            SubPanelItemGroup(
-              items: [
-                RawSubPanelItem(
-                  title: "Symbol",
-                  child: XSwitch(
-                    onChange: (v) {},
-                  ),
-                ),
-                RawColorInputSubPanelItem(
-                  enabled: false,
-                  label: "Symbol Color",
-                  defaultValue: Colors.black,
-                  onChanged: (color) {},
-                ),
-              ],
+            SubPanelItem(
+              title: "Symbol",
+              child: XSwitch(
+                defaultValue: true,
+                onChange: (v) {},
+              ),
             ),
             const VerySmallColumnGap(),
             SubPanelItem(
@@ -333,6 +315,7 @@ class StyleTabView extends StatelessWidget {
                     onChange: (bool value) {},
                   ),
                 ),
+                // ? if modifier and normal linked
                 RawColorInputSubPanelItem(
                   enabled: false,
                   label: "Border Color",
@@ -341,9 +324,35 @@ class StyleTabView extends StatelessWidget {
                 ),
               ],
             ),
+            // ...[
+            //   const VerySmallColumnGap(),
+            //   SubPanelItem(
+            //     title: "Normal",
+            //     child: SizedBox(
+            //       width: defaultPadding * 10,
+            //       child: RawColorInputSubPanelItem(
+            //         label: "Normal Border Color",
+            //         onChanged: (color) {},
+            //         defaultValue: Colors.black,
+            //       ),
+            //     ),
+            //   ),
+            //   const VerySmallColumnGap(),
+            //   SubPanelItem(
+            //     title: "Modifier",
+            //     child: SizedBox(
+            //       width: defaultPadding * 10,
+            //       child: RawColorInputSubPanelItem(
+            //         label: "Modifier Border Color",
+            //         onChanged: (color) {},
+            //         defaultValue: Colors.deepPurple,
+            //       ),
+            //     ),
+            //   ),
+            // ],
             const VerySmallColumnGap(),
             SubPanelItem(
-              title: "Width",
+              title: "Thickness",
               child: XSlider(
                 onChanged: (int value) {},
                 suffix: "px",
@@ -351,7 +360,7 @@ class StyleTabView extends StatelessWidget {
             ),
             const VerySmallColumnGap(),
             SubPanelItem(
-              title: "Corner Radius",
+              title: "Rounded Corner",
               child: XSlider(
                 max: 100,
                 onChanged: (int value) {},

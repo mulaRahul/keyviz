@@ -171,7 +171,7 @@ class _RawInputSubPanelItemState extends State<RawInputSubPanelItem> {
         if (event.logicalKey.keyLabel == "Arrow Up") {
           _ctrl.text = "${n + 1}";
           // decrease
-        } else if (event.logicalKey.keyLabel == "Arrow Down") {
+        } else if (event.logicalKey.keyLabel == "Arrow Down" && n > 0) {
           _ctrl.text = "${n - 1}";
         }
       } on FormatException {

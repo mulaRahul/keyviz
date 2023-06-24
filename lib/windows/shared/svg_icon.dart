@@ -36,4 +36,10 @@ class SvgIcon extends StatelessWidget {
     this.color,
     this.size = defaultPadding / 2,
   }) : icon = VuesaxIcons.cross;
+
+  const SvgIcon.arrowRight({
+    super.key,
+    this.color,
+    this.size = defaultPadding / 2,
+  }) : icon = VuesaxIcons.arrowRight;
 }

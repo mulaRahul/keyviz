@@ -20,4 +20,5 @@ class VuesaxIcons {
   static const unlinked = "$_imgDir/unlinked.svg";
   static const clipboard = "$_imgDir/clipboard.svg";
   static const clipboardTick = "$_imgDir/clipboard-tick.svg";
+  static const arrowRight = "$_imgDir/arrow-right.svg";
 }
