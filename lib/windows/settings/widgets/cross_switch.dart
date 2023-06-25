@@ -2,24 +2,15 @@ import 'package:flutter/material.dart';
 
 import 'package:keyviz/config/config.dart';
 
-class XSwitch extends StatefulWidget {
-  const XSwitch({super.key, this.defaultValue, required this.onChange});
+class XSwitch extends StatelessWidget {
+  const XSwitch({
+    super.key,
+    required this.value,
+    required this.onChange,
+  });
 
-  final bool? defaultValue;
-  final ValueChanged<bool>? onChange;
-
-  @override
-  State<XSwitch> createState() => _XSwitchState();
-}
-
-class _XSwitchState extends State<XSwitch> {
-  late bool _value;
-
-  @override
-  void initState() {
-    super.initState();
-    _value = widget.defaultValue ?? false;
-  }
+  final bool value;
+  final ValueChanged<bool> onChange;
 
   @override
   Widget build(BuildContext context) {
@@ -28,11 +19,8 @@ class _XSwitchState extends State<XSwitch> {
       child: FittedBox(
         fit: BoxFit.contain,
         child: Switch(
-          value: _value,
-          onChanged: (v) {
-            setState(() => _value = v);
-            widget.onChange?.call(v);
-          },
+          value: value,
+          onChanged: onChange,
         ),
       ),
     );

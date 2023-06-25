@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:keyviz/providers/key_event.dart';
+import 'package:provider/provider.dart';
 
 import 'package:keyviz/config/config.dart';
-import 'package:keyviz/windows/settings/widgets/cross_slider.dart';
+import 'package:keyviz/providers/key_style.dart';
 import 'package:keyviz/windows/shared/shared.dart';
+import 'package:tuple/tuple.dart';
+
 import '../widgets/widgets.dart';
 
 class StyleTabView extends StatelessWidget {
@@ -10,21 +14,24 @@ class StyleTabView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const bool linked = true;
-    const bool isFlat = false;
-    const bool isSolid = false;
     const div = Divider(height: defaultPadding);
 
     return Column(
       children: [
         // preset
-        const Padding(
-          padding: EdgeInsets.only(bottom: defaultPadding),
+        Padding(
+          padding: const EdgeInsets.only(bottom: defaultPadding),
           child: PanelItem(
             title: "Preset",
-            action: XDropdown(
-              option: "Elevated",
-              options: ["Minimal", "Flat", "Elevated", "Isometric"],
+            action: Selector<KeyStyleProvider, KeyCapStyle>(
+              selector: (_, keyStyle) => keyStyle.preset,
+              builder: (context, preset, _) {
+                return XDropdown<KeyCapStyle>(
+                  value: preset,
+                  options: KeyCapStyle.values,
+                  onChanged: (value) => context.keyStyle.preset = value,
+                );
+              },
             ),
           ),
         ),
@@ -33,62 +40,134 @@ class StyleTabView extends StatelessWidget {
         XExpansionTile(
           title: "Typography",
           children: [
-            SubPanelItemGroup(
-              items: [
-                RawInputSubPanelItem(
-                  title: "Size",
-                  suffix: "px",
-                  defaultValue: 16,
-                  onChanged: (value) {},
-                ),
-                RawColorInputSubPanelItem(
-                  label: "Font Color",
-                  defaultValue: Colors.amber,
-                  onChanged: (color) {},
-                ),
-              ],
+            Selector<KeyStyleProvider, bool>(
+              selector: (_, keyStyle) => keyStyle.differentColorForModifiers,
+              builder: (context, differentColorForModifiers, _) {
+                return differentColorForModifiers
+                    ? Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          SubPanelItem(
+                            title: "Font Size",
+                            child: Selector<KeyStyleProvider, double>(
+                              selector: (_, keyStyle) => keyStyle.fontSize,
+                              builder: (context, fontSize, _) => XSlider(
+                                max: 128,
+                                suffix: "px",
+                                value: fontSize,
+                                onChanged: (value) {
+                                  context.keyStyle.fontSize = value;
+                                },
+                              ),
+                            ),
+                          ),
+                          const VerySmallColumnGap(),
+                          SubPanelItem(
+                            title: "Normal Color",
+                            child: SizedBox(
+                              width: defaultPadding * 10,
+                              child: RawColorInputSubPanelItem(
+                                label: "Normal Font Color",
+                                defaultValue: context.keyStyle.fontColor,
+                                onChanged: (Color value) {
+                                  context.keyStyle.fontColor = value;
+                                },
+                              ),
+                            ),
+                          ),
+                          const VerySmallColumnGap(),
+                          SubPanelItem(
+                            title: "Modifier Color",
+                            child: SizedBox(
+                              width: defaultPadding * 10,
+                              child: RawColorInputSubPanelItem(
+                                label: "Modifier Font Color",
+                                defaultValue: context.keyStyle.mFontColor,
+                                onChanged: (Color value) {
+                                  context.keyStyle.mFontColor = value;
+                                },
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+                    : SubPanelItemGroup(
+                        items: [
+                          RawInputSubPanelItem(
+                            title: "Size",
+                            suffix: "px",
+                            defaultValue: context.keyStyle.fontSize.toInt(),
+                            onChanged: (value) {
+                              context.keyStyle.fontSize = value.toDouble();
+                            },
+                          ),
+                          RawColorInputSubPanelItem(
+                            label: "Font Color",
+                            defaultValue: context.keyStyle.fontColor,
+                            onChanged: (color) {
+                              context.keyStyle.fontColor = color;
+                            },
+                          ),
+                        ],
+                      );
+              },
             ),
             const VerySmallColumnGap(),
             SubPanelItemGroup(
               items: [
                 RawSubPanelItem(
                   title: "Caps",
-                  child: Row(
-                    children: [
-                      Text(
-                        "TT",
-                        style: context.textTheme.labelMedium?.copyWith(
-                          color: context.colorScheme.tertiary,
-                          fontWeight: FontWeight.w300,
-                        ),
-                      ),
-                      const SmallRowGap(),
-                      Text(
-                        "Tt",
-                        style: context.textTheme.labelMedium?.copyWith(
-                          color: context.colorScheme.primary,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      const SmallRowGap(),
-                      Text(
-                        "tt",
-                        style: context.textTheme.labelMedium?.copyWith(
-                          color: context.colorScheme.tertiary,
-                          fontWeight: FontWeight.w300,
-                        ),
-                      ),
-                    ],
+                  child: Selector<KeyStyleProvider, TextCap>(
+                    selector: (_, keyStyle) => keyStyle.textCap,
+                    builder: (context, textCap, _) => Row(
+                      children: [
+                        for (final value in TextCap.values)
+                          Tooltip(
+                            message: value.toString(),
+                            child: TextButton(
+                              onPressed: () {
+                                context.keyStyle.textCap = value;
+                              },
+                              style: TextButton.styleFrom(
+                                minimumSize: Size.zero,
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: defaultPadding * .25,
+                                  horizontal: defaultPadding * .5,
+                                ),
+                              ),
+                              child: Text(
+                                value.symbol,
+                                style: context.textTheme.labelMedium?.copyWith(
+                                  color: value == textCap
+                                      ? context.colorScheme.primary
+                                      : context.colorScheme.tertiary,
+                                  fontWeight: value == textCap
+                                      ? FontWeight.w700
+                                      : FontWeight.w300,
+                                ),
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
                   ),
                 ),
-                const RawSubPanelItem(
+                RawSubPanelItem(
                   title: "Modifier",
                   child: SizedBox(
                     width: defaultPadding * 5,
-                    child: XDropdown(
-                      option: "Icon Only",
-                      decorated: false,
-                      options: ["Icon Only", "Short Text", "Full Text"],
+                    child: Selector<KeyStyleProvider, ModifierTextLength>(
+                      selector: (_, keyStyle) => keyStyle.modifierTextLength,
+                      builder: (context, modifierTextLength, _) {
+                        return XDropdown<ModifierTextLength>(
+                          decorated: false,
+                          value: modifierTextLength,
+                          options: ModifierTextLength.values,
+                          onChanged: (value) {
+                            context.keyStyle.modifierTextLength = value;
+                          },
+                        );
+                      },
                     ),
                   ),
                 ),
@@ -107,46 +186,54 @@ class StyleTabView extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    XIconButton(
-                      icon: VuesaxIcons.alignTop,
-                      onTap: () {},
-                      selected: false,
-                    ),
-                    const SmallRowGap(),
-                    XIconButton(
-                      icon: VuesaxIcons.alignVertically,
-                      onTap: () {},
-                      selected: true,
-                    ),
-                    const SmallRowGap(),
-                    XIconButton(
-                      icon: VuesaxIcons.alignBottom,
-                      onTap: () {},
-                      selected: false,
-                    ),
+                    for (final value in VerticalAlignment.values)
+                      Padding(
+                        padding: EdgeInsets.only(
+                          right: value == VerticalAlignment.values.last
+                              ? 0
+                              : defaultPadding,
+                        ),
+                        child: Selector<KeyStyleProvider, VerticalAlignment>(
+                          selector: (_, keyStyle) => keyStyle.verticalAlignment,
+                          builder: (context, verticalAlignment, _) {
+                            return XIconButton(
+                              icon: value.iconName,
+                              onTap: () {
+                                context.keyStyle.verticalAlignment = value;
+                              },
+                              selected: verticalAlignment == value,
+                            );
+                          },
+                        ),
+                      ),
                   ],
                 ),
                 // horizontal align
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    XIconButton(
-                      icon: VuesaxIcons.alignLeft,
-                      onTap: () {},
-                      selected: false,
-                    ),
-                    const SmallRowGap(),
-                    XIconButton(
-                      icon: VuesaxIcons.alignHorizontally,
-                      onTap: () {},
-                      selected: true,
-                    ),
-                    const SmallRowGap(),
-                    XIconButton(
-                      icon: VuesaxIcons.alignRight,
-                      onTap: () {},
-                      selected: false,
-                    ),
+                    for (final value in HorizontalAlignment.values)
+                      Padding(
+                        padding: EdgeInsets.only(
+                          right: value == HorizontalAlignment.values.last
+                              ? 0
+                              : defaultPadding,
+                        ),
+                        child: Selector<KeyStyleProvider, HorizontalAlignment>(
+                          selector: (_, keyStyle) {
+                            return keyStyle.horizontalAlignment;
+                          },
+                          builder: (context, horizontalAlignment, _) {
+                            return XIconButton(
+                              icon: value.iconName,
+                              onTap: () {
+                                context.keyStyle.horizontalAlignment = value;
+                              },
+                              selected: horizontalAlignment == value,
+                            );
+                          },
+                        ),
+                      ),
                   ],
                 ),
               ],
@@ -154,252 +241,540 @@ class StyleTabView extends StatelessWidget {
             const VerySmallColumnGap(),
             SubPanelItem(
               title: "Icon",
-              child: XSwitch(
-                defaultValue: true,
-                onChange: (v) {},
+              child: Selector<KeyStyleProvider, bool>(
+                selector: (_, keyStyle) => keyStyle.showIcon,
+                builder: (context, showIcon, _) {
+                  return XSwitch(
+                    value: showIcon,
+                    onChange: (value) => context.keyStyle.showIcon = value,
+                  );
+                },
               ),
             ),
             const VerySmallColumnGap(),
             SubPanelItem(
               title: "Symbol",
-              child: XSwitch(
-                defaultValue: true,
-                onChange: (v) {},
+              child: Selector<KeyStyleProvider, bool>(
+                selector: (_, keyStyle) => keyStyle.showSymbol,
+                builder: (context, showSymbol, _) {
+                  return XSwitch(
+                    value: showSymbol,
+                    onChange: (value) => context.keyStyle.showSymbol = value,
+                  );
+                },
               ),
             ),
             const VerySmallColumnGap(),
             SubPanelItem(
               title: 'Add  "+"  Separator',
-              child: XSwitch(
-                onChange: (v) {},
+              child: Selector<KeyStyleProvider, bool>(
+                selector: (_, keyStyle) => keyStyle.addPlusSeparator,
+                builder: (context, addPlusSeparator, _) {
+                  return XSwitch(
+                    value: addPlusSeparator,
+                    onChange: (value) {
+                      context.keyStyle.addPlusSeparator = value;
+                    },
+                  );
+                },
               ),
             ),
           ],
         ),
         div,
         // color
-        XExpansionTile(
-          title: "Color",
-          children: [
-            SubPanelItem(
-              title: "Fill Type",
-              child: Row(
-                children: [
-                  XTextButton(
-                    "Solid",
-                    onTap: () {},
-                    selected: true,
-                  ),
-                  const VerySmallRowGap(),
-                  XTextButton(
-                    "Gradient",
-                    onTap: () {},
-                    selected: false,
-                  ),
-                ],
-              ),
-            ),
-            const VerySmallColumnGap(),
-            // normal & modifiers title
-            Padding(
-              padding: const EdgeInsets.only(
-                left: defaultPadding * .5,
-                bottom: defaultPadding * .5,
-              ),
-              child: Row(
-                children: [
-                  Text(
-                    "Normal",
-                    style: context.textTheme.titleSmall?.copyWith(
-                      color: context.colorScheme.tertiary,
-                    ),
-                  ),
-                  const VerySmallRowGap(),
-                  IconButton(
-                    onPressed: () {},
-                    icon: const SvgIcon(
-                      icon: linked ? VuesaxIcons.linked : VuesaxIcons.unlinked,
-                    ),
-                  ),
-                  const VerySmallRowGap(),
-                  Text(
-                    "Modifier",
-                    style: context.textTheme.titleSmall?.copyWith(
-                      color: context.colorScheme.tertiary
-                          .withOpacity(linked ? 1 : .25),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            // color options
-            if (isSolid) ...[
-              SubPanelItem(
-                title: "Color",
-                child: SizedBox(
-                  width: defaultPadding * 10,
-                  child: RawColorInputSubPanelItem(
-                    defaultValue: Colors.purple,
-                    onChanged: (Color value) {},
-                  ),
-                ),
-              ),
-              if (!isFlat) ...[
-                const VerySmallColumnGap(),
-                SubPanelItem(
-                  title: "Shadow",
-                  child: SizedBox(
-                    width: defaultPadding * 10,
-                    child: RawColorInputSubPanelItem(
-                      defaultValue: Colors.purple,
-                      onChanged: (Color value) {},
-                    ),
-                  ),
-                )
-              ]
-            ]
-            // gradient
-            else
-              SubPanelItemGroup(
-                items: [
-                  RawGradientInputSubPanelItem(
-                    title: "Primary Color",
-                    onColor1Changed: (Color color) {},
-                    onColor2Changed: (Color color) {},
-                  ),
-                  RawGradientInputSubPanelItem(
-                    title: "Shadow Color",
-                    onColor1Changed: (Color color) {},
-                    onColor2Changed: (Color color) {},
-                  ),
-                ],
-              ),
-            const VerySmallColumnGap(),
-            if (!linked) ...[
-              Padding(
-                padding: const EdgeInsets.only(
-                  top: defaultPadding * .5,
-                  left: defaultPadding * .5,
-                  bottom: defaultPadding * .5,
-                ),
-                child: Text(
-                  "Modifier",
-                  style: context.textTheme.titleSmall?.copyWith(
-                    color: context.colorScheme.tertiary,
-                  ),
-                ),
-              ),
-              SubPanelItem(
-                title: "Color",
-                child: SizedBox(
-                  width: defaultPadding * 10,
-                  child: RawColorInputSubPanelItem(
-                    defaultValue: Colors.purple,
-                    onChanged: (Color value) {},
-                  ),
-                ),
-              ),
-            ]
-          ],
+        Selector<KeyStyleProvider, KeyCapStyle>(
+          selector: (_, keyStyle) => keyStyle.preset,
+          shouldRebuild: (previous, next) =>
+              previous == KeyCapStyle.minimal || next == KeyCapStyle.minimal,
+          builder: (context, preset, _) {
+            return preset == KeyCapStyle.minimal
+                ? const SizedBox()
+                : Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      XExpansionTile(
+                        title: "Color",
+                        children: [
+                          SubPanelItem(
+                            title: "Fill Type",
+                            child: Selector<KeyStyleProvider, bool>(
+                              selector: (_, keyStyle) => keyStyle.isGradient,
+                              builder: (context, isGradient, _) {
+                                return Row(
+                                  children: [
+                                    XTextButton(
+                                      "Solid",
+                                      selected: !isGradient,
+                                      onTap: () =>
+                                          context.keyStyle.isGradient = false,
+                                    ),
+                                    const VerySmallRowGap(),
+                                    Selector<KeyStyleProvider, KeyCapStyle>(
+                                      selector: (_, keyStyle) =>
+                                          keyStyle.preset,
+                                      builder: (context, preset, _) {
+                                        final isElevated =
+                                            preset == KeyCapStyle.elevated;
+                                        return isElevated
+                                            ? Tooltip(
+                                                message:
+                                                    "Elevated style doesn't"
+                                                    " support gradients",
+                                                child: Padding(
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
+                                                    horizontal:
+                                                        defaultPadding * .6,
+                                                  ),
+                                                  child: Text(
+                                                    "Gradient",
+                                                    style: context
+                                                        .textTheme.labelSmall
+                                                        ?.copyWith(
+                                                      fontSize: 14,
+                                                      color: context
+                                                          .colorScheme.tertiary
+                                                          .withOpacity(.25),
+                                                    ),
+                                                  ),
+                                                ),
+                                              )
+                                            : XTextButton(
+                                                "Gradient",
+                                                selected: isGradient,
+                                                onTap: () => context
+                                                    .keyStyle.isGradient = true,
+                                              );
+                                      },
+                                    ),
+                                  ],
+                                );
+                              },
+                            ),
+                          ),
+                          const VerySmallColumnGap(),
+                          // normal & modifiers title
+                          Padding(
+                            padding: const EdgeInsets.only(
+                              left: defaultPadding * .5,
+                              bottom: defaultPadding * .5,
+                            ),
+                            child: Selector<KeyStyleProvider, bool>(
+                              selector: (_, keyStyle) =>
+                                  keyStyle.differentColorForModifiers,
+                              builder: (context, differentColors, _) => Row(
+                                children: [
+                                  Text(
+                                    "Normal",
+                                    style:
+                                        context.textTheme.titleSmall?.copyWith(
+                                      color: context.colorScheme.tertiary,
+                                    ),
+                                  ),
+                                  const VerySmallRowGap(),
+                                  IconButton(
+                                    onPressed: () {
+                                      context.keyStyle
+                                              .differentColorForModifiers =
+                                          !differentColors;
+                                    },
+                                    icon: SvgIcon(
+                                      icon: differentColors
+                                          ? VuesaxIcons.unlinked
+                                          : VuesaxIcons.linked,
+                                    ),
+                                  ),
+                                  const VerySmallRowGap(),
+                                  Text(
+                                    "Modifier",
+                                    style:
+                                        context.textTheme.titleSmall?.copyWith(
+                                      color: context.colorScheme.tertiary
+                                          .withOpacity(
+                                              differentColors ? .25 : 1),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          // color options
+                          Selector<KeyStyleProvider,
+                              Tuple3<KeyCapStyle, bool, bool>>(
+                            selector: (_, keyStyle) => Tuple3(
+                              keyStyle.preset,
+                              keyStyle.isGradient,
+                              keyStyle.differentColorForModifiers,
+                            ),
+                            builder: (context, tuple, _) {
+                              final bool need2Colors =
+                                  tuple.item1 == KeyCapStyle.isometric ||
+                                      tuple.item1 == KeyCapStyle.elevated;
+                              final bool isGradient = tuple.item2;
+                              final bool differentColorForModifiers =
+                                  tuple.item3;
+
+                              return Column(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // normal color options
+                                  isGradient
+                                      ? SubPanelItemGroup(
+                                          items: [
+                                            RawGradientInputSubPanelItem(
+                                              title: need2Colors
+                                                  ? "Primary"
+                                                  : "Color",
+                                              initialColor1: context
+                                                  .keyStyle.primaryColor1,
+                                              initialColor2: context
+                                                  .keyStyle.primaryColor2,
+                                              onColor1Changed: (Color color) {
+                                                context.keyStyle.primaryColor1 =
+                                                    color;
+                                              },
+                                              onColor2Changed: (Color color) {
+                                                context.keyStyle.primaryColor2 =
+                                                    color;
+                                              },
+                                            ),
+                                            if (need2Colors)
+                                              RawGradientInputSubPanelItem(
+                                                title: "Secondary",
+                                                initialColor1: context
+                                                    .keyStyle.secondaryColor1,
+                                                initialColor2: context
+                                                    .keyStyle.secondaryColor2,
+                                                onColor1Changed: (Color color) {
+                                                  context.keyStyle
+                                                      .secondaryColor1 = color;
+                                                },
+                                                onColor2Changed: (Color color) {
+                                                  context.keyStyle
+                                                      .secondaryColor2 = color;
+                                                },
+                                              ),
+                                          ],
+                                        )
+                                      : Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            SubPanelItem(
+                                              title: need2Colors
+                                                  ? "Primary"
+                                                  : "Color",
+                                              child: SizedBox(
+                                                width: defaultPadding * 10,
+                                                child:
+                                                    RawColorInputSubPanelItem(
+                                                  defaultValue: context
+                                                      .keyStyle.primaryColor1,
+                                                  onChanged: (Color color) {
+                                                    context.keyStyle
+                                                        .primaryColor1 = color;
+                                                  },
+                                                ),
+                                              ),
+                                            ),
+                                            if (need2Colors) ...[
+                                              const VerySmallColumnGap(),
+                                              SubPanelItem(
+                                                title: "Secondary",
+                                                child: SizedBox(
+                                                  width: defaultPadding * 10,
+                                                  child:
+                                                      RawColorInputSubPanelItem(
+                                                    defaultValue: context
+                                                        .keyStyle
+                                                        .secondaryColor1,
+                                                    onChanged: (Color color) {
+                                                      context.keyStyle
+                                                              .secondaryColor1 =
+                                                          color;
+                                                    },
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ],
+                                        ),
+                                  // modifier color options
+                                  if (differentColorForModifiers) ...[
+                                    const VerySmallColumnGap(),
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                        top: defaultPadding * .5,
+                                        left: defaultPadding * .5,
+                                        bottom: defaultPadding * .5,
+                                      ),
+                                      child: Text(
+                                        "Modifier",
+                                        style: context.textTheme.titleSmall
+                                            ?.copyWith(
+                                          color: context.colorScheme.tertiary,
+                                        ),
+                                      ),
+                                    ),
+                                    isGradient
+                                        ? SubPanelItemGroup(
+                                            items: [
+                                              RawGradientInputSubPanelItem(
+                                                title: need2Colors
+                                                    ? "Primary"
+                                                    : "Color",
+                                                initialColor1: context
+                                                    .keyStyle.mPrimaryColor1,
+                                                initialColor2: context
+                                                    .keyStyle.mPrimaryColor2,
+                                                onColor1Changed: (Color color) {
+                                                  context.keyStyle
+                                                      .mPrimaryColor1 = color;
+                                                },
+                                                onColor2Changed: (Color color) {
+                                                  context.keyStyle
+                                                      .mPrimaryColor2 = color;
+                                                },
+                                              ),
+                                              if (need2Colors)
+                                                RawGradientInputSubPanelItem(
+                                                  title: "Secondary",
+                                                  initialColor1: context
+                                                      .keyStyle
+                                                      .mSecondaryColor1,
+                                                  initialColor2: context
+                                                      .keyStyle
+                                                      .mSecondaryColor2,
+                                                  onColor1Changed:
+                                                      (Color color) {
+                                                    context.keyStyle
+                                                            .mSecondaryColor1 =
+                                                        color;
+                                                  },
+                                                  onColor2Changed:
+                                                      (Color color) {
+                                                    context.keyStyle
+                                                            .mSecondaryColor2 =
+                                                        color;
+                                                  },
+                                                ),
+                                            ],
+                                          )
+                                        : Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              SubPanelItem(
+                                                title: need2Colors
+                                                    ? "Primary"
+                                                    : "Color",
+                                                child: SizedBox(
+                                                  width: defaultPadding * 10,
+                                                  child:
+                                                      RawColorInputSubPanelItem(
+                                                    defaultValue: context
+                                                        .keyStyle
+                                                        .mPrimaryColor1,
+                                                    onChanged: (Color color) {
+                                                      context.keyStyle
+                                                              .mPrimaryColor1 =
+                                                          color;
+                                                    },
+                                                  ),
+                                                ),
+                                              ),
+                                              if (need2Colors) ...[
+                                                const VerySmallColumnGap(),
+                                                SubPanelItem(
+                                                  title: "Secondary",
+                                                  child: SizedBox(
+                                                    width: defaultPadding * 10,
+                                                    child:
+                                                        RawColorInputSubPanelItem(
+                                                      defaultValue: context
+                                                          .keyStyle
+                                                          .mSecondaryColor1,
+                                                      onChanged: (Color color) {
+                                                        context.keyStyle
+                                                                .mSecondaryColor1 =
+                                                            color;
+                                                      },
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ],
+                                          ),
+                                  ]
+                                ],
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                      div,
+                    ],
+                  );
+          },
         ),
-        div,
         // border
-        XExpansionTile(
-          title: "Border",
-          children: [
-            SubPanelItemGroup(
-              items: [
-                RawSubPanelItem(
-                  title: "Enable",
-                  child: XSwitch(
-                    onChange: (bool value) {},
+        Selector<KeyStyleProvider, bool>(
+          selector: (_, keyStyle) => keyStyle.borderEnabled,
+          builder: (context, enabled, _) => XExpansionTile(
+            title: "Border",
+            children: [
+              Selector<KeyStyleProvider, bool>(
+                  selector: (_, keyStyle) =>
+                      keyStyle.differentColorForModifiers,
+                  builder: (context, differentColors, _) {
+                    return Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        SubPanelItemGroup(
+                          items: [
+                            RawSubPanelItem(
+                              title: "Enable",
+                              child: XSwitch(
+                                value: enabled,
+                                onChange: (value) {
+                                  context.keyStyle.borderEnabled = value;
+                                },
+                              ),
+                            ),
+                            if (!differentColors)
+                              RawColorInputSubPanelItem(
+                                enabled: enabled,
+                                label: "Border Color",
+                                defaultValue: context.keyStyle.borderColor,
+                                onChanged: (color) {
+                                  context.keyStyle.borderColor = color;
+                                },
+                              ),
+                          ],
+                        ),
+                        if (differentColors) ...[
+                          const VerySmallColumnGap(),
+                          SubPanelItem(
+                            enabled: enabled,
+                            title: "Normal",
+                            child: SizedBox(
+                              width: defaultPadding * 10,
+                              child: RawColorInputSubPanelItem(
+                                label: "Normal Border Color",
+                                defaultValue: context.keyStyle.borderColor,
+                                onChanged: (color) {
+                                  context.keyStyle.borderColor = color;
+                                },
+                              ),
+                            ),
+                          ),
+                          const VerySmallColumnGap(),
+                          SubPanelItem(
+                            enabled: enabled,
+                            title: "Modifier",
+                            child: SizedBox(
+                              width: defaultPadding * 10,
+                              child: RawColorInputSubPanelItem(
+                                label: "Modifier Border Color",
+                                defaultValue: context.keyStyle.mBorderColor,
+                                onChanged: (color) {
+                                  context.keyStyle.mBorderColor = color;
+                                },
+                              ),
+                            ),
+                          ),
+                        ],
+                      ],
+                    );
+                  }),
+              const VerySmallColumnGap(),
+              SubPanelItem(
+                enabled: enabled,
+                title: "Thickness",
+                child: Selector<KeyStyleProvider, double>(
+                  selector: (_, keyStyle) => keyStyle.borderWidth,
+                  builder: (context, borderWidth, _) => XSlider(
+                    suffix: "px",
+                    min: 1,
+                    max: 8,
+                    value: borderWidth,
+                    onChanged: (value) => context.keyStyle.borderWidth = value,
                   ),
                 ),
-                // ? if modifier and normal linked
-                RawColorInputSubPanelItem(
-                  enabled: false,
-                  label: "Border Color",
-                  defaultValue: Colors.blueGrey,
-                  onChanged: (color) {},
+              ),
+              const VerySmallColumnGap(),
+              SubPanelItem(
+                title: "Rounded Corner",
+                child: Selector<KeyStyleProvider, double>(
+                  selector: (_, keyStyle) => keyStyle.cornerSmoothing,
+                  builder: (context, cornerSmoothing, _) {
+                    return XSlider(
+                      max: 100,
+                      suffix: "%",
+                      value: cornerSmoothing,
+                      onChanged: (value) {
+                        context.keyStyle.cornerSmoothing = value;
+                      },
+                    );
+                  },
                 ),
-              ],
-            ),
-            // ...[
-            //   const VerySmallColumnGap(),
-            //   SubPanelItem(
-            //     title: "Normal",
-            //     child: SizedBox(
-            //       width: defaultPadding * 10,
-            //       child: RawColorInputSubPanelItem(
-            //         label: "Normal Border Color",
-            //         onChanged: (color) {},
-            //         defaultValue: Colors.black,
-            //       ),
-            //     ),
-            //   ),
-            //   const VerySmallColumnGap(),
-            //   SubPanelItem(
-            //     title: "Modifier",
-            //     child: SizedBox(
-            //       width: defaultPadding * 10,
-            //       child: RawColorInputSubPanelItem(
-            //         label: "Modifier Border Color",
-            //         onChanged: (color) {},
-            //         defaultValue: Colors.deepPurple,
-            //       ),
-            //     ),
-            //   ),
-            // ],
-            const VerySmallColumnGap(),
-            SubPanelItem(
-              title: "Thickness",
-              child: XSlider(
-                onChanged: (int value) {},
-                suffix: "px",
               ),
-            ),
-            const VerySmallColumnGap(),
-            SubPanelItem(
-              title: "Rounded Corner",
-              child: XSlider(
-                max: 100,
-                onChanged: (int value) {},
-                suffix: "%",
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
         div,
         // background
-        XExpansionTile(
-          title: "Background",
-          children: [
-            SubPanelItemGroup(
-              items: [
-                RawSubPanelItem(
-                  title: "Enable",
-                  child: XSwitch(
-                    defaultValue: true,
-                    onChange: (bool value) {},
+        Selector<KeyStyleProvider, bool>(
+          selector: (_, keyStyle) => keyStyle.backgroundEnabled,
+          builder: (context, enabled, _) {
+            return XExpansionTile(
+              title: "Background",
+              children: [
+                SubPanelItemGroup(
+                  items: [
+                    RawSubPanelItem(
+                      title: "Enable",
+                      child: XSwitch(
+                        value: enabled,
+                        onChange: (value) {
+                          context.keyStyle.backgroundEnabled = value;
+                        },
+                      ),
+                    ),
+                    RawColorInputSubPanelItem(
+                      enabled: enabled,
+                      label: "Background Color",
+                      defaultValue: context.keyStyle.backgroundColor,
+                      onChanged: (color) {
+                        context.keyStyle.backgroundColor = color;
+                      },
+                    ),
+                  ],
+                ),
+                const VerySmallColumnGap(),
+                SubPanelItem(
+                  title: "Opacity",
+                  enabled: enabled,
+                  child: Selector<KeyStyleProvider, double>(
+                    selector: (_, keyStyle) => keyStyle.backgroundOpacity,
+                    builder: (context, opacity, _) => XSlider(
+                      max: 100,
+                      suffix: "%",
+                      value: opacity * 100,
+                      onChanged: (value) {
+                        context.keyStyle.backgroundOpacity = value / 100;
+                      },
+                    ),
                   ),
                 ),
-                RawColorInputSubPanelItem(
-                  label: "Background Color",
-                  defaultValue: Colors.lime,
-                  onChanged: (Color value) {},
-                ),
               ],
-            ),
-            const VerySmallColumnGap(),
-            SubPanelItem(
-              title: "Opacity",
-              child: XSlider(
-                max: 100,
-                suffix: "%",
-                onChanged: (int value) {},
-              ),
-            ),
-          ],
+            );
+          },
         ),
         const SmallColumnGap(),
       ],

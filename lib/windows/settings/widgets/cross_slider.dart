@@ -1,37 +1,30 @@
 import 'package:flutter/material.dart';
-import 'package:keyviz/config/config.dart';
-import 'package:keyviz/windows/shared/shared.dart';
 
-class XSlider extends StatefulWidget {
+import 'package:keyviz/config/config.dart';
+
+class XSlider extends StatelessWidget {
   const XSlider({
     super.key,
+    required this.value,
     this.defaultValue,
     required this.onChanged,
     this.min = 0,
     this.max = 10,
     this.suffix,
+    this.divisions,
+    this.labelWidth,
     this.width = defaultPadding * 10,
   });
 
+  final double value;
   final double min;
   final double max;
   final double width;
   final String? suffix;
   final num? defaultValue;
-  final ValueChanged<int> onChanged;
-
-  @override
-  State<XSlider> createState() => _XSliderState();
-}
-
-class _XSliderState extends State<XSlider> {
-  late double _value;
-
-  @override
-  void initState() {
-    super.initState();
-    _value = (widget.defaultValue ?? widget.min).toDouble();
-  }
+  final int? divisions;
+  final double? labelWidth;
+  final ValueChanged<double> onChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -39,26 +32,27 @@ class _XSliderState extends State<XSlider> {
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
         SizedBox(
-          width: widget.width,
+          width: width,
           child: Slider.adaptive(
-            value: _value,
-            min: widget.min,
-            max: widget.max,
-            onChanged: _onChanged,
+            value: value,
+            min: min,
+            max: max,
+            divisions: divisions,
+            onChanged: onChanged,
           ),
         ),
         SizedBox(
-          width: context.textTheme.labelMedium!.fontSize! * 3.5,
+          width: labelWidth ?? context.textTheme.labelMedium!.fontSize! * 3.5,
           child: RichText(
             textAlign: TextAlign.end,
             text: TextSpan(
-              text: "${_value.toInt()}",
+              text: "${value.toInt()}",
               style: context.textTheme.labelMedium,
-              children: widget.suffix == null
+              children: suffix == null
                   ? null
                   : [
                       TextSpan(
-                        text: widget.suffix,
+                        text: suffix,
                         style: context.textTheme.bodyMedium,
                       ),
                     ],
@@ -67,10 +61,5 @@ class _XSliderState extends State<XSlider> {
         ),
       ],
     );
-  }
-
-  void _onChanged(double v) {
-    setState(() => _value = v);
-    widget.onChanged(v.toInt());
   }
 }

@@ -2,47 +2,38 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:keyviz/config/config.dart';
 
-class XDropdown extends StatefulWidget {
+class XDropdown<T> extends StatelessWidget {
   const XDropdown({
     super.key,
-    required this.option,
+    required this.value,
     required this.options,
+    required this.onChanged,
     this.decorated = true,
   });
 
-  final String option;
-  final List<String> options;
+  final T value;
   final bool decorated;
-
-  @override
-  State<XDropdown> createState() => _XDropdownState();
-}
-
-class _XDropdownState extends State<XDropdown> {
-  late String _value;
-
-  @override
-  void initState() {
-    super.initState();
-    _value = widget.option;
-  }
+  final List<T> options;
+  final ValueChanged<T> onChanged;
 
   @override
   Widget build(BuildContext context) {
     final child = DropdownButton(
-      value: _value,
+      value: value,
       items: [
-        for (final option in widget.options)
+        for (final option in options)
           DropdownMenuItem(
             value: option,
-            child: Text(option),
+            child: Text(option.toString()),
           ),
       ],
-      onChanged: (v) => v != null ? setState(() => _value = v) : null,
+      onChanged: (v) {
+        if (v != null) onChanged(v);
+      },
       // style
       isDense: true,
       isExpanded: true,
-      padding: widget.decorated
+      padding: decorated
           ? const EdgeInsets.symmetric(
               horizontal: defaultPadding * .5,
               vertical: defaultPadding * .2,
@@ -63,7 +54,7 @@ class _XDropdownState extends State<XDropdown> {
       underline: const SizedBox(),
     );
 
-    return widget.decorated
+    return decorated
         ? DecoratedBox(
             decoration: BoxDecoration(
               color: context.colorScheme.primaryContainer,

@@ -22,14 +22,14 @@ class SubPanelItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedOpacity(
-      duration: transitionDuration,
-      opacity: enabled ? 1 : .25,
-      child: _Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: defaultPadding,
-          vertical: defaultPadding * .5,
-        ),
+    return _Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: defaultPadding,
+        vertical: defaultPadding * .5,
+      ),
+      child: AnimatedOpacity(
+        duration: transitionDuration,
+        opacity: enabled ? 1 : .25,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -268,6 +268,7 @@ class _RawColorInputSubPanelItemState extends State<RawColorInputSubPanelItem> {
         const Spacer(),
         IconButton(
           onPressed: _toggleColorSwatches,
+          tooltip: "Swatches",
           icon: const SvgIcon.chevronDown(size: defaultPadding * .32),
         ),
       ],

@@ -34,15 +34,36 @@ class _SettingsWindowState extends State<SettingsWindow> {
           Expanded(
             child: DecoratedBox(
               decoration: _innerDecor,
-              child: const SingleChildScrollView(
-                padding: EdgeInsets.all(defaultPadding * 1.5),
-                child: StyleTabView(),
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(defaultPadding * 1.5),
+                child: _currentTabView,
               ),
             ),
           ),
         ],
       ),
     );
+  }
+
+  Widget get _currentTabView {
+    switch (_currentTab) {
+      case SettingsTab.general:
+        return const GeneralTabView();
+
+      case SettingsTab.mouse:
+        return const MouseTabView();
+
+      case SettingsTab.style:
+        return const StyleTabView();
+
+      case SettingsTab.apperance:
+        return const AppearanceTabView();
+
+      case SettingsTab.about:
+        return const Center(
+          child: Text("Keyviz v2.0.0-alpha by Rahul Mula"),
+        );
+    }
   }
 
   BoxDecoration get _backgroundDecor => BoxDecoration(

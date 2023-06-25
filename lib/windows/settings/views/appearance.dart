@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:vector_math/vector_math.dart';
 
 import 'package:keyviz/config/config.dart';
+import 'package:keyviz/providers/key_event.dart';
+import 'package:keyviz/providers/key_style.dart';
 import 'package:keyviz/windows/shared/shared.dart';
-import 'package:vector_math/vector_math_64.dart';
+
 import '../widgets/widgets.dart';
 
 class AppearanceTabView extends StatelessWidget {
@@ -15,9 +19,14 @@ class AppearanceTabView extends StatelessWidget {
         PanelItem(
           title: "Alignment",
           subtitle: "Position of the key visualization on the screen",
-          action: _AlignmentPicker(
-            selected: Alignment.bottomRight,
-            onChanged: (value) {},
+          action: Selector<KeyStyleProvider, Alignment>(
+            selector: (_, keyStyle) => keyStyle.alignment,
+            builder: (context, alignment, _) => _AlignmentPicker(
+              selected: alignment,
+              onChanged: (value) {
+                context.keyStyle.alignment = value;
+              },
+            ),
           ),
         ),
         const Divider(),
@@ -27,10 +36,14 @@ class AppearanceTabView extends StatelessWidget {
               "The spacing betweeen the visualization and the edge of the monitor",
           actionFlex: 4,
           crossAxisAlignment: CrossAxisAlignment.center,
-          action: XSlider(
-            max: 128,
-            suffix: "px",
-            onChanged: (value) {},
+          action: Selector<KeyStyleProvider, double>(
+            selector: (_, keyStyle) => keyStyle.margin,
+            builder: (context, margin, _) => XSlider(
+              max: 128,
+              suffix: "px",
+              value: margin,
+              onChanged: (value) => context.keyStyle.margin = value,
+            ),
           ),
         ),
         const Divider(),
@@ -39,26 +52,29 @@ class AppearanceTabView extends StatelessWidget {
           subtitle: "Amount of time the keys linger before disappearing",
           actionFlex: 4,
           crossAxisAlignment: CrossAxisAlignment.center,
-          action: XSlider(
-            max: 16,
-            suffix: "s",
-            onChanged: (value) {},
+          action: Selector<KeyEventProvider, int>(
+            selector: (_, keyEvent) => keyEvent.lingerDurationInSeconds,
+            builder: (context, duration, _) => XSlider(
+              max: 16,
+              suffix: "s",
+              value: duration.toDouble(),
+              onChanged: (value) {
+                context.keyEvent.lingerDurationInSeconds = value.toInt();
+              },
+            ),
           ),
         ),
         const Divider(),
-        const PanelItem(
+        PanelItem(
           title: "Key Animation",
-          action: XDropdown(
-            option: "Fade",
-            options: ["Fade", "Slide", "Grow", "Wham"],
-          ),
-        ),
-        const Divider(),
-        const PanelItem(
-          title: "Secondary Animation",
-          action: XDropdown(
-            option: "Fade",
-            options: ["Fade", "Slide"],
+          subtitle: "The animation used by key cap",
+          action: Selector<KeyStyleProvider, KeyCapAnimation>(
+            selector: (_, keyStyle) => keyStyle.keyCapAnimation,
+            builder: (context, animation, _) => XDropdown(
+              value: animation,
+              options: KeyCapAnimation.values,
+              onChanged: (value) => context.keyStyle.keyCapAnimation = value,
+            ),
           ),
         ),
         const Divider(),
@@ -67,13 +83,18 @@ class AppearanceTabView extends StatelessWidget {
           subtitle: "Speed of the animations",
           actionFlex: 4,
           crossAxisAlignment: CrossAxisAlignment.center,
-          action: XSlider(
-            max: 1200,
-            suffix: "ms",
-            divisions: 24,
-            defaultValue: 200,
-            labelWidth: defaultPadding * 4.5,
-            onChanged: (value) {},
+          action: Selector<KeyEventProvider, int>(
+            selector: (_, keyEvent) => keyEvent.animationSpeed,
+            builder: (context, duration, _) => XSlider(
+              max: 1200,
+              suffix: "ms",
+              divisions: 24,
+              value: duration.toDouble(),
+              labelWidth: defaultPadding * 4.5,
+              onChanged: (value) {
+                context.keyEvent.animationSpeed = value.toInt();
+              },
+            ),
           ),
         ),
         const ColumnGap(),

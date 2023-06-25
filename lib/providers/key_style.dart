@@ -60,7 +60,16 @@ enum HorizontalAlignment {
 }
 
 // keycap animation
-enum KeyCapAnimation { none, fade, wham, grow, slide }
+enum KeyCapAnimation {
+  none,
+  fade,
+  wham,
+  grow,
+  slide;
+
+  @override
+  String toString() => name.capitalize();
+}
 
 // mouse animation type
 enum MouseClickAnimation { static, ripple, focus, filled }

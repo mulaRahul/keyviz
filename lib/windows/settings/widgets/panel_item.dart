@@ -57,7 +57,10 @@ class PanelItem extends StatelessWidget {
                   flex: actionFlex,
                   child: Align(
                     alignment: Alignment.topRight,
-                    child: action,
+                    child: IgnorePointer(
+                      ignoring: !enabled,
+                      child: action,
+                    ),
                   ),
                 ),
               ],
@@ -68,7 +71,7 @@ class PanelItem extends StatelessWidget {
               children: [
                 label,
                 const SizedBox(height: defaultPadding * .75),
-                action,
+                IgnorePointer(ignoring: !enabled, child: action),
               ],
             ),
     );

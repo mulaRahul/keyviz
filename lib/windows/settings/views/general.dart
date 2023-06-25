@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import 'package:keyviz/config/config.dart';
+import 'package:keyviz/providers/key_event.dart';
+
 import '../widgets/widgets.dart';
 
 class GeneralTabView extends StatelessWidget {
@@ -14,24 +17,24 @@ class GeneralTabView extends StatelessWidget {
           title: "Hotkey Filter",
           subtitle: "Filter out letters and only "
               "display hotkeys/keyboard shortcuts",
-          action: XSwitch(
-            onChange: (bool value) {},
+          action: Selector<KeyEventProvider, bool>(
+            selector: (_, keyEvent) => keyEvent.filterHotkeys,
+            builder: (_, filterHotkeys, __) => XSwitch(
+              value: filterHotkeys,
+              onChange: (bool value) {
+                context.keyEvent.filterHotkeys = value;
+              },
+            ),
           ),
         ),
         const Divider(),
-        const PanelItem(
-          asRow: false,
-          enabled: false,
-          title: "Ignore Keys",
-          action: _IgnoreKeyOptions(),
-        ),
-        const Divider(),
-        PanelItem(
-          title: "Shift Symbol",
-          subtitle: "Filter out letters and only "
-              "display hotkeys/keyboard shortcuts",
-          action: XSwitch(
-            onChange: (bool value) {},
+        Selector<KeyEventProvider, bool>(
+          selector: (_, keyEvent) => keyEvent.filterHotkeys,
+          builder: (_, filterHotkeys, __) => PanelItem(
+            asRow: false,
+            enabled: filterHotkeys,
+            title: "Ignore Keys",
+            action: const _IgnoreKeyOptions(),
           ),
         ),
         const Divider(),
@@ -39,9 +42,17 @@ class GeneralTabView extends StatelessWidget {
           title: "Show History",
           subtitle: "Filter out letters and only "
               "display hotkeys/keyboard shortcuts",
-          action: XDropdown(
-            option: "None",
-            options: ["None", "Vertically", "Horizontally"],
+          action: Selector<KeyEventProvider, VisualizationHistoryMode>(
+            selector: (_, keyEvent) => keyEvent.historyMode,
+            builder: (context, historyMode, __) {
+              return XDropdown<VisualizationHistoryMode>(
+                value: historyMode,
+                options: VisualizationHistoryMode.values,
+                onChanged: (value) {
+                  context.keyEvent.historyMode = value;
+                },
+              );
+            },
           ),
         ),
         const Divider(),
@@ -53,6 +64,7 @@ class GeneralTabView extends StatelessWidget {
               onPressed: () {
                 showDialog(
                   context: context,
+                  // TODO style alert dialog
                   builder: (_) => AlertDialog(
                     title: const Text(
                       "Do you want to revert to default settings?",
@@ -61,7 +73,7 @@ class GeneralTabView extends StatelessWidget {
                     actions: [
                       OutlinedButton(
                         onPressed: () {
-                          // revert settings
+                          // TODO: revert settings
                         },
                         child: const Text("Revert"),
                       ),
@@ -93,21 +105,8 @@ class GeneralTabView extends StatelessWidget {
   }
 }
 
-class _IgnoreKeyOptions extends StatefulWidget {
+class _IgnoreKeyOptions extends StatelessWidget {
   const _IgnoreKeyOptions();
-
-  @override
-  State<_IgnoreKeyOptions> createState() => _IgnoreKeyOptionsState();
-}
-
-class _IgnoreKeyOptionsState extends State<_IgnoreKeyOptions> {
-  final _modifiers = <String, bool>{
-    "Ctrl": true,
-    "Alt": true,
-    "Shift": false,
-    "Caps Lock": true,
-    "Scroll Lock": true,
-  };
 
   @override
   Widget build(BuildContext context) {
@@ -120,12 +119,19 @@ class _IgnoreKeyOptionsState extends State<_IgnoreKeyOptions> {
       ),
       child: Row(
         children: [
-          for (final name in _modifiers.keys)
-            _KeyOption(
-              name: name,
-              isSelected: _modifiers[name]!,
-              onTap: () =>
-                  setState(() => _modifiers[name] = !_modifiers[name]!),
+          for (final modifierKey in ModifierKey.values)
+            Selector<KeyEventProvider, bool>(
+              selector: (_, keyEvent) => keyEvent.ignoreKeys[modifierKey]!,
+              builder: (context, ignoring, __) => _KeyOption(
+                name: modifierKey.name.capitalize(),
+                ignoring: ignoring,
+                onTap: () {
+                  context.keyEvent.setModifierKeyIgnoring(
+                    modifierKey,
+                    !ignoring,
+                  );
+                },
+              ),
             ),
         ],
       ),
@@ -136,19 +142,19 @@ class _IgnoreKeyOptionsState extends State<_IgnoreKeyOptions> {
 class _KeyOption extends StatelessWidget {
   const _KeyOption({
     required this.name,
-    required this.isSelected,
+    required this.ignoring,
     required this.onTap,
   });
 
   final String name;
-  final bool isSelected;
+  final bool ignoring;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    final bgColor = isSelected
-        ? context.colorScheme.secondary
-        : context.colorScheme.tertiary;
+    final bgColor = ignoring
+        ? context.colorScheme.tertiary.withOpacity(.5)
+        : context.colorScheme.secondary;
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -159,9 +165,9 @@ class _KeyOption extends StatelessWidget {
         ),
         padding: const EdgeInsets.symmetric(horizontal: defaultPadding * .5),
         decoration: BoxDecoration(
-          color: isSelected
-              ? context.colorScheme.primaryContainer
-              : context.colorScheme.secondaryContainer,
+          color: ignoring
+              ? context.colorScheme.secondaryContainer
+              : context.colorScheme.primaryContainer,
           borderRadius: BorderRadius.circular(defaultPadding * .4),
           border: Border.all(color: bgColor),
           boxShadow: [
