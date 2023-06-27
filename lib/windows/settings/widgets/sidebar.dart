@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:keyviz/config/config.dart';
+import 'package:keyviz/windows/shared/shared.dart';
 
 enum SettingsTab {
   general(VuesaxIcons.cogWheel),
@@ -51,7 +52,7 @@ class SideBar extends StatelessWidget {
       children.add(
         _IconButton(
           icon: tab.icon,
-          label: tab.name,
+          tooltip: tab.name,
           onTap: () => onChange(tab),
           selected: currentTab == tab,
         ),
@@ -65,42 +66,37 @@ class SideBar extends StatelessWidget {
 class _IconButton extends StatelessWidget {
   const _IconButton({
     required this.icon,
-    required this.label,
+    required this.tooltip,
     required this.onTap,
     required this.selected,
     this.size = 40.0,
   });
 
   final String icon;
-  final String label;
+  final String tooltip;
   final bool selected;
   final VoidCallback onTap;
   final double size;
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: size,
-        height: size,
-        decoration: BoxDecoration(
-          color: selected
-              ? context.colorScheme.secondaryContainer
-              : context.colorScheme.secondaryContainer.withOpacity(0),
-          borderRadius: BorderRadius.circular(defaultPadding / 2),
-        ),
-        alignment: Alignment.center,
-        child: SvgPicture.asset(
-          icon,
-          width: size * .44,
-          height: size * .44,
-          colorFilter: ColorFilter.mode(
-            selected
-                ? context.colorScheme.primary
-                : context.colorScheme.tertiary,
-            BlendMode.srcIn,
-          ),
+    return IconButton(
+      onPressed: onTap,
+      tooltip: tooltip.capitalize(),
+      icon: SvgIcon(
+        size: size * .44,
+        icon: icon,
+        color: selected
+            ? context.colorScheme.primary
+            : context.colorScheme.tertiary,
+      ),
+      style: IconButton.styleFrom(
+        fixedSize: Size.square(size),
+        backgroundColor: selected
+            ? context.colorScheme.secondaryContainer
+            : context.colorScheme.secondaryContainer.withOpacity(0),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(defaultPadding * .5),
         ),
       ),
     );
