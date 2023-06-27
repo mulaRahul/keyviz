@@ -59,18 +59,6 @@ enum HorizontalAlignment {
   final String iconName;
 }
 
-// keycap animation
-enum KeyCapAnimation {
-  none,
-  fade,
-  wham,
-  grow,
-  slide;
-
-  @override
-  String toString() => name.capitalize();
-}
-
 // mouse animation type
 enum MouseClickAnimation { static, ripple, focus, filled }
 
@@ -175,9 +163,6 @@ class KeyStyleProvider extends ChangeNotifier {
   // margin from the edge of the screen in px/pixels
   double _margin = 64;
 
-  // keycap animation type
-  KeyCapAnimation _keyCapAnimation = KeyCapAnimation.slide;
-
   // ----- Mouse -----
   // mouse click animation type
   MouseClickAnimation _clickAnimation = MouseClickAnimation.focus;
@@ -263,7 +248,6 @@ class KeyStyleProvider extends ChangeNotifier {
 
   Alignment get alignment => _alignment;
   double get margin => _margin;
-  KeyCapAnimation get keyCapAnimation => _keyCapAnimation;
 
   MouseClickAnimation get clickAnimation => _clickAnimation;
   Color get clickColor => _clickColor;
@@ -435,11 +419,6 @@ class KeyStyleProvider extends ChangeNotifier {
 
   set margin(double value) {
     _margin = value;
-    notifyListeners();
-  }
-
-  set keyCapAnimation(KeyCapAnimation value) {
-    _keyCapAnimation = value;
     notifyListeners();
   }
 }

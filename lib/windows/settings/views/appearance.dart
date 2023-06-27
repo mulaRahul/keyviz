@@ -68,12 +68,12 @@ class AppearanceTabView extends StatelessWidget {
         PanelItem(
           title: "Key Animation",
           subtitle: "The animation used by key cap",
-          action: Selector<KeyStyleProvider, KeyCapAnimation>(
-            selector: (_, keyStyle) => keyStyle.keyCapAnimation,
+          action: Selector<KeyEventProvider, KeyCapAnimation>(
+            selector: (_, keyEvent) => keyEvent.keyCapAnimation,
             builder: (context, animation, _) => XDropdown(
               value: animation,
               options: KeyCapAnimation.values,
-              onChanged: (value) => context.keyStyle.keyCapAnimation = value,
+              onChanged: (value) => context.keyEvent.keyCapAnimation = value,
             ),
           ),
         ),
