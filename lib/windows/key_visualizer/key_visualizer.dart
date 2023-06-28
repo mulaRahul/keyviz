@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
-import 'package:keyviz/config/config.dart';
 import 'package:provider/provider.dart';
 
+import 'package:keyviz/config/config.dart';
 import 'package:keyviz/providers/key_event.dart';
 
 class KeyVisualizer extends StatelessWidget {
@@ -19,26 +19,7 @@ class KeyVisualizer extends StatelessWidget {
                 builder: (context, events, _) => Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    for (final event in events)
-                      Container(
-                        padding: const EdgeInsets.all(defaultPadding),
-                        margin: const EdgeInsets.only(left: defaultPadding),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          border: Border.all(color: Colors.black),
-                          borderRadius:
-                              BorderRadius.circular(defaultPadding * .5),
-                          boxShadow: const [
-                            BoxShadow(
-                              offset: Offset(0, 4),
-                              color: Colors.black,
-                            )
-                          ],
-                        ),
-                        child: Text(
-                          event.logicalKey.keyLabel,
-                        ),
-                      ),
+                    for (final event in events) _KeyCap(event.label),
                   ],
                 ),
                 // select the last/latest event list
@@ -50,12 +31,12 @@ class KeyVisualizer extends StatelessWidget {
             : Selector<KeyEventProvider, Map<String, Map<int, KeyEventData>>>(
                 builder: (context, events, _) => Wrap(
                   direction: direction,
+                  spacing: defaultPadding,
                   children: [
                     for (final group in events.values)
                       Row(
                         children: [
-                          for (final event in group.values)
-                            Text(event.logicalKey.keyLabel)
+                          for (final event in group.values) _KeyCap(event.label)
                         ],
                       )
                   ],
@@ -64,6 +45,32 @@ class KeyVisualizer extends StatelessWidget {
                 shouldRebuild: (previous, next) => mapEquals(previous, next),
               );
       },
+    );
+  }
+}
+
+class _KeyCap extends StatelessWidget {
+  const _KeyCap(this.label);
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(defaultPadding),
+      margin: const EdgeInsets.only(left: defaultPadding),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(color: Colors.black),
+        borderRadius: BorderRadius.circular(defaultPadding * .5),
+        boxShadow: const [
+          BoxShadow(
+            offset: Offset(0, 4),
+            color: Colors.black,
+          )
+        ],
+      ),
+      child: Text(label),
     );
   }
 }
