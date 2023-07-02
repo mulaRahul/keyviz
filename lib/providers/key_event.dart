@@ -37,7 +37,7 @@ enum VisualizationHistoryMode {
 }
 
 // keycap animation style
-enum KeyCapAnimation {
+enum KeyCapAnimationType {
   none,
   fade,
   wham,
@@ -90,7 +90,7 @@ class KeyEventProvider extends ChangeNotifier {
 
   // filter letters, numbers, symbols, etc. and
   // show hotkeys/keyboard shortuts
-  bool _filterHotkeys = false;
+  bool _filterHotkeys = true;
 
   // modifiers and function keys to ignore
   // when hotkey filter is turned on
@@ -118,7 +118,7 @@ class KeyEventProvider extends ChangeNotifier {
   int _animationSpeed = 200;
 
   // keycap animation type
-  KeyCapAnimation _keyCapAnimation = KeyCapAnimation.slide;
+  KeyCapAnimationType _keyCapAnimation = KeyCapAnimationType.slide;
 
   // mouse visualize clicks
   bool _showMouseClicks = false;
@@ -126,8 +126,8 @@ class KeyEventProvider extends ChangeNotifier {
   // mouse visualize clicks
   bool _highlightCursor = false;
 
-  // show mouse events with keypress like Shift + Drag
-  bool _showMouseEvents = false;
+  // show mouse events with keypress like, [Shift] + [Drag]
+  bool _showMouseEvents = true;
 
   Map<String, Map<int, KeyEventData>> get keyboardEvents => _keyboardEvents;
 
@@ -152,8 +152,8 @@ class KeyEventProvider extends ChangeNotifier {
   Duration get lingerDuration => Duration(seconds: _lingerDurationInSeconds);
   int get animationSpeed => _animationSpeed;
   Duration get animationDuration => Duration(milliseconds: _animationSpeed);
-  KeyCapAnimation get keyCapAnimation => _keyCapAnimation;
-  bool get _noKeyCapAnimation => _keyCapAnimation == KeyCapAnimation.none;
+  KeyCapAnimationType get keyCapAnimation => _keyCapAnimation;
+  bool get _noKeyCapAnimation => _keyCapAnimation == KeyCapAnimationType.none;
   bool get showMouseClicks => _showMouseClicks;
   bool get highlightCursor => _highlightCursor;
   bool get showMouseEvents => _showMouseEvents;
@@ -192,7 +192,7 @@ class KeyEventProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  set keyCapAnimation(KeyCapAnimation value) {
+  set keyCapAnimation(KeyCapAnimationType value) {
     _keyCapAnimation = value;
     notifyListeners();
   }
