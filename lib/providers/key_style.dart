@@ -7,7 +7,9 @@ enum KeyCapStyle {
   minimal,
   flat,
   elevated,
-  isometric;
+  plastic,
+  mechanical,
+  retro;
 
   @override
   String toString() => name.capitalize();
@@ -65,7 +67,7 @@ enum MouseClickAnimation { static, ripple, focus, filled }
 // style provider of the keycap visualization
 class KeyStyleProvider extends ChangeNotifier {
   // key cap style for the visualization
-  KeyCapStyle _preset = KeyCapStyle.elevated;
+  KeyCapStyle _keyCapStyle = KeyCapStyle.elevated;
 
   // ----- Typography -----
   // literal font size in px/pixels
@@ -170,7 +172,7 @@ class KeyStyleProvider extends ChangeNotifier {
   // mouse click border color
   Color _clickColor = Colors.grey[100]!;
 
-  KeyCapStyle get preset => _preset;
+  KeyCapStyle get keyCapStyle => _keyCapStyle;
 
   bool get differentColorForModifiers => _differentColorForModifiers;
 
@@ -225,6 +227,14 @@ class KeyStyleProvider extends ChangeNotifier {
   bool get showIcon => _showIcon;
   bool get showSymbol => _showSymbol;
   bool get addPlusSeparator => _addPlusSeparator;
+  Widget? get separator {
+    return _addPlusSeparator
+        ? Text(
+            "+",
+            style: TextStyle(fontSize: _fontSize, color: _fontColor),
+          )
+        : null;
+  }
 
   bool get isGradient => _isGradient;
   Color get primaryColor1 => _primaryColor1;
@@ -245,6 +255,7 @@ class KeyStyleProvider extends ChangeNotifier {
   bool get backgroundEnabled => _backgroundEnabled;
   Color get backgroundColor => _backgroundColor;
   double get backgroundOpacity => _backgroundOpacity;
+  double get backgroundSpacing => _fontSize * .5;
 
   Alignment get alignment => _alignment;
   double get margin => _margin;
@@ -252,10 +263,157 @@ class KeyStyleProvider extends ChangeNotifier {
   MouseClickAnimation get clickAnimation => _clickAnimation;
   Color get clickColor => _clickColor;
 
-  set preset(KeyCapStyle value) {
-    _preset = value;
+  // key cap properties
+  Size get minContainerSize {
+    switch (_keyCapStyle) {
+      case KeyCapStyle.flat:
+      case KeyCapStyle.elevated:
+      case KeyCapStyle.plastic:
+        return Size.square(_fontSize * 2.25);
 
-    if (_preset == KeyCapStyle.elevated) {
+      case KeyCapStyle.retro:
+        return Size(_fontSize * 1.75, _fontSize * 2.0625);
+
+      case KeyCapStyle.mechanical:
+        return Size(_fontSize * 1.875, _fontSize * 2.35);
+
+      default:
+        return Size.zero;
+    }
+  }
+
+  Size get minOuterContainerSize {
+    switch (_keyCapStyle) {
+      case KeyCapStyle.elevated:
+        return Size.square(_fontSize * 2.5);
+
+      case KeyCapStyle.plastic:
+      case KeyCapStyle.retro:
+      case KeyCapStyle.mechanical:
+        return Size.square(_fontSize * 2.75);
+
+      default:
+        return Size.zero;
+    }
+  }
+
+  double get keycapHeight {
+    switch (_keyCapStyle) {
+      case KeyCapStyle.minimal:
+        return _fontSize * 1.2; // line height
+
+      case KeyCapStyle.flat:
+        return _fontSize * 2.25;
+
+      case KeyCapStyle.elevated:
+        return _fontSize * 2.5;
+
+      case KeyCapStyle.retro:
+      case KeyCapStyle.plastic:
+      case KeyCapStyle.mechanical:
+        return _fontSize * 2.75;
+    }
+  }
+
+  EdgeInsets get contentPadding {
+    switch (_keyCapStyle) {
+      case KeyCapStyle.flat:
+      case KeyCapStyle.elevated:
+        return EdgeInsets.symmetric(
+          horizontal: _fontSize *
+              (_cornerSmoothing < .75 ? .5 : (.5 + (_cornerSmoothing - .75))),
+          vertical: _fontSize * .375,
+        );
+
+      case KeyCapStyle.plastic:
+        return EdgeInsets.symmetric(
+          horizontal: _fontSize *
+              (_cornerSmoothing < .75 ? .5 : (.5 + (_cornerSmoothing - .75))),
+        ).copyWith(top: _fontSize * .25, bottom: _fontSize * .5);
+
+      case KeyCapStyle.retro:
+        return EdgeInsets.symmetric(
+          horizontal: _fontSize * .5,
+          vertical: _fontSize * .375,
+        );
+      case KeyCapStyle.mechanical:
+        return EdgeInsets.all(_fontSize * .25);
+
+      default:
+        return EdgeInsets.zero;
+    }
+  }
+
+  EdgeInsets get containerPadding {
+    switch (_keyCapStyle) {
+      case KeyCapStyle.elevated:
+        return EdgeInsets.only(bottom: _fontSize * .25);
+
+      case KeyCapStyle.plastic:
+        return EdgeInsets.symmetric(
+          horizontal: _fontSize * .175,
+        ).copyWith(bottom: _fontSize * .5);
+
+      case KeyCapStyle.retro:
+        return EdgeInsets.symmetric(
+          horizontal: _fontSize * .5,
+        ).copyWith(top: _fontSize * 0.125, bottom: _fontSize * 0.5625);
+      case KeyCapStyle.mechanical:
+        return EdgeInsets.symmetric(
+          horizontal: _fontSize * .4375,
+        ).copyWith(top: _fontSize * 0.16, bottom: _fontSize * 0.24);
+
+      default:
+        return EdgeInsets.zero;
+    }
+  }
+
+  double get borderRadiusValue =>
+      (minContainerSize.height / 2) * _cornerSmoothing;
+
+  BorderRadius get borderRadius {
+    switch (_keyCapStyle) {
+      case KeyCapStyle.flat:
+      case KeyCapStyle.elevated:
+      case KeyCapStyle.retro:
+      case KeyCapStyle.mechanical:
+        return BorderRadius.circular(borderRadiusValue);
+
+      case KeyCapStyle.plastic:
+        if (_cornerSmoothing >= .5 && _cornerSmoothing <= .75) {
+          return BorderRadius.vertical(
+            top: Radius.circular((minContainerSize.height / 2) * .5),
+            bottom: Radius.circular(borderRadiusValue),
+          );
+        } else {
+          return BorderRadius.vertical(
+            top: Radius.circular(borderRadiusValue),
+            bottom: Radius.circular(borderRadiusValue * 1.2),
+          );
+        }
+
+      default:
+        return BorderRadius.zero;
+    }
+  }
+
+  BorderRadius get outerBorderRadius {
+    switch (_keyCapStyle) {
+      case KeyCapStyle.retro:
+      case KeyCapStyle.mechanical:
+      case KeyCapStyle.plastic:
+      case KeyCapStyle.elevated:
+        return BorderRadius.circular(borderRadiusValue);
+
+      default:
+        return BorderRadius.zero;
+    }
+  }
+
+  set keyCapStyle(KeyCapStyle value) {
+    _keyCapStyle = value;
+
+    if (_keyCapStyle == KeyCapStyle.elevated) {
       _isGradient = false;
     }
 
