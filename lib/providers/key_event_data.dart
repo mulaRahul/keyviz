@@ -23,6 +23,134 @@ const _modifiers = [
   LogicalKeyboardKey.metaLeft,
   LogicalKeyboardKey.metaRight,
 ];
+const _letters = [
+  LogicalKeyboardKey.keyA,
+  LogicalKeyboardKey.keyB,
+  LogicalKeyboardKey.keyC,
+  LogicalKeyboardKey.keyD,
+  LogicalKeyboardKey.keyE,
+  LogicalKeyboardKey.keyF,
+  LogicalKeyboardKey.keyG,
+  LogicalKeyboardKey.keyH,
+  LogicalKeyboardKey.keyI,
+  LogicalKeyboardKey.keyJ,
+  LogicalKeyboardKey.keyK,
+  LogicalKeyboardKey.keyL,
+  LogicalKeyboardKey.keyM,
+  LogicalKeyboardKey.keyN,
+  LogicalKeyboardKey.keyO,
+  LogicalKeyboardKey.keyP,
+  LogicalKeyboardKey.keyQ,
+  LogicalKeyboardKey.keyR,
+  LogicalKeyboardKey.keyS,
+  LogicalKeyboardKey.keyT,
+  LogicalKeyboardKey.keyU,
+  LogicalKeyboardKey.keyV,
+  LogicalKeyboardKey.keyX,
+  LogicalKeyboardKey.keyY,
+  LogicalKeyboardKey.keyZ,
+];
+const _digits = [
+  LogicalKeyboardKey.digit1,
+  LogicalKeyboardKey.digit2,
+  LogicalKeyboardKey.digit3,
+  LogicalKeyboardKey.digit4,
+  LogicalKeyboardKey.digit5,
+  LogicalKeyboardKey.digit6,
+  LogicalKeyboardKey.digit7,
+  LogicalKeyboardKey.digit8,
+  LogicalKeyboardKey.digit9,
+  LogicalKeyboardKey.digit0,
+];
+const _oems = [
+  LogicalKeyboardKey.tilde,
+  LogicalKeyboardKey.minus,
+  LogicalKeyboardKey.equal,
+  LogicalKeyboardKey.braceLeft,
+  LogicalKeyboardKey.braceRight,
+  LogicalKeyboardKey.backslash,
+  LogicalKeyboardKey.comma,
+  LogicalKeyboardKey.quote,
+  LogicalKeyboardKey.quoteSingle,
+  LogicalKeyboardKey.bracketLeft,
+  LogicalKeyboardKey.bracketRight,
+  LogicalKeyboardKey.question,
+];
+const _functions = [
+  LogicalKeyboardKey.f1,
+  LogicalKeyboardKey.f2,
+  LogicalKeyboardKey.f3,
+  LogicalKeyboardKey.f4,
+  LogicalKeyboardKey.f5,
+  LogicalKeyboardKey.f6,
+  LogicalKeyboardKey.f7,
+  LogicalKeyboardKey.f8,
+  LogicalKeyboardKey.f9,
+  LogicalKeyboardKey.f10,
+  LogicalKeyboardKey.f11,
+  LogicalKeyboardKey.f12,
+  LogicalKeyboardKey.f13,
+  LogicalKeyboardKey.f14,
+  LogicalKeyboardKey.f15,
+  LogicalKeyboardKey.f16,
+  LogicalKeyboardKey.f17,
+  LogicalKeyboardKey.f18,
+  LogicalKeyboardKey.f19,
+  LogicalKeyboardKey.f20,
+  LogicalKeyboardKey.f21,
+  LogicalKeyboardKey.f22,
+  LogicalKeyboardKey.f23,
+  LogicalKeyboardKey.f24,
+];
+const _normals = [
+  LogicalKeyboardKey.printScreen,
+  LogicalKeyboardKey.pause,
+  LogicalKeyboardKey.backspace,
+  LogicalKeyboardKey.tab,
+  LogicalKeyboardKey.space,
+  LogicalKeyboardKey.enter,
+];
+const _locks = [
+  LogicalKeyboardKey.capsLock,
+  LogicalKeyboardKey.scrollLock,
+  LogicalKeyboardKey.numLock,
+];
+const _navigations = [
+  LogicalKeyboardKey.escape,
+  LogicalKeyboardKey.insert,
+  LogicalKeyboardKey.delete,
+  LogicalKeyboardKey.home,
+  LogicalKeyboardKey.end,
+  LogicalKeyboardKey.pageUp,
+  LogicalKeyboardKey.pageDown,
+];
+const _arrows = [
+  LogicalKeyboardKey.arrowUp,
+  LogicalKeyboardKey.arrowRight,
+  LogicalKeyboardKey.arrowDown,
+  LogicalKeyboardKey.arrowLeft,
+];
+const _numpad = [
+  LogicalKeyboardKey.numpad0,
+  LogicalKeyboardKey.numpad1,
+  LogicalKeyboardKey.numpad2,
+  LogicalKeyboardKey.numpad3,
+  LogicalKeyboardKey.numpad4,
+  LogicalKeyboardKey.numpad5,
+  LogicalKeyboardKey.numpad6,
+  LogicalKeyboardKey.numpad7,
+  LogicalKeyboardKey.numpad8,
+  LogicalKeyboardKey.numpad9,
+  LogicalKeyboardKey.numpadDivide,
+  LogicalKeyboardKey.numpadMultiply,
+  LogicalKeyboardKey.numpadSubtract,
+  LogicalKeyboardKey.numpadAdd,
+  LogicalKeyboardKey.numpadEnter,
+  LogicalKeyboardKey.numpadEnter,
+  LogicalKeyboardKey.numpadDecimal,
+  LogicalKeyboardKey.numpadEqual,
+  LogicalKeyboardKey.numpadComma,
+];
 
 class KeyEventData {
   KeyEventData(this.rawEvent);
@@ -50,9 +178,47 @@ class KeyEventData {
 
   String get label => rawEvent.label;
 
-  bool get isModifierKey {
-    return _modifiers.contains(rawEvent.logicalKey);
-  }
+  // The event is a modifier like control, command, etc.
+  bool get isModifier => _modifiers.contains(rawEvent.logicalKey);
+
+  // The event is an alphabet like Q, A, etc.
+  bool get isLetter => _letters.contains(rawEvent.logicalKey);
+
+  // The event is a digit/number like 1, 2, etc.
+  bool get isDigit => _digits.contains(rawEvent.logicalKey);
+
+  // The event is a punctuation/symbol key like ~, =, etc.
+  bool get isOEM => _oems.contains(rawEvent.logicalKey);
+
+  // The event is a function key like F1, F2, etc.
+  bool get isFunction => _functions.contains(rawEvent.logicalKey);
+
+  // The event is an arrow key like ↑, →, etc.
+  bool get isArrow => _arrows.contains(rawEvent.logicalKey);
+
+  // The event is a special purpose key like Insert, Home, etc.
+  bool get isNavigation => _navigations.contains(rawEvent.logicalKey);
+
+  // The event is a normal key i.e. doesn't fall in the above
+  // groups like Escape, Spacebar, Enter, etc.
+  bool get isNormal => _normals.contains(rawEvent.logicalKey);
+
+  // The event is a numpad key like Numpad /, *, etc.
+  bool get isNumpad => _numpad.contains(rawEvent.logicalKey);
+
+  // The event is a lock key i.e. caps lock, scroll lock, etc.
+  bool get isLock => _locks.contains(rawEvent.logicalKey);
+
+  // The event is a character i.e. either a letter, digit or punctuation
+  bool get isCharacter => isLetter || isDigit || isOEM;
+
+  // The event has a secondary symbol like digit 2 has @,
+  // equals = has add +, etc.
+  bool get hasSymbol => isDigit || isOEM;
+
+  // The event can be represented with iconography
+  bool get hasIcon =>
+      isModifier || isNormal || isArrow || isNavigation || isLock;
 
   @override
   bool operator ==(other) {
