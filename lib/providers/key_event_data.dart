@@ -1,5 +1,6 @@
 import 'package:flutter/services.dart';
-import 'package:keyviz/domain/services/raw_keyboard_mouse.dart';
+
+import 'package:keyviz/domain/services/services.dart';
 
 extension Ease on RawKeyEvent {
   int get keyId => logicalKey.keyId;
@@ -66,14 +67,11 @@ const _oems = [
   LogicalKeyboardKey.tilde,
   LogicalKeyboardKey.minus,
   LogicalKeyboardKey.equal,
-  LogicalKeyboardKey.braceLeft,
-  LogicalKeyboardKey.braceRight,
-  LogicalKeyboardKey.backslash,
-  LogicalKeyboardKey.comma,
-  LogicalKeyboardKey.quote,
-  LogicalKeyboardKey.quoteSingle,
   LogicalKeyboardKey.bracketLeft,
   LogicalKeyboardKey.bracketRight,
+  LogicalKeyboardKey.backslash,
+  LogicalKeyboardKey.comma,
+  LogicalKeyboardKey.quoteSingle,
   LogicalKeyboardKey.question,
 ];
 const _functions = [
@@ -109,6 +107,7 @@ const _normals = [
   LogicalKeyboardKey.tab,
   LogicalKeyboardKey.space,
   LogicalKeyboardKey.enter,
+  LogicalKeyboardKey.contextMenu,
 ];
 const _locks = [
   LogicalKeyboardKey.capsLock,
@@ -170,13 +169,12 @@ class KeyEventData {
 
   bool get pressed => _pressed;
   int get pressedCount => _pressedCount;
+  int get _id => rawEvent.logicalKey.keyId;
 
   set pressed(bool value) {
     _pressed = value;
     if (_pressed) _pressedCount++;
   }
-
-  String get label => rawEvent.label;
 
   // The event is a modifier like control, command, etc.
   bool get isModifier => _modifiers.contains(rawEvent.logicalKey);
@@ -212,13 +210,22 @@ class KeyEventData {
   // The event is a character i.e. either a letter, digit or punctuation
   bool get isCharacter => isLetter || isDigit || isOEM;
 
-  // The event has a secondary symbol like digit 2 has @,
-  // equals = has add +, etc.
-  bool get hasSymbol => isDigit || isOEM;
+  // textual representation of this event
+  String get label => keymaps[_id]?.label ?? rawEvent.label;
 
-  // The event can be represented with iconography
-  bool get hasIcon =>
-      isModifier || isNormal || isArrow || isNavigation || isLock;
+  // textual representation of this event in short
+  String? get shortLabel => keymaps[_id]?.shortLabel;
+
+  // graphical (unicode) representation of this event
+  String? get glyph => keymaps[_id]?.glyph;
+
+  // The event secondary symbol like digit 2 has @,
+  // equals = has add +, etc. returns null if doesn't has symbol
+  String? get symbol => keymaps[_id]?.symbol;
+
+  // The events representation with iconography
+  // returns null if doesn't has associated icon
+  String? get icon => keymaps[_id]?.icon;
 
   @override
   bool operator ==(other) {

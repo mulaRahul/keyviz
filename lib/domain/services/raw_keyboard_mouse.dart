@@ -38,10 +38,8 @@ class RawKeyEventDataMouse extends RawKeyEventData {
 
       case scrollId:
         return "Scroll";
-
-      default:
-        return '';
     }
+    return '';
   }
 
   @override
