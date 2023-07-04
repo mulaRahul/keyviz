@@ -152,7 +152,8 @@ const _numpad = [
 ];
 
 class KeyEventData {
-  KeyEventData(this.rawEvent);
+  KeyEventData(this.rawEvent)
+      : isModifier = _modifiers.contains(rawEvent.logicalKey);
 
   // pressed state of the key
   // initially comes pressed
@@ -162,10 +163,13 @@ class KeyEventData {
   int _pressedCount = 1;
 
   // the animation in/out state of this key
-  bool show = false;
+  bool show = true; // TODO rm !DEBUG
 
   // logical representation of the KeyEvent
   final RawKeyEvent rawEvent;
+
+  // The event is a modifier like control, command, etc.
+  final bool isModifier;
 
   bool get pressed => _pressed;
   int get pressedCount => _pressedCount;
@@ -175,9 +179,6 @@ class KeyEventData {
     _pressed = value;
     if (_pressed) _pressedCount++;
   }
-
-  // The event is a modifier like control, command, etc.
-  bool get isModifier => _modifiers.contains(rawEvent.logicalKey);
 
   // The event is an alphabet like Q, A, etc.
   bool get isLetter => _letters.contains(rawEvent.logicalKey);
@@ -237,4 +238,8 @@ class KeyEventData {
 
   @override
   int get hashCode => Object.hash(pressed, _pressedCount, show);
+
+  @override
+  String toString() =>
+      "vkCode: ${(rawEvent.data as RawKeyEventDataWindows).keyCode} modifiers: ${(rawEvent.data as RawKeyEventDataWindows).modifiers}";
 }

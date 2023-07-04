@@ -61,3 +61,11 @@ flutter:
           weight: 700
         - asset: assets/fonts/IBMPlexSans-Bold.ttf
           weight: 900
+
+    - family: Inter
+      fonts:
+        - asset: assets/fonts/Inter-Thin.ttf
+          weight: 200
+        - asset: assets/fonts/Inter-Regular.ttf
+        - asset: assets/fonts/Inter-SemiBold.ttf
+          weight: 600

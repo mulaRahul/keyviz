@@ -5,8 +5,22 @@ import 'package:keyviz/providers/key_event.dart';
 import 'package:keyviz/providers/key_style.dart';
 
 extension Cap on String {
+  static const _space = " ";
+
   String capitalize() {
-    return "${this[0].toUpperCase()}${substring(1).toLowerCase()}";
+    if (contains(_space)) {
+      final words = [];
+      for (final word in split(_space)) {
+        words.add(_capitalize(word));
+      }
+      return words.join(_space);
+    } else {
+      return _capitalize(this);
+    }
+  }
+
+  String _capitalize(String txt) {
+    return "${txt[0].toUpperCase()}${txt.substring(1).toLowerCase()}";
   }
 }
 
