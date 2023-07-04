@@ -157,7 +157,7 @@ class KeyEventData {
 
   // pressed state of the key
   // initially comes pressed
-  bool _pressed = true;
+  bool _pressed = false; // TODO rm !DEBUG
 
   // number of times pressed
   int _pressedCount = 1;

@@ -1,12 +1,10 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
-import 'package:keyviz/windows/key_visualizer/widgets/keycap_wrapper.dart';
-import 'package:keyviz/windows/key_visualizer/widgets/keycaps/keycaps.dart';
 import 'package:provider/provider.dart';
 import 'package:tuple/tuple.dart';
 
 import 'package:keyviz/providers/providers.dart';
+
+import 'keycap_wrapper.dart';
 
 class KeyCapGroup extends StatelessWidget {
   const KeyCapGroup({super.key, required this.groupId, required this.events});
@@ -19,14 +17,17 @@ class KeyCapGroup extends StatelessWidget {
     return Selector<KeyStyleProvider,
         Tuple6<bool, Color, double, double, double, double>>(
       builder: (context, tuple, child) {
+        final height = tuple.item6 + (tuple.item4 * 2);
         return tuple.item1
             ? SizedBox(
                 // total height + key cap + padding
-                height: tuple.item6 + (tuple.item4 * 2),
+                height: height,
                 child: DecoratedBox(
                   decoration: BoxDecoration(
                     color: tuple.item2.withOpacity(tuple.item3),
-                    borderRadius: BorderRadius.circular(tuple.item5),
+                    borderRadius: BorderRadius.circular(
+                      (height * .5) * tuple.item5,
+                    ),
                   ),
                   child: Padding(
                     padding: events.isEmpty
@@ -43,7 +44,7 @@ class KeyCapGroup extends StatelessWidget {
         keyStyle.backgroundColor,
         keyStyle.backgroundOpacity,
         keyStyle.backgroundSpacing,
-        keyStyle.borderRadiusValue,
+        keyStyle.cornerSmoothing,
         keyStyle.keycapHeight,
       ),
       child: _KeyCapGroup(groupId, events),

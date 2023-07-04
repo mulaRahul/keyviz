@@ -20,11 +20,10 @@ class KeyCapContent extends StatelessWidget {
     final symbol =
         isNumpad || (style.showSymbol && icon == null) ? event.symbol : null;
 
-    final fontColor = style.differentColorForModifiers
-        ? event.isModifier
-            ? style.mFontColor
-            : style.fontColor
+    final fontColor = style.differentColorForModifiers && event.isModifier
+        ? style.mFontColor
         : style.fontColor;
+
     final textStyle = TextStyle(
       height: 1.2,
       fontFamily: "Inter",
