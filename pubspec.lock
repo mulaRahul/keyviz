@@ -237,10 +237,10 @@ packages:
     dependency: "direct dev"
     description:
       name: msix
-      sha256: bf151b9a1648985e7604672ade54c8df693566099d0731e318548c47d54676e6
+      sha256: c8ebdd4670807904214889c4f9c447492439696814a0189b6a18a4d2f5e1290e
       url: "https://pub.dev"
     source: hosted
-    version: "3.14.2"
+    version: "3.15.0"
   nested:
     dependency: transitive
     description:
@@ -594,10 +594,10 @@ packages:
     dependency: "direct main"
     description:
       name: window_manager
-      sha256: "2b2572442b2a5178642730442dc625ac088244f5827b1f0811371b1b7485eb62"
+      sha256: "9eef00e393e7f9308309ce9a8b2398c9ee3ca78b50c96e8b4f9873945693ac88"
       url: "https://pub.dev"
     source: hosted
-    version: "0.3.2"
+    version: "0.3.5"
   xdg_directories:
     dependency: transitive
     description:
