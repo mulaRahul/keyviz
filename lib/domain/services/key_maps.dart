@@ -116,7 +116,7 @@ final keymaps = <int, KeyMapData>{
     icon: KeyIcons.tab,
   ),
   LogicalKeyboardKey.space.keyId: const KeyMapData(
-    label: "space",
+    label: "        ",
     glyph: "⎵",
     icon: KeyIcons.space,
   ),

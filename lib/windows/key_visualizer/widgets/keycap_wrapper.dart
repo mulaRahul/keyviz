@@ -76,8 +76,8 @@ class _KeyCap extends StatelessWidget {
       case KeyCapStyle.plastic:
         return PlasticKeyCap(event: event);
 
-      case KeyCapStyle.retro:
-        return RetroKeyCap(event: event);
+      // case KeyCapStyle.retro:
+      //   return RetroKeyCap(event: event);
 
       case KeyCapStyle.mechanical:
         return MechanicalKeyCap(event: event);

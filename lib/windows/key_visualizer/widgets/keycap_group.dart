@@ -15,37 +15,44 @@ class KeyCapGroup extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Selector<KeyStyleProvider,
-        Tuple6<bool, Color, double, double, double, double>>(
+        Tuple7<bool, Color, double, double, double, double, KeyCapStyle>>(
       builder: (context, tuple, child) {
         final height = tuple.item6 + (tuple.item4 * 2);
-        return tuple.item1
-            ? SizedBox(
-                // total height + key cap + padding
-                height: height,
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: tuple.item2.withOpacity(tuple.item3),
-                    borderRadius: BorderRadius.circular(
-                      (height * .5) * tuple.item5,
+        return SizedBox(
+          // total height + key cap + padding
+          height: height,
+          child: tuple.item1
+              ? ClipRRect(
+                  clipBehavior: Clip.hardEdge,
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: tuple.item2.withOpacity(tuple.item3),
+                      borderRadius: tuple.item7 == KeyCapStyle.mechanical
+                          ? BorderRadius.circular(
+                              (height * .5) * tuple.item5.clamp(.0, .32))
+                          : BorderRadius.circular(
+                              (height * .5) * tuple.item5,
+                            ),
+                    ),
+                    child: Padding(
+                      padding: events.isEmpty
+                          ? EdgeInsets.zero
+                          : EdgeInsets.all(tuple.item4),
+                      child: child!,
                     ),
                   ),
-                  child: Padding(
-                    padding: events.isEmpty
-                        ? EdgeInsets.zero
-                        : EdgeInsets.all(tuple.item4),
-                    child: child!,
-                  ),
-                ),
-              )
-            : child!;
+                )
+              : child!,
+        );
       },
-      selector: (_, keyStyle) => Tuple6(
+      selector: (_, keyStyle) => Tuple7(
         keyStyle.backgroundEnabled,
         keyStyle.backgroundColor,
         keyStyle.backgroundOpacity,
         keyStyle.backgroundSpacing,
         keyStyle.cornerSmoothing,
         keyStyle.keycapHeight,
+        keyStyle.keyCapStyle,
       ),
       child: _KeyCapGroup(groupId, events),
     );
@@ -77,7 +84,14 @@ class _KeyCapGroup extends StatelessWidget {
           if (keyId != events.keys.last) {
             children.add(
               SizedBox(
-                width: (isMinimal && separator == null) ? 4 : backgroundSpacing,
+                width: backgroundSpacing *
+                    (separator == null
+                        ? isMinimal
+                            ? .25
+                            : 1
+                        : isMinimal
+                            ? 1.5
+                            : 2),
                 child: separator,
               ),
             );
@@ -86,7 +100,7 @@ class _KeyCapGroup extends StatelessWidget {
 
         return Row(
           mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.end,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: children,
         );
       },

@@ -55,8 +55,12 @@ extension on MouseEvent {
 /// keyboard event provider and related configurations
 class KeyEventProvider extends ChangeNotifier {
   KeyEventProvider() {
-    _init();
+    // _init();
   }
+
+  // toggle for styling, if true keeps the events
+  // on display unless changed by others
+  bool _styling = true; // TODO implement setter
 
   // keyboard event listener id
   int? _mouseListenerId;
@@ -86,7 +90,21 @@ class KeyEventProvider extends ChangeNotifier {
 
   // main list of key events to be consumed by the visualizer
   // may not include history is historyMode is set to none
-  final Map<String, Map<int, KeyEventData>> _keyboardEvents = {};
+  // TODO rm !DEBUG
+  final Map<String, Map<int, KeyEventData>> _keyboardEvents = {
+    "0": {
+      8589934848: KeyEventData(
+        const RawKeyDownEvent(
+          data: RawKeyEventDataWindows(keyCode: 162, modifiers: 28),
+        ),
+      ),
+      107: KeyEventData(
+        const RawKeyDownEvent(
+          data: RawKeyEventDataWindows(keyCode: 75, modifiers: 28),
+        ),
+      ),
+    }
+  };
 
   // filter letters, numbers, symbols, etc. and
   // show hotkeys/keyboard shortuts
@@ -106,6 +124,7 @@ class KeyEventProvider extends ChangeNotifier {
   VisualizationHistoryMode _historyMode = VisualizationHistoryMode.none;
 
   // max history number
+  // TODO calculate based on keycap height and screen size
   final int _maxHistory = 6;
 
   // keyviz toggle global shortcut
@@ -218,6 +237,14 @@ class KeyEventProvider extends ChangeNotifier {
     _registerMouseListener();
     // register keyboard event listener
     _registerKeyboardListener();
+  }
+
+  toggleKeyboardListener() {
+    if (_keyboardListenerId == null) {
+      _registerKeyboardListener();
+    } else {
+      _removeKeyboardListener();
+    }
   }
 
   _registerMouseListener() {
@@ -557,6 +584,9 @@ class KeyEventProvider extends ChangeNotifier {
     // animate key released
     event.pressed = false;
     notifyListeners();
+
+    // don't animate out when styling i.e. settings windows opened
+    if (_styling) return;
 
     final pressedCount = event.pressedCount;
 
