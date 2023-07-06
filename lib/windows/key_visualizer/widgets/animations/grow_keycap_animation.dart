@@ -11,6 +11,11 @@ class GrowKeyCapAnimation extends KeyCapAnimation {
 
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return AnimatedScale(
+      duration: animationDuration(context),
+      curve: Curves.easeInOutCubicEmphasized,
+      scale: show ? 1 : 0,
+      child: child,
+    );
   }
 }

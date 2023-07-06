@@ -14,6 +14,6 @@ abstract class KeyCapAnimation extends StatelessWidget {
   final Widget child;
 
   // utility getter for animation duration
-  Duration duration(BuildContext context) =>
+  Duration animationDuration(BuildContext context) =>
       context.read<KeyEventProvider>().animationDuration;
 }

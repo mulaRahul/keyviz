@@ -30,14 +30,18 @@ class KeyCapContent extends StatelessWidget {
       color: fontColor,
       fontSize: style.fontSize,
     );
-
+    // spacebar
+    if (event.isSpacebar) {
+      return Text(" " * 16, style: textStyle);
+    }
     // has icon
-    if (icon != null) {
-      return style.modifierTextLength == ModifierTextLength.iconOnly
+    else if (icon != null) {
+      return (style.modifierTextLength == ModifierTextLength.iconOnly) ||
+              event.isArrow
           ? SvgIcon(
               icon: icon,
               color: fontColor,
-              size: style.fontSize,
+              size: style.fontSize * .8,
             )
           : Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -96,6 +100,8 @@ class KeyCapContent extends StatelessWidget {
   }
 
   String _label(KeyStyleProvider style) {
+    if (event.isSpacebar) return event.label;
+
     final value = style.modifierTextLength == ModifierTextLength.shortLength
         ? event.shortLabel ?? event.label
         : event.label;
@@ -115,12 +121,12 @@ class KeyCapContent extends StatelessWidget {
   CrossAxisAlignment _crossAxisAlignment(KeyStyleProvider style) {
     if (event.isModifier) {
       bool isLeftSide =
-          event.rawEvent.isKeyPressed(LogicalKeyboardKey.controlLeft) ||
-              event.rawEvent.isKeyPressed(LogicalKeyboardKey.metaLeft) ||
-              event.rawEvent.isKeyPressed(LogicalKeyboardKey.altLeft) ||
-              event.rawEvent.isKeyPressed(LogicalKeyboardKey.shiftLeft);
+          event.rawEvent.logicalKey == LogicalKeyboardKey.controlLeft ||
+              event.rawEvent.logicalKey == LogicalKeyboardKey.metaLeft ||
+              event.rawEvent.logicalKey == LogicalKeyboardKey.altLeft ||
+              event.rawEvent.logicalKey == LogicalKeyboardKey.shiftLeft;
 
-      return isLeftSide ? CrossAxisAlignment.start : CrossAxisAlignment.end;
+      return isLeftSide ? CrossAxisAlignment.end : CrossAxisAlignment.start;
     }
 
     switch (style.horizontalAlignment) {

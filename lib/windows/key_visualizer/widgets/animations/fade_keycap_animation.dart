@@ -11,6 +11,11 @@ class FadeKeyCapAnimation extends KeyCapAnimation {
 
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return AnimatedOpacity(
+      duration: animationDuration(context),
+      curve: Curves.easeInOut,
+      opacity: show ? 1 : 0,
+      child: child,
+    );
   }
 }

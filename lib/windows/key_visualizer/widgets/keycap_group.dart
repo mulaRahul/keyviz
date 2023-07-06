@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tuple/tuple.dart';
 
+import 'package:keyviz/config/extensions.dart';
 import 'package:keyviz/providers/providers.dart';
 
 import 'keycap_wrapper.dart';
@@ -15,40 +16,33 @@ class KeyCapGroup extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Selector<KeyStyleProvider,
-        Tuple7<bool, Color, double, double, double, double, KeyCapStyle>>(
+        Tuple6<bool, Color, double, double, double, KeyCapStyle>>(
       builder: (context, tuple, child) {
-        final height = tuple.item6 + (tuple.item4 * 2);
-        return SizedBox(
-          // total height + key cap + padding
-          height: height,
-          child: tuple.item1
-              ? ClipRRect(
-                  clipBehavior: Clip.hardEdge,
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      color: tuple.item2.withOpacity(tuple.item3),
-                      borderRadius: tuple.item7 == KeyCapStyle.mechanical
-                          ? BorderRadius.circular(
-                              (height * .5) * tuple.item5.clamp(.0, .32))
-                          : BorderRadius.circular(
-                              (height * .5) * tuple.item5,
-                            ),
-                    ),
-                    child: Padding(
-                      padding: events.isEmpty
-                          ? EdgeInsets.zero
-                          : EdgeInsets.all(tuple.item4),
-                      child: child!,
-                    ),
-                  ),
-                )
-              : child!,
-        );
+        // total height + key cap + padding
+        final height = tuple.item5 + (tuple.item3 * 2);
+        return tuple.item1
+            ? Container(
+                height: height,
+                padding: events.isEmpty
+                    ? EdgeInsets.zero
+                    : EdgeInsets.all(tuple.item3),
+                decoration: BoxDecoration(
+                  color: tuple.item2,
+                  borderRadius: tuple.item6 == KeyCapStyle.mechanical
+                      ? BorderRadius.circular(
+                          (height * .5) * tuple.item4.clamp(.0, .32))
+                      : BorderRadius.circular(
+                          (height * .5) * tuple.item4,
+                        ),
+                ),
+                clipBehavior: Clip.none,
+                child: child!,
+              )
+            : child!;
       },
-      selector: (_, keyStyle) => Tuple7(
+      selector: (_, keyStyle) => Tuple6(
         keyStyle.backgroundEnabled,
-        keyStyle.backgroundColor,
-        keyStyle.backgroundOpacity,
+        keyStyle.backgroundColorWithOpacity,
         keyStyle.backgroundSpacing,
         keyStyle.cornerSmoothing,
         keyStyle.keycapHeight,
@@ -67,7 +61,7 @@ class _KeyCapGroup extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Selector<KeyStyleProvider, Tuple3<bool, double, Widget?>>(
+    return Selector<KeyStyleProvider, Tuple4<bool, double, Widget?, Alignment>>(
       builder: (context, tuple, _) {
         final isMinimal = tuple.item1;
         final backgroundSpacing = tuple.item2;
@@ -98,16 +92,26 @@ class _KeyCapGroup extends StatelessWidget {
           }
         }
 
-        return Row(
+        final row = Row(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: children,
         );
+
+        return context.keyEvent.noKeyCapAnimation
+            ? row
+            : AnimatedSize(
+                duration: context.keyEvent.animationDuration,
+                curve: Curves.easeInOutCubic,
+                alignment: tuple.item4,
+                child: row,
+              );
       },
-      selector: (_, keyStyle) => Tuple3(
+      selector: (_, keyStyle) => Tuple4(
         keyStyle.keyCapStyle == KeyCapStyle.minimal,
         keyStyle.backgroundSpacing,
         keyStyle.separator,
+        keyStyle.alignment,
       ),
     );
   }
