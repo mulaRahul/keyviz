@@ -1,11 +1,16 @@
 import 'dart:async';
+import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' hide ModifierKey;
 import 'package:hid_listener/hid_listener.dart';
 
 import 'package:keyviz/config/config.dart';
 import 'package:keyviz/domain/services/raw_keyboard_mouse.dart';
+import 'package:keyviz/domain/vault/vault.dart';
+import 'package:tray_manager/tray_manager.dart';
+import 'package:window_manager/window_manager.dart';
 
 import 'key_event_data.dart';
 
@@ -18,8 +23,24 @@ enum ModifierKey {
   alt("Alt"),
   meta("Meta");
 
-  const ModifierKey(this.keyLabel);
-  final String keyLabel;
+  const ModifierKey(this.label);
+  final String label;
+
+  String get keyLabel {
+    if (this == ModifierKey.alt) {
+      if (Platform.isMacOS) {
+        return "Option";
+      }
+    } else if (this == ModifierKey.meta) {
+      if (Platform.isWindows) {
+        return "Win";
+      } else if (Platform.isMacOS) {
+        return "Command";
+      }
+    }
+
+    return label;
+  }
 }
 
 // key visualization history mode
@@ -53,14 +74,17 @@ extension on MouseEvent {
 }
 
 /// keyboard event provider and related configurations
-class KeyEventProvider extends ChangeNotifier {
+class KeyEventProvider extends ChangeNotifier with TrayListener {
   KeyEventProvider() {
-    // _init();
+    _init();
   }
+
+  // errors
+  final List<String> _errors = const [];
 
   // toggle for styling, if true keeps the events
   // on display unless changed by others
-  bool _styling = true; // TODO implement setter
+  bool _styling = false;
 
   // keyboard event listener id
   int? _mouseListenerId;
@@ -71,6 +95,9 @@ class KeyEventProvider extends ChangeNotifier {
   // cursor button down state
   bool _mouseButtonDown = false;
 
+  // track gap between mouse down and up
+  int? _mouseButtonDownTimestamp;
+
   // mouse left button down and mouse moving
   bool _dragging = false;
 
@@ -79,6 +106,9 @@ class KeyEventProvider extends ChangeNotifier {
 
   // list of key id's currently hold down
   final Map<int, RawKeyDownEvent> _keyDown = {};
+
+  // unfiltered keyboard event ids list
+  final List<int> _unfilteredEvents = [];
 
   // tracking variable for every key down
   // follwed by key up  synchronously
@@ -90,25 +120,11 @@ class KeyEventProvider extends ChangeNotifier {
 
   // main list of key events to be consumed by the visualizer
   // may not include history is historyMode is set to none
-  // TODO rm !DEBUG
-  final Map<String, Map<int, KeyEventData>> _keyboardEvents = {
-    "0": {
-      8589934848: KeyEventData(
-        const RawKeyDownEvent(
-          data: RawKeyEventDataWindows(keyCode: 162, modifiers: 28),
-        ),
-      ),
-      107: KeyEventData(
-        const RawKeyDownEvent(
-          data: RawKeyEventDataWindows(keyCode: 75, modifiers: 28),
-        ),
-      ),
-    }
-  };
+  final Map<String, Map<int, KeyEventData>> _keyboardEvents = {};
 
   // filter letters, numbers, symbols, etc. and
   // show hotkeys/keyboard shortuts
-  bool _filterHotkeys = true;
+  bool _filterHotkeys = _Defaults.filterHotkeys;
 
   // modifiers and function keys to ignore
   // when hotkey filter is turned on
@@ -121,34 +137,42 @@ class KeyEventProvider extends ChangeNotifier {
 
   // whether to show history, if yes
   // then vertically or horizontally
-  VisualizationHistoryMode _historyMode = VisualizationHistoryMode.none;
+  VisualizationHistoryMode _historyMode = _Defaults.historyMode;
 
   // max history number
   // TODO calculate based on keycap height and screen size
   final int _maxHistory = 6;
 
-  // keyviz toggle global shortcut
-  List<String> _keyvizToggleShortcut = [];
+  // global keyviz toggle shortcut, list of keyIds
+  // default [Shift] + [F10]
+  List<int> keyvizToggleShortcut = _Defaults.toggleShortcut;
+
+  // display events in the visualizer
+  bool _visualizeEvents = true;
 
   // amount of time the visualization stays on the screen in seconds
-  int _lingerDurationInSeconds = 4;
+  int _lingerDurationInSeconds = _Defaults.lingerDurationInSeconds;
 
   // key cap animation speed in milliseconds
-  int _animationSpeed = 200;
+  int _animationSpeed = _Defaults.animationSpeed;
 
   // keycap animation type
-  KeyCapAnimationType _keyCapAnimation = KeyCapAnimationType.slide;
+  KeyCapAnimationType _keyCapAnimation = _Defaults.keyCapAnimation;
 
   // mouse visualize clicks
-  bool _showMouseClicks = false;
+  bool _showMouseClicks = _Defaults.showMouseClicks;
 
   // mouse visualize clicks
-  bool _highlightCursor = false;
+  bool _highlightCursor = _Defaults.highlightCursor;
 
   // show mouse events with keypress like, [Shift] + [Drag]
-  bool _showMouseEvents = true;
+  bool _showMouseEvents = _Defaults.showMouseEvents;
 
   Map<String, Map<int, KeyEventData>> get keyboardEvents => _keyboardEvents;
+
+  bool get styling => _styling;
+  bool get visualizeEvents => _visualizeEvents;
+  List<String> get errors => _errors;
 
   bool get filterHotkeys => _filterHotkeys;
   Map<ModifierKey, bool> get ignoreKeys => _ignoreKeys;
@@ -166,20 +190,26 @@ class KeyEventProvider extends ChangeNotifier {
     }
   }
 
-  List<String> get keyvizToggleShortcut => _keyvizToggleShortcut;
   int get lingerDurationInSeconds => _lingerDurationInSeconds;
   Duration get lingerDuration => Duration(seconds: _lingerDurationInSeconds);
   int get animationSpeed => _animationSpeed;
   Duration get animationDuration => Duration(milliseconds: _animationSpeed);
   KeyCapAnimationType get keyCapAnimation => _keyCapAnimation;
-  bool get _noKeyCapAnimation => _keyCapAnimation == KeyCapAnimationType.none;
+  bool get noKeyCapAnimation => _keyCapAnimation == KeyCapAnimationType.none;
   bool get showMouseClicks => _showMouseClicks;
   bool get highlightCursor => _highlightCursor;
   bool get showMouseEvents => _showMouseEvents;
   Offset get cursorOffset => _cursorOffset;
   bool get mouseButtonDown => _mouseButtonDown;
 
-  bool get _ignoreHistory => _historyMode == VisualizationHistoryMode.none;
+  bool get _ignoreHistory =>
+      _historyMode == VisualizationHistoryMode.none || _styling;
+
+  set styling(bool value) {
+    _styling = value;
+    windowManager.setIgnoreMouseEvents(!value);
+    notifyListeners();
+  }
 
   set filterHotkeys(value) {
     _filterHotkeys = value;
@@ -193,11 +223,6 @@ class KeyEventProvider extends ChangeNotifier {
 
   set historyMode(VisualizationHistoryMode value) {
     _historyMode = value;
-    notifyListeners();
-  }
-
-  set keyvizToggleShortcut(List<String> value) {
-    _keyvizToggleShortcut = value;
     notifyListeners();
   }
 
@@ -231,26 +256,31 @@ class KeyEventProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  _init() {
-    // TODO: load data
+  _toggleVisualizer() {
+    _visualizeEvents = !_visualizeEvents;
+    _setTrayIcon();
+    _setTrayContextMenu();
+  }
+
+  _init() async {
+    // load data
+    await _updateFromJson();
     // register mouse event listener
     _registerMouseListener();
     // register keyboard event listener
     _registerKeyboardListener();
-  }
-
-  toggleKeyboardListener() {
-    if (_keyboardListenerId == null) {
-      _registerKeyboardListener();
-    } else {
-      _removeKeyboardListener();
-    }
+    // setup tray manager
+    trayManager.addListener(this);
+    await _setTrayIcon();
+    await _setTrayContextMenu();
   }
 
   _registerMouseListener() {
     _mouseListenerId = registerMouseListener(_onMouseEvent);
 
     if (_mouseListenerId == null) {
+      _errors.add("mouse");
+      notifyListeners();
       debugPrint("couldn't register mouse listener");
     } else {
       debugPrint("registered mouse listener");
@@ -321,14 +351,41 @@ class KeyEventProvider extends ChangeNotifier {
     // update offset
     _cursorOffset = event.offset;
 
+    // mouse button down
     if (leftOrRightDown) {
       _mouseButtonDown = true;
-    } else {
-      _mouseButtonDown = false;
-    }
 
-    if (_showMouseClicks) {
-      notifyListeners();
+      if (_showMouseClicks) {
+        _mouseButtonDownTimestamp = DateTime.now().millisecondsSinceEpoch;
+        notifyListeners();
+      }
+    }
+    // mouse button up
+    else {
+      if (_showMouseClicks) {
+        final diff = _mouseButtonDownTimestamp == null
+            ? 200
+            : DateTime.now().millisecondsSinceEpoch -
+                _mouseButtonDownTimestamp!;
+        _mouseButtonDownTimestamp = null;
+
+        // enforce minimum transition duration for smooth animation
+        if (diff < 200) {
+          Future.delayed(Duration(milliseconds: 200 - diff)).then(
+            (_) {
+              _mouseButtonDown = false;
+              notifyListeners();
+            },
+          );
+        } else {
+          _mouseButtonDown = false;
+          notifyListeners();
+        }
+      }
+      // set it right away
+      else {
+        _mouseButtonDown = false;
+      }
     }
 
     if (_showMouseEvents) {
@@ -407,6 +464,9 @@ class KeyEventProvider extends ChangeNotifier {
     _keyboardListenerId = registerKeyboardListener(_onRawKeyEvent);
 
     if (_keyboardListenerId == null) {
+      _errors.add("keyboard");
+      notifyListeners();
+
       debugPrint("cannot register keyboard listener!");
     } else {
       debugPrint("keyboard listener registered");
@@ -416,11 +476,19 @@ class KeyEventProvider extends ChangeNotifier {
   _onRawKeyEvent(RawKeyEvent event) {
     // key pressed
     if (event is RawKeyDownEvent && !_keyDown.containsKey(event.keyId)) {
-      _onKeyDown(event);
+      // check for shortcut pressed
+      _unfilteredEvents.add(event.keyId);
+      if (listEquals(_unfilteredEvents, keyvizToggleShortcut)) {
+        _toggleVisualizer();
+      }
+
+      if (_visualizeEvents) _onKeyDown(event);
     }
     // key released
     else if (event is RawKeyUpEvent) {
-      _onKeyUp(event);
+      _unfilteredEvents.remove(event.keyId);
+
+      if (_visualizeEvents) _onKeyUp(event);
     }
   }
 
@@ -450,7 +518,11 @@ class KeyEventProvider extends ChangeNotifier {
       _keyDown[event.keyId] = event;
 
       // animate key press
-      _keyboardEvents[_groupId]![event.keyId]!.pressed = true;
+      final data = _keyboardEvents[_groupId]![event.keyId]!;
+      _keyboardEvents[_groupId]![event.keyId] = data.copyWith(
+        pressed: true,
+        pressedCount: data.pressedCount + 1,
+      );
       notifyListeners();
 
       // remove previous keys if the above was just tracked
@@ -469,7 +541,11 @@ class KeyEventProvider extends ChangeNotifier {
       // reuse last group id
       _groupId = _keyboardEvents.keys.last;
       // animate key press
-      _keyboardEvents[_groupId]![event.keyId]!.pressed = true;
+      final data = _keyboardEvents[_groupId]![event.keyId]!;
+      _keyboardEvents[_groupId]![event.keyId] = data.copyWith(
+        pressed: true,
+        pressedCount: data.pressedCount + 1,
+      );
       notifyListeners();
 
       debugPrint("⬇️ [${event.label}]");
@@ -502,38 +578,62 @@ class KeyEventProvider extends ChangeNotifier {
       }
 
       if (!_keyUpFollowed) {
-        // TODO handle events like Alt + (Left Click * n)
-        // dispatch key up for not removed
-        for (final keyId in _keyDown.keys) {
-          _animateOut(_groupId!, keyId);
+        final events = _keyboardEvents[_groupId];
+        // handle pressed again
+        if (
+            // last pressed event
+            events?.keys.last == event.keyId &&
+                // other keys are pressed down
+                events!.values
+                    .take(events.length - 1)
+                    .every((value) => value.pressed)) {
+          // press the last item
+          // track key pressed down
+          _keyDown[event.keyId] = event;
+          // animate key press
+          final data = _keyboardEvents[_groupId]![event.keyId]!;
+          _keyboardEvents[_groupId]![event.keyId] = data.copyWith(
+            pressed: true,
+            pressedCount: data.pressedCount + 1,
+          );
+          notifyListeners();
+
+          debugPrint("⬇️ [${event.label}]");
+          return;
         }
-        // change group id
-        _groupId = _timestamp;
-        // duplicate key downs
-        _keyboardEvents[_groupId!] = {
-          for (final entry in _keyDown.entries)
-            entry.key: KeyEventData(entry.value),
-        };
+        // create new group
+        else {
+          // dispatch key up for not removed
+          for (final keyId in _keyDown.keys) {
+            _animateOut(_groupId!, keyId);
+          }
+          // change group id
+          _groupId = _timestamp;
+          // duplicate key downs
+          _keyboardEvents[_groupId!] = {
+            for (final entry in _keyDown.entries)
+              entry.key: KeyEventData(entry.value),
+          };
+        }
       }
     }
 
     // track key pressed down
     _keyDown[event.keyId] = event;
 
-    _keyboardEvents[_groupId]![event.keyId] = KeyEventData(event);
+    _keyboardEvents[_groupId]![event.keyId] = KeyEventData(
+      event,
+      show: noKeyCapAnimation,
+    );
 
-    if (_noKeyCapAnimation) {
-      // show the key event without animation
-      _keyboardEvents[_groupId]![event.keyId]!.show = true;
+    // animate with configured key cap animation
+    if (!noKeyCapAnimation) {
+      _animateIn(_groupId!, event.keyId);
     }
 
     notifyListeners();
 
-    // animate with configured key cap animation
-    if (!_noKeyCapAnimation) {
-      _animateIn(_groupId!, event.keyId);
-    }
-
+    debugPrint("keyboardEvents: $_keyboardEvents");
     debugPrint("⬇️ [${event.label}]");
 
     // key event tracking
@@ -572,7 +672,7 @@ class KeyEventProvider extends ChangeNotifier {
     // set show to true
     final event = _keyboardEvents[groupId]?[keyId];
     if (event != null) {
-      event.show = true;
+      _keyboardEvents[groupId]![keyId] = event.copyWith(show: true);
       notifyListeners();
     }
   }
@@ -582,7 +682,7 @@ class KeyEventProvider extends ChangeNotifier {
     if (event == null) return;
 
     // animate key released
-    event.pressed = false;
+    _keyboardEvents[groupId]![keyId] = event.copyWith(pressed: false);
     notifyListeners();
 
     // don't animate out when styling i.e. settings windows opened
@@ -594,19 +694,19 @@ class KeyEventProvider extends ChangeNotifier {
     await Future.delayed(lingerDuration);
 
     // new pressed count
-    final newPressedCount = _keyboardEvents[groupId]?[keyId]?.pressedCount;
+    final newEvent = _keyboardEvents[groupId]?[keyId];
 
     if ( // make sure key event not removed
         // newPressedCount == null ||
         // key not pressed again
-        pressedCount != newPressedCount) {
+        pressedCount != newEvent?.pressedCount) {
       debugPrint("key pressed again, returning...");
       return;
     }
 
-    if (!_noKeyCapAnimation) {
+    if (!noKeyCapAnimation) {
       // animate out the key event
-      event.show = false;
+      _keyboardEvents[groupId]![keyId] = newEvent!.copyWith(show: false);
       notifyListeners();
 
       // wait for animation to finish
@@ -658,13 +758,220 @@ class KeyEventProvider extends ChangeNotifier {
 
   String get _timestamp {
     final now = DateTime.now();
-    return "${now.hour}${now.minute}${now.second}${now.millisecond}";
+    return "${now.minute}${now.second}${now.millisecond}";
+  }
+
+  _setTrayIcon() async {
+    if (_visualizeEvents) {
+      await trayManager.setIcon(
+        Platform.isWindows
+            ? 'assets/img/tray-on.ico'
+            : 'assets/img/tray-on.png',
+      );
+    } else {
+      await trayManager.setIcon(
+        Platform.isWindows
+            ? 'assets/img/tray-off.ico'
+            : 'assets/imag/tray-off.png',
+      );
+    }
+  }
+
+  _setTrayContextMenu() async {
+    await trayManager.setContextMenu(
+      Menu(
+        items: [
+          MenuItem(
+            key: "toggle",
+            label: _visualizeEvents ? "✗ Turn Off" : "✓ Turn On",
+          ),
+          MenuItem(
+            key: "settings",
+            label: "Settings",
+            toolTip: "Open settings window",
+          ),
+          MenuItem.separator(),
+          MenuItem(
+            key: "quit",
+            label: "Quit",
+            toolTip: "Close Keyviz",
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  void onTrayIconMouseDown() {
+    super.onTrayIconMouseDown();
+    _toggleVisualizer();
+  }
+
+  @override
+  void onTrayIconRightMouseDown() async {
+    super.onTrayIconRightMouseDown();
+    await trayManager.popUpContextMenu();
+  }
+
+  @override
+  void onTrayMenuItemClick(MenuItem menuItem) async {
+    super.onTrayMenuItemClick(menuItem);
+
+    switch (menuItem.key) {
+      case "toggle":
+        _toggleVisualizer();
+        break;
+
+      case "settings":
+        styling = !_styling;
+        break;
+
+      case "quit":
+        windowManager.close();
+        break;
+    }
+  }
+
+  Map<String, dynamic> get toJson => {
+        _JsonKeys.filterHotkeys: _filterHotkeys,
+        _JsonKeys.ignoreKeys: {
+          ModifierKey.control.name: _ignoreKeys[ModifierKey.control],
+          ModifierKey.shift.name: _ignoreKeys[ModifierKey.shift],
+          ModifierKey.alt.name: _ignoreKeys[ModifierKey.alt],
+          ModifierKey.meta.name: _ignoreKeys[ModifierKey.meta],
+        },
+        _JsonKeys.historyMode: _historyMode.name,
+        _JsonKeys.toggleShortcut: keyvizToggleShortcut,
+        _JsonKeys.lingerDurationInSeconds: _lingerDurationInSeconds,
+        _JsonKeys.animationSpeed: _animationSpeed,
+        _JsonKeys.keyCapAnimation: _keyCapAnimation.name,
+        _JsonKeys.showMouseClicks: _showMouseClicks,
+        _JsonKeys.highlightCursor: _highlightCursor,
+        _JsonKeys.showMouseEvents: _showMouseEvents,
+      };
+
+  _updateFromJson() async {
+    final data = await Vault.loadConfigData();
+
+    if (data == null) return;
+
+    _filterHotkeys = data[_JsonKeys.filterHotkeys] ?? _Defaults.filterHotkeys;
+
+    for (final modifier in ModifierKey.values) {
+      _ignoreKeys[modifier] = data[_JsonKeys.ignoreKeys][modifier.name] ??
+          _Defaults.ignoreKeys[modifier];
+    }
+
+    switch (data[_JsonKeys.historyMode]) {
+      case "none":
+        _historyMode = VisualizationHistoryMode.none;
+        break;
+
+      case "vertical":
+        _historyMode = VisualizationHistoryMode.vertical;
+        break;
+
+      case "horizontal":
+        _historyMode = VisualizationHistoryMode.horizontal;
+        break;
+    }
+
+    if (data[_JsonKeys.toggleShortcut] != null) {
+      keyvizToggleShortcut =
+          (data[_JsonKeys.toggleShortcut] as List).cast<int>();
+    }
+
+    _lingerDurationInSeconds = data[_JsonKeys.lingerDurationInSeconds] ??
+        _Defaults.lingerDurationInSeconds;
+
+    _animationSpeed =
+        data[_JsonKeys.animationSpeed] ?? _Defaults.animationSpeed;
+
+    switch (data[_JsonKeys.keyCapAnimation]) {
+      case "none":
+        _keyCapAnimation = KeyCapAnimationType.none;
+        break;
+
+      case "slide":
+        _keyCapAnimation = KeyCapAnimationType.slide;
+        break;
+
+      case "grow":
+        _keyCapAnimation = KeyCapAnimationType.grow;
+        break;
+
+      case "fade":
+        _keyCapAnimation = KeyCapAnimationType.fade;
+        break;
+
+      case "wham":
+        _keyCapAnimation = KeyCapAnimationType.wham;
+        break;
+    }
+
+    _showMouseClicks =
+        data[_JsonKeys.showMouseClicks] ?? _Defaults.showMouseClicks;
+
+    _highlightCursor =
+        data[_JsonKeys.highlightCursor] ?? _Defaults.highlightCursor;
+
+    _showMouseEvents =
+        data[_JsonKeys.showMouseEvents] ?? _Defaults.showMouseEvents;
+  }
+
+  revertToDefaults() {
+    _filterHotkeys = _Defaults.filterHotkeys;
+    for (final modifier in ModifierKey.values) {
+      _ignoreKeys[modifier] = _Defaults.ignoreKeys[modifier] ?? false;
+    }
+    _historyMode = _Defaults.historyMode;
+    keyvizToggleShortcut = _Defaults.toggleShortcut;
+    _lingerDurationInSeconds = _Defaults.lingerDurationInSeconds;
+    _animationSpeed = _Defaults.animationSpeed;
+    _keyCapAnimation = _Defaults.keyCapAnimation;
+    _showMouseClicks = _Defaults.showMouseClicks;
+    _highlightCursor = _Defaults.highlightCursor;
+    _showMouseEvents = _Defaults.showMouseEvents;
+
+    notifyListeners();
   }
 
   @override
   void dispose() {
     _removeMouseListener();
     _removeKeyboardListener();
+    trayManager.removeListener(this);
     super.dispose();
   }
+}
+
+class _JsonKeys {
+  static const filterHotkeys = "filter_hotkeys";
+  static const ignoreKeys = "ignore_keys";
+  static const historyMode = "history_mode";
+  static const toggleShortcut = "toggle_shortcut";
+  static const lingerDurationInSeconds = "linger_duration";
+  static const animationSpeed = "animation_speed";
+  static const keyCapAnimation = "keycap_animation";
+  static const showMouseClicks = "show_clicks";
+  static const highlightCursor = "highlight_cursor";
+  static const showMouseEvents = "show_mouse_events";
+}
+
+class _Defaults {
+  static const filterHotkeys = true;
+  static const ignoreKeys = {
+    ModifierKey.control: false,
+    ModifierKey.shift: true,
+    ModifierKey.alt: false,
+    ModifierKey.meta: false,
+  };
+  static const historyMode = VisualizationHistoryMode.none;
+  static const toggleShortcut = [8589934850, 4294969354];
+  static const lingerDurationInSeconds = 4;
+  static const animationSpeed = 500;
+  static const keyCapAnimation = KeyCapAnimationType.none;
+  static const showMouseClicks = true;
+  static const highlightCursor = false;
+  static const showMouseEvents = true;
 }
