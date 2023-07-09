@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tuple/tuple.dart';
@@ -8,34 +9,33 @@ import 'package:keyviz/providers/providers.dart';
 import 'keycap_wrapper.dart';
 
 class KeyCapGroup extends StatelessWidget {
-  const KeyCapGroup({super.key, required this.groupId, required this.events});
+  const KeyCapGroup({super.key, required this.groupId});
 
   final String groupId;
-  final Map<int, KeyEventData> events;
 
   @override
   Widget build(BuildContext context) {
     return Selector<KeyStyleProvider,
-        Tuple6<bool, Color, double, double, double, KeyCapStyle>>(
+        Tuple6<bool, Color, double, double, double, bool>>(
       builder: (context, tuple, child) {
         // total height + key cap + padding
         final height = tuple.item5 + (tuple.item3 * 2);
         return tuple.item1
             ? Container(
                 height: height,
-                padding: events.isEmpty
-                    ? EdgeInsets.zero
-                    : EdgeInsets.all(tuple.item3),
                 decoration: BoxDecoration(
                   color: tuple.item2,
-                  borderRadius: tuple.item6 == KeyCapStyle.mechanical
+                  borderRadius: tuple.item6
                       ? BorderRadius.circular(
                           (height * .5) * tuple.item4.clamp(.0, .32))
                       : BorderRadius.circular(
                           (height * .5) * tuple.item4,
                         ),
                 ),
-                clipBehavior: Clip.none,
+                clipBehavior: context.keyEvent.keyCapAnimation ==
+                        KeyCapAnimationType.slide
+                    ? Clip.hardEdge
+                    : Clip.none,
                 child: child!,
               )
             : child!;
@@ -46,36 +46,44 @@ class KeyCapGroup extends StatelessWidget {
         keyStyle.backgroundSpacing,
         keyStyle.cornerSmoothing,
         keyStyle.keycapHeight,
-        keyStyle.keyCapStyle,
+        keyStyle.keyCapStyle == KeyCapStyle.mechanical,
       ),
-      child: _KeyCapGroup(groupId, events),
+      child: _KeyCapGroup(groupId),
     );
   }
 }
 
 class _KeyCapGroup extends StatelessWidget {
-  const _KeyCapGroup(this.groupId, this.events);
+  const _KeyCapGroup(this.groupId);
 
   final String groupId;
-  final Map<int, KeyEventData> events;
 
   @override
   Widget build(BuildContext context) {
-    return Selector<KeyStyleProvider, Tuple4<bool, double, Widget?, Alignment>>(
-      builder: (context, tuple, _) {
-        final isMinimal = tuple.item1;
-        final backgroundSpacing = tuple.item2;
-        final separator = tuple.item3;
+    final style =
+        context.select<KeyStyleProvider, Tuple3<bool, double, Widget?>>(
+      (keyStyle) => Tuple3(
+        keyStyle.keyCapStyle == KeyCapStyle.minimal,
+        keyStyle.backgroundSpacing,
+        keyStyle.separator,
+        // keyStyle.alignment,
+      ),
+    );
+    final isMinimal = style.item1;
+    final backgroundSpacing = style.item2;
+    final separator = style.item3;
 
+    return Selector<KeyEventProvider, List<int>>(
+      builder: (context, keyIds, _) {
         final children = <Widget>[];
 
-        for (final keyId in events.keys) {
+        for (final keyId in keyIds) {
           // add key cap wrapper
           children.add(
             KeyCapWrapper(groupId: groupId, keyId: keyId),
           );
           // add separator/spacing
-          if (keyId != events.keys.last) {
+          if (keyId != keyIds.last) {
             children.add(
               SizedBox(
                 width: backgroundSpacing *
@@ -92,27 +100,21 @@ class _KeyCapGroup extends StatelessWidget {
           }
         }
 
-        final row = Row(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: children,
+        return Padding(
+          padding: keyIds.isEmpty
+              ? EdgeInsets.zero
+              : EdgeInsets.all(backgroundSpacing),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: children,
+          ),
         );
-
-        return context.keyEvent.noKeyCapAnimation
-            ? row
-            : AnimatedSize(
-                duration: context.keyEvent.animationDuration,
-                curve: Curves.easeInOutCubic,
-                alignment: tuple.item4,
-                child: row,
-              );
       },
-      selector: (_, keyStyle) => Tuple4(
-        keyStyle.keyCapStyle == KeyCapStyle.minimal,
-        keyStyle.backgroundSpacing,
-        keyStyle.separator,
-        keyStyle.alignment,
-      ),
+      selector: (_, keyEvent) =>
+          keyEvent.keyboardEvents[groupId]?.keys.toList(growable: false) ??
+          const [],
+      shouldRebuild: (previous, next) => !listEquals(previous, next),
     );
   }
 }

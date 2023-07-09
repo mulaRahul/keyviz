@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
 import 'package:tuple/tuple.dart';
 import 'package:provider/provider.dart';
 
@@ -58,42 +57,34 @@ class _KeyVisualizer extends StatelessWidget {
     final historyDirection = context.select<KeyEventProvider, Axis?>(
       (keyEvent) => keyEvent.historyDirection,
     );
-    return Selector<KeyEventProvider, Map<String, Map<int, KeyEventData>>>(
-      builder: (context, events, _) {
+    return Selector<KeyEventProvider, List<String>>(
+      builder: (context, groups, _) {
+        // placeholder
+        if (groups.isEmpty) return const SizedBox();
         // ignoring history
-        if (historyDirection == null) {
-          if (events.isEmpty) {
-            // placeholder
-            return const SizedBox();
-          } else {
-            // single display list
-            final groupId = events.keys.last;
-
-            return KeyCapGroup(
-              groupId: groupId,
-              events: events[groupId]!,
-            );
-          }
-        }
-        // showing history
-        else {
-          return _VisualizationHistory(
-            events: events,
-            direction: historyDirection,
-          );
-        }
+        return historyDirection == null
+            // latest display group
+            ? KeyCapGroup(
+                key: Key(groups.last),
+                groupId: groups.last,
+              )
+            // show history
+            : _VisualizationHistory(
+                groups: groups,
+                direction: historyDirection,
+              );
       },
-      selector: (_, keyEvent) => keyEvent.keyboardEvents,
-      shouldRebuild: (previous, next) => mapEquals(previous, next),
+      selector: (_, keyEvent) =>
+          keyEvent.keyboardEvents.keys.toList(growable: false),
     );
   }
 }
 
 class _VisualizationHistory extends StatelessWidget {
-  const _VisualizationHistory({required this.events, required this.direction});
+  const _VisualizationHistory({required this.groups, required this.direction});
 
   final Axis direction;
-  final Map<String, Map<int, KeyEventData>> events;
+  final List<String> groups;
 
   @override
   Widget build(BuildContext context) {
@@ -105,12 +96,12 @@ class _VisualizationHistory extends StatelessWidget {
         alignment: _wrapAlignment(tuple.item1),
         crossAxisAlignment: _crossAxisAlignment(tuple.item1),
         children: [
-          for (final groupId in _showReversed(tuple.item1)
-              ? events.keys.toList().reversed
-              : events.keys)
-            // sanity check
-            if (events[groupId] != null)
-              KeyCapGroup(groupId: groupId, events: events[groupId]!)
+          for (final groupId
+              in _showReversed(tuple.item1) ? groups.reversed : groups)
+            KeyCapGroup(
+              key: Key(groupId),
+              groupId: groupId,
+            )
         ],
       ),
       selector: (_, keyStyle) => Tuple2(
