@@ -26,6 +26,7 @@ extension Cap on String {
 
 extension Ease on BuildContext {
   ThemeData get theme => Theme.of(this);
+  bool get isDark => theme.brightness == Brightness.dark;
   ColorScheme get colorScheme => theme.colorScheme;
   TextTheme get textTheme => theme.textTheme;
   KeyEventProvider get keyEvent => read<KeyEventProvider>();

@@ -13,6 +13,7 @@ const lighterGrey = Color(0xfff2f2f2);
 const _baseTextStyle = TextStyle(
   color: darkerGrey,
   height: 1.25,
+  fontFamily: "IBM Plex Sans",
 );
 final _titleStyle = _baseTextStyle.copyWith(
   fontSize: 18,
@@ -80,6 +81,56 @@ final lightTheme = ThemeData(
   sliderTheme: SliderThemeData(
     trackHeight: 2,
     inactiveTrackColor: lightGrey,
+    overlayShape: SliderComponentShape.noOverlay,
+    thumbShape: const RoundSliderThumbShape(
+      enabledThumbRadius: 6,
+      elevation: 0,
+    ),
+  ),
+);
+
+final darkTheme = lightTheme.copyWith(
+  colorScheme: const ColorScheme.dark(
+    // font and highlights
+    primary: Colors.white,
+    onPrimary: Colors.black,
+    secondary: lightGrey,
+    onSecondary: darkerGrey,
+    tertiary: grey,
+    outline: darkGrey,
+    // containers
+    primaryContainer: Color(0xff252525),
+    secondaryContainer: darkerGrey,
+    background: Colors.black,
+  ),
+  textTheme: TextTheme(
+    // title
+    titleLarge: _titleStyle.copyWith(color: lightGrey),
+    titleMedium: _titleStyle.copyWith(fontSize: 16, color: lightGrey),
+    titleSmall: _titleStyle.copyWith(
+      fontSize: 14,
+      color: lightGrey,
+      fontWeight: FontWeight.w600,
+    ),
+    // label
+    labelLarge: _labelStyle.copyWith(color: lightGrey),
+    labelMedium: _labelStyle.copyWith(fontSize: 16, color: lightGrey),
+    labelSmall: _labelStyle.copyWith(fontSize: 12, color: lightGrey),
+    // body
+    bodyLarge: _bodyStyle.copyWith(color: grey),
+    bodyMedium: _bodyStyle.copyWith(fontSize: 12, color: grey),
+    bodySmall: _bodyStyle.copyWith(fontSize: 10, color: grey),
+  ),
+  dividerTheme: const DividerThemeData(
+    space: defaultPadding * 2,
+    thickness: .5,
+    color: darkGrey,
+  ),
+  sliderTheme: SliderThemeData(
+    trackHeight: 2,
+    inactiveTrackColor: grey,
+    activeTrackColor: lighterGrey,
+    thumbColor: Colors.white,
     overlayShape: SliderComponentShape.noOverlay,
     thumbShape: const RoundSliderThumbShape(
       enabledThumbRadius: 6,
