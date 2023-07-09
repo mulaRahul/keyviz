@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:keyviz/windows/settings/widgets/hotkey_input.dart';
 import 'package:provider/provider.dart';
 
 import 'package:keyviz/config/config.dart';
@@ -15,8 +16,8 @@ class GeneralTabView extends StatelessWidget {
       children: [
         PanelItem(
           title: "Hotkey Filter",
-          subtitle: "Filter out letters and only "
-              "display hotkeys/keyboard shortcuts",
+          subtitle: "Filter out letters, numbers, symbols, etc. "
+              "and only display hotkeys/keyboard shortcuts",
           action: Selector<KeyEventProvider, bool>(
             selector: (_, keyEvent) => keyEvent.filterHotkeys,
             builder: (_, filterHotkeys, __) => XSwitch(
@@ -34,14 +35,15 @@ class GeneralTabView extends StatelessWidget {
             asRow: false,
             enabled: filterHotkeys,
             title: "Ignore Keys",
+            subtitle: "Skip any keystroke starting with "
+                "the disabled modifiers below",
             action: const _IgnoreKeyOptions(),
           ),
         ),
         const Divider(),
         PanelItem(
           title: "Show History",
-          subtitle: "Filter out letters and only "
-              "display hotkeys/keyboard shortcuts",
+          subtitle: "Keep previously pressed keystrokes in the view",
           action: Selector<KeyEventProvider, VisualizationHistoryMode>(
             selector: (_, keyEvent) => keyEvent.historyMode,
             builder: (context, historyMode, __) {
@@ -56,36 +58,21 @@ class GeneralTabView extends StatelessWidget {
           ),
         ),
         const Divider(),
+        PanelItem(
+          asRow: false,
+          title: "Visualizer Toggle Shortcut",
+          action: HotkeyInput(
+            initialValue: context.keyEvent.keyvizToggleShortcut,
+            onChanged: (value) => context.keyEvent.keyvizToggleShortcut = value,
+          ),
+        ),
+        const Divider(),
         Padding(
           padding: const EdgeInsets.only(top: defaultPadding),
           child: Align(
             alignment: Alignment.centerRight,
             child: TextButton(
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  // TODO style alert dialog
-                  builder: (_) => AlertDialog(
-                    title: const Text(
-                      "Do you want to revert to default settings?",
-                    ),
-                    titleTextStyle: context.textTheme.titleLarge,
-                    actions: [
-                      OutlinedButton(
-                        onPressed: () {
-                          // TODO: revert settings
-                        },
-                        child: const Text("Revert"),
-                      ),
-                      OutlinedButton(
-                        onPressed: Navigator.of(context).pop,
-                        child: const Text("Cancel"),
-                      ),
-                    ],
-                    elevation: 0,
-                  ),
-                );
-              },
+              onPressed: () => _showDialog(context),
               style: TextButton.styleFrom(
                 foregroundColor: Colors.red,
                 backgroundColor: Colors.red.withOpacity(.2),
@@ -103,6 +90,34 @@ class GeneralTabView extends StatelessWidget {
       ],
     );
   }
+
+  void _showDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text("Do you want to revert to default settings?"),
+        backgroundColor: context.colorScheme.primaryContainer,
+        titleTextStyle: context.textTheme.titleLarge,
+        actions: [
+          OutlinedButton(
+            onPressed: () {
+              // revert to defaults
+              context.keyEvent.revertToDefaults();
+              context.keyStyle.reverToDefaults();
+
+              Navigator.of(context).pop();
+            },
+            child: const Text("Revert"),
+          ),
+          OutlinedButton(
+            onPressed: Navigator.of(context).pop,
+            child: const Text("Cancel"),
+          ),
+        ],
+        elevation: 0,
+      ),
+    );
+  }
 }
 
 class _IgnoreKeyOptions extends StatelessWidget {
@@ -113,7 +128,9 @@ class _IgnoreKeyOptions extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(defaultPadding * .5),
       decoration: BoxDecoration(
-        color: context.colorScheme.background,
+        color: context.isDark
+            ? context.colorScheme.primaryContainer
+            : context.colorScheme.background,
         borderRadius: BorderRadius.circular(defaultPadding * .5),
         border: Border.all(color: context.colorScheme.outline),
       ),
@@ -123,7 +140,7 @@ class _IgnoreKeyOptions extends StatelessWidget {
             Selector<KeyEventProvider, bool>(
               selector: (_, keyEvent) => keyEvent.ignoreKeys[modifierKey]!,
               builder: (context, ignoring, __) => _KeyOption(
-                name: modifierKey.name.capitalize(),
+                name: modifierKey.keyLabel,
                 ignoring: ignoring,
                 onTap: () {
                   context.keyEvent.setModifierKeyIgnoring(
@@ -152,37 +169,39 @@ class _KeyOption extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bgColor = ignoring
-        ? context.colorScheme.tertiary.withOpacity(.5)
-        : context.colorScheme.secondary;
+    final bgColor =
+        ignoring ? context.colorScheme.tertiary.withOpacity(.35) : Colors.black;
     return GestureDetector(
       onTap: onTap,
-      child: Container(
-        height: defaultPadding * 1.5,
-        margin: const EdgeInsets.only(
-          right: defaultPadding * .5,
-          bottom: defaultPadding * .2,
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: defaultPadding * .5),
-        decoration: BoxDecoration(
-          color: ignoring
-              ? context.colorScheme.secondaryContainer
-              : context.colorScheme.primaryContainer,
-          borderRadius: BorderRadius.circular(defaultPadding * .4),
-          border: Border.all(color: bgColor),
-          boxShadow: [
-            BoxShadow(
-              color: bgColor,
-              offset: const Offset(0, defaultPadding * .2),
-            )
-          ],
-        ),
-        alignment: Alignment.center,
-        child: Text(
-          name,
-          style: TextStyle(
-            color: bgColor,
-            fontSize: defaultPadding * .75,
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        child: Container(
+          height: defaultPadding * 1.5,
+          margin: const EdgeInsets.only(
+            right: defaultPadding * .5,
+            bottom: defaultPadding * .2,
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: defaultPadding * .5),
+          decoration: BoxDecoration(
+            color: ignoring
+                ? context.colorScheme.secondaryContainer
+                : context.colorScheme.primaryContainer,
+            borderRadius: BorderRadius.circular(defaultPadding * .4),
+            border: Border.all(color: bgColor),
+            boxShadow: [
+              BoxShadow(
+                color: bgColor,
+                offset: const Offset(0, defaultPadding * .2),
+              )
+            ],
+          ),
+          alignment: Alignment.center,
+          child: Text(
+            name,
+            style: TextStyle(
+              color: context.isDark && !ignoring ? Colors.white : bgColor,
+              fontSize: defaultPadding * .75,
+            ),
           ),
         ),
       ),
