@@ -152,33 +152,35 @@ const _numpad = [
 ];
 
 class KeyEventData {
-  KeyEventData(this.rawEvent)
-      : isModifier = _modifiers.contains(rawEvent.logicalKey);
+  const KeyEventData(
+    this.rawEvent, {
+    this.show = false,
+    this.pressed = true,
+    this.pressedCount = 1,
+  });
 
   // pressed state of the key
   // initially comes pressed
-  bool _pressed = false; // TODO rm !DEBUG
+  final bool pressed;
 
   // number of times pressed
-  int _pressedCount = 1;
+  final int pressedCount;
 
   // the animation in/out state of this key
-  bool show = true; // TODO rm !DEBUG
+  final bool show;
 
   // logical representation of the KeyEvent
   final RawKeyEvent rawEvent;
 
-  // The event is a modifier like control, command, etc.
-  final bool isModifier;
-
-  bool get pressed => _pressed;
-  int get pressedCount => _pressedCount;
   int get _id => rawEvent.logicalKey.keyId;
 
-  set pressed(bool value) {
-    _pressed = value;
-    if (_pressed) _pressedCount++;
-  }
+  // set pressed(bool value) {
+  //   _pressed = value;
+  //   if (_pressed) _pressedCount++;
+  // }
+
+  // The event is a modifier like control, command, etc.
+  bool get isModifier => _modifiers.contains(rawEvent.logicalKey);
 
   // The event is an alphabet like Q, A, etc.
   bool get isLetter => _letters.contains(rawEvent.logicalKey);
@@ -211,6 +213,9 @@ class KeyEventData {
   // The event is a character i.e. either a letter, digit or punctuation
   bool get isCharacter => isLetter || isDigit || isOEM;
 
+  // The event is the space key
+  bool get isSpacebar => rawEvent.logicalKey == LogicalKeyboardKey.space;
+
   // textual representation of this event
   String get label => keymaps[_id]?.label ?? rawEvent.label;
 
@@ -228,18 +233,27 @@ class KeyEventData {
   // returns null if doesn't has associated icon
   String? get icon => keymaps[_id]?.icon;
 
+  KeyEventData copyWith({bool? show, bool? pressed, int? pressedCount}) {
+    return KeyEventData(
+      rawEvent,
+      show: show ?? this.show,
+      pressed: pressed ?? this.pressed,
+      pressedCount: pressedCount ?? this.pressedCount,
+    );
+  }
+
   @override
   bool operator ==(other) {
     return other is KeyEventData &&
         other.show == show &&
-        other.pressed == _pressed &&
-        other.pressedCount == _pressedCount;
+        other.pressed == pressed &&
+        other.pressedCount == pressedCount;
   }
 
   @override
-  int get hashCode => Object.hash(pressed, _pressedCount, show);
+  int get hashCode => Object.hash(pressed, pressedCount, show);
 
   @override
   String toString() =>
-      "vkCode: ${(rawEvent.data as RawKeyEventDataWindows).keyCode} modifiers: ${(rawEvent.data as RawKeyEventDataWindows).modifiers}";
+      "${pressed ? '⬇️' : '⬆️'}[$label](${show ? '🟢' : '🔴'})";
 }

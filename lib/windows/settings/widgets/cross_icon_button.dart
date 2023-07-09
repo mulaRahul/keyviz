@@ -9,6 +9,7 @@ class XIconButton extends StatelessWidget {
     required this.onTap,
     required this.selected,
     this.size = 40.0,
+    this.tooltip,
     this.iconSize,
   });
 
@@ -16,27 +17,23 @@ class XIconButton extends StatelessWidget {
   final double size;
   final double? iconSize;
   final bool selected;
+  final String? tooltip;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: size,
-        height: size,
-        decoration: BoxDecoration(
-          color: selected ? context.colorScheme.primary : Colors.transparent,
-          borderRadius: BorderRadius.circular(defaultPadding / 2),
-        ),
-        alignment: Alignment.center,
-        child: SvgIcon(
-          icon: icon,
-          size: iconSize ?? size * .5,
-          color: selected
-              ? context.colorScheme.onPrimary
-              : context.colorScheme.tertiary,
-        ),
+    return IconButton(
+      onPressed: onTap,
+      style: IconButton.styleFrom(
+        padding: const EdgeInsets.all(defaultPadding * .4),
+      ),
+      tooltip: tooltip,
+      icon: SvgIcon(
+        icon: icon,
+        size: size * .6,
+        color: selected
+            ? context.colorScheme.primary
+            : context.colorScheme.outline,
       ),
     );
   }

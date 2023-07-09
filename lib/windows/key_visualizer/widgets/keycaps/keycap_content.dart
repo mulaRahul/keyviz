@@ -49,7 +49,7 @@ class KeyCapContent extends StatelessWidget {
               children: [
                 SvgIcon(
                   icon: icon,
-                  size: style.fontSize * .5,
+                  size: style.fontSize * .45,
                   color: fontColor,
                 ),
                 Text(

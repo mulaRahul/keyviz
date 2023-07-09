@@ -17,9 +17,11 @@ class MouseVisualizer extends StatelessWidget {
             ? Positioned(
                 left: tuple.item2.dx,
                 top: tuple.item2.dy,
-                child: const FractionalTranslation(
-                  translation: Offset(-.5, -.5),
-                  child: _MouseVisualizer(),
+                child: const IgnorePointer(
+                  child: FractionalTranslation(
+                    translation: Offset(-.5, -.5),
+                    child: _MouseVisualizer(),
+                  ),
                 ),
               )
             : const SizedBox();

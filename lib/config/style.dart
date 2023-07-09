@@ -1,6 +1,6 @@
-// size & spacing
 import 'package:flutter/material.dart';
 
+// size & spacing
 const double defaultPadding = 16;
 final BorderRadius defaultBorderRadius = BorderRadius.circular(defaultPadding);
 

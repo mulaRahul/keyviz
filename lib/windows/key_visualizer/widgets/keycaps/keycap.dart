@@ -75,6 +75,7 @@ abstract class KeyCap extends StatelessWidget {
     return Border.all(
       color: borderColor(style),
       width: style.borderWidth,
+      strokeAlign: BorderSide.strokeAlignOutside,
     );
   }
 

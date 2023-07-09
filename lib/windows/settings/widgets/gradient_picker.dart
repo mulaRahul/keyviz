@@ -140,6 +140,7 @@ class _GradientPickerState extends State<GradientPicker> {
                   begin: Alignment.centerLeft,
                   end: Alignment.centerRight,
                 ),
+                border: Border.all(color: context.colorScheme.outline),
                 borderRadius: defaultBorderRadius,
               ),
               child: Padding(
@@ -264,6 +265,7 @@ class _GradientPickerState extends State<GradientPicker> {
                   child: DecoratedBox(
                     decoration: BoxDecoration(
                       color: _hsvColor.toColor(),
+                      border: Border.all(color: context.colorScheme.outline),
                       borderRadius: BorderRadius.circular(defaultPadding * .25),
                     ),
                   ),

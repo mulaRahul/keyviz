@@ -121,14 +121,14 @@ class MechanicalKeyCap extends KeyCap {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     SizedBox(
-                      height: style.fontSize,
+                      height: style.fontSize * 1.25,
                       width: (outerSize.width - (outerSize.height * .5)) * .5,
                       child: DecoratedBox(
                         decoration: BoxDecoration(
                           backgroundBlendMode: BlendMode.multiply,
                           gradient: const LinearGradient(
                             begin: Alignment.bottomRight,
-                            end: Alignment.topLeft,
+                            end: Alignment.topCenter,
                             stops: [.24, 1.0],
                             colors: [Colors.black45, Colors.transparent],
                           ),
@@ -150,14 +150,14 @@ class MechanicalKeyCap extends KeyCap {
                       ),
                     ),
                     SizedBox(
-                      height: style.fontSize,
+                      height: style.fontSize * 1.25,
                       width: (outerSize.width - (outerSize.height * .5)) * .5,
                       child: DecoratedBox(
                         decoration: BoxDecoration(
                           backgroundBlendMode: BlendMode.multiply,
                           gradient: const LinearGradient(
                             begin: Alignment.bottomLeft,
-                            end: Alignment.topRight,
+                            end: Alignment.topCenter,
                             stops: [.24, 1.0],
                             colors: [Colors.black45, Colors.transparent],
                           ),
@@ -186,7 +186,7 @@ class MechanicalKeyCap extends KeyCap {
                         Offset(-style.fontSize * .05, -style.fontSize * .05),
                   ),
                   BoxShadow(
-                    color: Colors.white12,
+                    color: Colors.white24,
                     offset: Offset(style.fontSize * .04, 0),
                   ),
                   BoxShadow(
@@ -195,13 +195,15 @@ class MechanicalKeyCap extends KeyCap {
                   ),
                 ],
               ),
-              foregroundDecoration: BoxDecoration(
-                // backgroundBlendMode: BlendMode.multiply,
-                gradient: const LinearGradient(
-                  colors: [Colors.transparent, Colors.black45],
-                ),
-                borderRadius: style.borderRadius,
-              ),
+              foregroundDecoration: event.isModifier
+                  ? null
+                  : BoxDecoration(
+                      backgroundBlendMode: BlendMode.multiply,
+                      gradient: const LinearGradient(
+                        colors: [Colors.transparent, Colors.black38],
+                      ),
+                      borderRadius: style.borderRadius,
+                    ),
               alignment: style.childrenAlignment,
               child: KeyCapContent(event),
             ),

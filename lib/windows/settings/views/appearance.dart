@@ -18,7 +18,8 @@ class AppearanceTabView extends StatelessWidget {
       children: [
         PanelItem(
           title: "Alignment",
-          subtitle: "Position of the key visualization on the screen",
+          subtitle: "Position of the key visualization on the screen.\nIf "
+              "history is enabled, then the lastest keystroke\nwill be show here",
           action: Selector<KeyStyleProvider, Alignment>(
             selector: (_, keyStyle) => keyStyle.alignment,
             builder: (context, alignment, _) => _AlignmentPicker(
@@ -32,14 +33,14 @@ class AppearanceTabView extends StatelessWidget {
         const Divider(),
         PanelItem(
           title: "Margin",
-          subtitle:
-              "The spacing betweeen the visualization and the edge of the monitor",
+          subtitle: "The spacing betweeen the visualization and "
+              "the edge of the screen",
           actionFlex: 4,
           crossAxisAlignment: CrossAxisAlignment.center,
           action: Selector<KeyStyleProvider, double>(
             selector: (_, keyStyle) => keyStyle.margin,
             builder: (context, margin, _) => XSlider(
-              max: 128,
+              max: 192,
               suffix: "px",
               value: margin,
               onChanged: (value) => context.keyStyle.margin = value,
@@ -66,13 +67,12 @@ class AppearanceTabView extends StatelessWidget {
         ),
         const Divider(),
         PanelItem(
-          title: "Key Animation",
-          subtitle: "The animation used by key cap",
-          action: Selector<KeyEventProvider, KeyCapAnimation>(
+          title: "Animation",
+          action: Selector<KeyEventProvider, KeyCapAnimationType>(
             selector: (_, keyEvent) => keyEvent.keyCapAnimation,
             builder: (context, animation, _) => XDropdown(
               value: animation,
-              options: KeyCapAnimation.values,
+              options: KeyCapAnimationType.values,
               onChanged: (value) => context.keyEvent.keyCapAnimation = value,
             ),
           ),
@@ -80,7 +80,7 @@ class AppearanceTabView extends StatelessWidget {
         const Divider(),
         PanelItem(
           title: "Animation Speed",
-          subtitle: "Speed of the animations",
+          subtitle: "Higher the value, slower the animation",
           actionFlex: 4,
           crossAxisAlignment: CrossAxisAlignment.center,
           action: Selector<KeyEventProvider, int>(

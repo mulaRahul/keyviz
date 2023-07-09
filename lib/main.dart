@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+
 import 'package:flutter_acrylic/flutter_acrylic.dart';
 import 'package:window_manager/window_manager.dart';
 
 import 'app.dart';
 
-// TODO: add comments
 void main() async {
   // ensure flutter plugins are intialized and ready to use
   WidgetsFlutterBinding.ensureInitialized();

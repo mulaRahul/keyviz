@@ -15,12 +15,14 @@ class KeyCapWrapper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Selector<KeyEventProvider, KeyEventData?>(
-      builder: (context, event, _) => event == null
-          ? const SizedBox()
-          : _AnimationWrapper(
-              show: event.show,
-              child: _KeyCap(event),
-            ),
+      builder: (context, event, _) {
+        return event == null
+            ? const SizedBox()
+            : _AnimationWrapper(
+                show: event.show,
+                child: _KeyCap(event),
+              );
+      },
       selector: (_, keyStyle) => keyStyle.keyboardEvents[groupId]?[keyId],
     );
   }

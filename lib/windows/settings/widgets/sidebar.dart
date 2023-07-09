@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:keyviz/config/config.dart';
 import 'package:keyviz/windows/shared/shared.dart';
@@ -7,7 +6,7 @@ import 'package:keyviz/windows/shared/shared.dart';
 enum SettingsTab {
   general(VuesaxIcons.cogWheel),
   mouse(VuesaxIcons.mouse),
-  style(VuesaxIcons.edit),
+  keycap(VuesaxIcons.keyboard),
   apperance(VuesaxIcons.monitor),
   about(VuesaxIcons.more);
 
@@ -88,7 +87,9 @@ class _IconButton extends StatelessWidget {
         icon: icon,
         color: selected
             ? context.colorScheme.primary
-            : context.colorScheme.tertiary,
+            : context.isDark
+                ? context.colorScheme.outline
+                : context.colorScheme.tertiary,
       ),
       style: IconButton.styleFrom(
         fixedSize: Size.square(size),

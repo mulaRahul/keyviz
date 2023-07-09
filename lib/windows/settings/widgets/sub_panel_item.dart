@@ -235,13 +235,16 @@ class _RawColorInputSubPanelItemState extends State<RawColorInputSubPanelItem> {
       children: [
         GestureDetector(
           onTap: _toggleColorPicker,
-          child: SizedBox.square(
-            dimension: defaultPadding * 2,
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                color: _color,
-                border: Border.all(color: context.colorScheme.outline),
-                borderRadius: BorderRadius.circular(defaultPadding * .4),
+          child: MouseRegion(
+            cursor: SystemMouseCursors.click,
+            child: SizedBox.square(
+              dimension: defaultPadding * 2,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  color: _color,
+                  border: Border.all(color: context.colorScheme.outline),
+                  borderRadius: BorderRadius.circular(defaultPadding * .4),
+                ),
               ),
             ),
           ),
@@ -464,16 +467,20 @@ class _RawGradientInputSubPanelItemState
       title: widget.title,
       child: GestureDetector(
         onTap: _togglePicker,
-        child: SizedBox.square(
-          dimension: defaultPadding * 2,
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [_color1, _color2],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
+        child: MouseRegion(
+          cursor: SystemMouseCursors.click,
+          child: SizedBox.square(
+            dimension: defaultPadding * 2,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                border: Border.all(color: context.colorScheme.outline),
+                gradient: LinearGradient(
+                  colors: [_color1, _color2],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                ),
+                borderRadius: BorderRadius.circular(defaultPadding * .5),
               ),
-              borderRadius: BorderRadius.circular(defaultPadding * .5),
             ),
           ),
         ),

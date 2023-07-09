@@ -150,6 +150,7 @@ class _ColorPickerState extends State<ColorPicker> {
                   child: DecoratedBox(
                     decoration: BoxDecoration(
                       color: _hsvColor.toColor(),
+                      border: Border.all(color: context.colorScheme.outline),
                       borderRadius: BorderRadius.circular(defaultPadding * .25),
                     ),
                   ),

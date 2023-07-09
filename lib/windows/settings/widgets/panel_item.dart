@@ -51,7 +51,10 @@ class PanelItem extends StatelessWidget {
               children: [
                 Expanded(
                   flex: 3,
-                  child: label,
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: defaultPadding * .5),
+                    child: label,
+                  ),
                 ),
                 Expanded(
                   flex: actionFlex,
