@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/services.dart';
+
 import 'package:keyviz/config/assets.dart';
 import 'package:keyviz/domain/services/raw_keyboard_mouse.dart';
 
@@ -116,7 +117,7 @@ final keymaps = <int, KeyMapData>{
     icon: KeyIcons.tab,
   ),
   LogicalKeyboardKey.space.keyId: const KeyMapData(
-    label: "        ",
+    label: "space",
     glyph: "⎵",
     icon: KeyIcons.space,
   ),
@@ -167,7 +168,7 @@ final keymaps = <int, KeyMapData>{
     glyph: "⤒",
     icon: KeyIcons.pageUp,
   ),
-  LogicalKeyboardKey.pageUp.keyId: const KeyMapData(
+  LogicalKeyboardKey.pageDown.keyId: const KeyMapData(
     label: "page down",
     shortLabel: "pg dn",
     glyph: "⤓",
@@ -350,19 +351,22 @@ final keymaps = <int, KeyMapData>{
     symbol: "pg up",
   ),
   leftClickId: const KeyMapData(
-    label: "left click",
-    shortLabel: "click",
+    label: "click",
+    icon: KeyIcons.leftClick,
   ),
   rightClickId: const KeyMapData(
     label: "right click",
     shortLabel: "click",
+    icon: KeyIcons.rightClick,
   ),
   dragId: const KeyMapData(
     label: "drag",
+    icon: KeyIcons.drag,
   ),
   scrollId: const KeyMapData(
     label: "scroll",
     glyph: "↕",
+    icon: KeyIcons.scroll,
   ),
 };
 

@@ -8,6 +8,7 @@ class VuesaxIcons {
   static const monitor = "$_dir/monitor.svg";
   static const more = "$_dir/more.svg";
   static const mouse = "$_dir/mouse.svg";
+  static const keyboard = "$_dir/keyboard.svg";
   static const cross = "$_dir/cross.svg";
   static const chevronDown = "$_dir/chevron-down.svg";
   static const alignTop = "$_dir/align-top.svg";
@@ -21,6 +22,8 @@ class VuesaxIcons {
   static const clipboard = "$_dir/clipboard.svg";
   static const clipboardTick = "$_dir/clipboard-tick.svg";
   static const arrowRight = "$_dir/arrow-right.svg";
+  static const mail = "$_dir/mail.svg";
+  static const error = "$_dir/error.svg";
 }
 
 class KeyIcons {
@@ -60,6 +63,11 @@ class KeyIcons {
   static const scrollLocked = "$_dir/scroll-locked.svg";
   static const numLock = "$_dir/num-lock.svg";
   static const numLocked = "$_dir/num-locked.svg";
+  // mouse
+  static const leftClick = "$_dir/left-click.svg";
+  static const rightClick = "$_dir/right-click.svg";
+  static const drag = "$_dir/drag.svg";
+  static const scroll = "$_dir/scroll.svg";
 
   // platform
   static const macMeta = "$_dir/mac-meta.svg";
