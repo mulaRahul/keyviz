@@ -1,36 +1,40 @@
 name: keyviz
-description: Visualize your keypress in realtime
+description: visualize your keypress and mouse actions
 
 publish_to: 'none'
 
-version: 0.1.0-b
+version: 1.0.0+1
 
 environment:
-  sdk: ">=2.17.1 <3.0.0"
+  sdk: '>=3.0.5 <4.0.0'
 
 dependencies:
   flutter:
     sdk: flutter
 
-  keyboard_event:
+  # cross-platform HID (Human Input Device) listener
+  hid_listener:
     git:
-      url: https://github.com/Krysl/keyboard_event.git
+      url: https://github.com/localcc/hid_listener.git
       ref: main
-    version: ^0.3.4
 
+    version: ^1.1.2
+
+  tuple: ^2.0.2
   provider: ^6.0.5
-  flutter_svg: ^2.0.5
+  flutter_svg: ^2.0.7
+  vector_math: ^2.1.4
   tray_manager: ^0.2.0
-  url_launcher: ^6.1.7
+  url_launcher: ^6.1.12
   window_manager: ^0.3.5
+  path_provider: ^2.0.15
+  flutter_animate: ^4.2.0
   flutter_acrylic: ^1.1.3
-  screen_retriever: ^0.1.5
-  shared_preferences: ^2.1.1
+  screen_retriever: ^0.1.6
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
   flutter_lints: ^2.0.2
   msix: ^3.15.0
 
@@ -40,22 +44,30 @@ flutter:
 
   assets:
     - assets/img/
-    - assets/symbols/
-  
+    - assets/icons/
+
   fonts:
-    - family: Poppins
+    - family: IBM Plex Sans
       fonts:
-        - asset: fonts/Poppins-Light.ttf
+        - asset: assets/fonts/IBMPlexSans-Thin.ttf
+          weight: 100
+        - asset: assets/fonts/IBMPlexSans-ExtraLight.ttf
+          weight: 200
+        - asset: assets/fonts/IBMPlexSans-Light.ttf
           weight: 300
-        - asset: fonts/Poppins-Regular.ttf
-          weight: 600
-        - asset: fonts/Poppins-SemiBold.ttf
+        - asset: assets/fonts/IBMPlexSans-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/IBMPlexSans-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/IBMPlexSans-SemiBold.ttf
+          weight: 700
+        - asset: assets/fonts/IBMPlexSans-Bold.ttf
           weight: 900
-  
-msix_config:
-  display_name: Keyviz
-  publisher_display_name: Rahul Mula
-  identity_name: dev.rahulmula.keyviz
-  msix_version: 0.1.0
-  logo_path: X:\dev\keypress\keyviz\assets\img\icon.png
-  capabilities: inputObservation
+
+    - family: Inter
+      fonts:
+        - asset: assets/fonts/Inter-Thin.ttf
+          weight: 200
+        - asset: assets/fonts/Inter-Regular.ttf
+        - asset: assets/fonts/Inter-SemiBold.ttf
+          weight: 600
