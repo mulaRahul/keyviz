@@ -6,6 +6,8 @@ list(APPEND FLUTTER_PLUGIN_LIST
   flutter_acrylic
   hid_listener
   screen_retriever
+  tray_manager
+  url_launcher_windows
   window_manager
 )
 

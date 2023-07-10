@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import 'package:keyviz/config/config.dart';
-import 'package:keyviz/windows/shared/shared.dart';
 
 class XTextButton extends StatelessWidget {
   const XTextButton(
