@@ -3,7 +3,7 @@ description: visualize your keypress and mouse actions
 
 publish_to: 'none'
 
-version: 1.0.0+1
+version: 2.0.0-alpha
 
 environment:
   sdk: '>=3.0.5 <4.0.0'
