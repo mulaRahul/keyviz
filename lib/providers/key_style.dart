@@ -916,6 +916,8 @@ class KeyStyleProvider extends ChangeNotifier {
     }
 
     _clickColor = HexColor.fromHex(data[_JsonKeys.clickColor] ?? "e6e6e6");
+
+    notifyListeners();
   }
 
   reverToDefaults() {
