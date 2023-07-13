@@ -80,7 +80,7 @@ class KeyEventProvider extends ChangeNotifier with TrayListener {
   }
 
   // errors
-  final List<String> _errors = const [];
+  bool _hasError = false;
 
   // toggle for styling, if true keeps the events
   // on display unless changed by others
@@ -172,7 +172,7 @@ class KeyEventProvider extends ChangeNotifier with TrayListener {
 
   bool get styling => _styling;
   bool get visualizeEvents => _visualizeEvents;
-  List<String> get errors => _errors;
+  bool get hasError => _hasError;
 
   bool get filterHotkeys => _filterHotkeys;
   Map<ModifierKey, bool> get ignoreKeys => _ignoreKeys;
@@ -206,6 +206,7 @@ class KeyEventProvider extends ChangeNotifier with TrayListener {
       _historyMode == VisualizationHistoryMode.none || _styling;
 
   set styling(bool value) {
+    if (_hasError) return;
     _styling = value;
     windowManager.setIgnoreMouseEvents(!value);
     notifyListeners();
@@ -275,11 +276,11 @@ class KeyEventProvider extends ChangeNotifier with TrayListener {
     await _setTrayContextMenu();
   }
 
-  _registerMouseListener() {
+  _registerMouseListener() async {
     _mouseListenerId = registerMouseListener(_onMouseEvent);
 
     if (_mouseListenerId == null) {
-      _errors.add("mouse");
+      _hasError = true;
       notifyListeners();
       debugPrint("couldn't register mouse listener");
     } else {
@@ -460,13 +461,12 @@ class KeyEventProvider extends ChangeNotifier with TrayListener {
     }
   }
 
-  _registerKeyboardListener() {
+  _registerKeyboardListener() async {
     _keyboardListenerId = registerKeyboardListener(_onRawKeyEvent);
 
     if (_keyboardListenerId == null) {
-      _errors.add("keyboard");
+      _hasError = true;
       notifyListeners();
-
       debugPrint("cannot register keyboard listener!");
     } else {
       debugPrint("keyboard listener registered");
