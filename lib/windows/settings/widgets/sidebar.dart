@@ -7,7 +7,7 @@ enum SettingsTab {
   general(VuesaxIcons.cogWheel),
   mouse(VuesaxIcons.mouse),
   keycap(VuesaxIcons.keyboard),
-  apperance(VuesaxIcons.monitor),
+  appearance(VuesaxIcons.monitor),
   about(VuesaxIcons.more);
 
   const SettingsTab(this.icon);

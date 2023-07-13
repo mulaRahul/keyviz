@@ -97,7 +97,7 @@ class _SettingsWindowState extends State<_SettingsWindow> {
       case SettingsTab.keycap:
         return const StyleTabView();
 
-      case SettingsTab.apperance:
+      case SettingsTab.appearance:
         return const AppearanceTabView();
 
       case SettingsTab.about:
