@@ -13,7 +13,7 @@ class MechanicalKeyCap extends KeyCap {
     final style = keyStyle(context);
 
     final size = style.minContainerSize;
-    final outerSize = outerContainerSize(style);
+    final outerSize = style.minOuterContainerSize;
 
     return TweenAnimationBuilder(
       duration: animationDuration(context),
@@ -41,9 +41,8 @@ class MechanicalKeyCap extends KeyCap {
           ),
         );
       },
-      child: SizedBox(
-        height: outerSize.height,
-        width: outerSize.width,
+      child: IntrinsicWidth(
+        stepWidth: style.fontSize,
         child: Stack(
           alignment: Alignment.center,
           fit: StackFit.expand,

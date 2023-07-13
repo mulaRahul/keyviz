@@ -89,28 +89,4 @@ abstract class KeyCap extends StatelessWidget {
   // utility getter animation duration
   Duration animationDuration(BuildContext context) =>
       context.keyEvent.animationDuration;
-
-  // outer container size
-  Size outerContainerSize(KeyStyleProvider style) {
-    if (event.isModifier &&
-        event.rawEvent.logicalKey != LogicalKeyboardKey.altLeft &&
-        event.rawEvent.logicalKey != LogicalKeyboardKey.altRight) {
-      return Size(
-        style.minOuterContainerSize.width * 1.4,
-        style.minOuterContainerSize.height,
-      );
-    } else if (event.isLock) {
-      return Size(
-        style.minOuterContainerSize.width * 1.8,
-        style.minOuterContainerSize.height,
-      );
-    } else if (event.rawEvent.logicalKey == LogicalKeyboardKey.space) {
-      return Size(
-        style.minOuterContainerSize.width * 3.2,
-        style.minOuterContainerSize.height,
-      );
-    }
-
-    return style.minOuterContainerSize;
-  }
 }

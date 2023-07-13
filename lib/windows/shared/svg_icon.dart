@@ -20,6 +20,7 @@ class SvgIcon extends StatelessWidget {
       icon,
       height: size,
       width: size,
+      fit: BoxFit.contain,
       colorFilter: ColorFilter.mode(
           color ?? context.colorScheme.secondary, BlendMode.srcIn),
     );

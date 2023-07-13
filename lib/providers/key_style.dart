@@ -138,7 +138,7 @@ class KeyStyleProvider extends ChangeNotifier {
   // primary color to be used on modifiers keys
   Color _mPrimaryColor1 = const Color(0xffb8b8b8);
   // second color for gradient
-  Color _mPrimaryColor2 = Color.fromRGBO(84, 84, 84, 1);
+  Color _mPrimaryColor2 = const Color(0xff545454);
 
   // secondary color to be used on
   // elevated/isometric keycap's bottom container
