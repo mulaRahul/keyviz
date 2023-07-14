@@ -245,10 +245,10 @@ packages:
     dependency: "direct dev"
     description:
       name: msix
-      sha256: c8ebdd4670807904214889c4f9c447492439696814a0189b6a18a4d2f5e1290e
+      sha256: a4744aa9b7f1811a69facbccd9f912d44687b30d2af3bc6e22990684f07e4fa2
       url: "https://pub.dev"
     source: hosted
-    version: "3.15.0"
+    version: "3.15.1"
   nested:
     dependency: transitive
     description:
@@ -386,7 +386,7 @@ packages:
     source: hosted
     version: "2.1.4"
   screen_retriever:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: screen_retriever
       sha256: "4931f226ca158123ccd765325e9fbf360bfed0af9b460a10f960f9bb13d58323"
