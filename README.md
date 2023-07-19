@@ -27,7 +27,7 @@ Powerful and easy-to-use configuration options.
 
 # 📥 Installation
 
-You can download the latest version of keyviz from the [Github Releases](github.com/mulaRahul/keyviz/releases) page. For the installer, unzip the downloaded file, run the installer and follow the familiar steps to install keyviz.
+You can download the latest version of keyviz from the [Github Releases](https://github.com/mulaRahul/keyviz/releases) page. For the installer, unzip the downloaded file, run the installer and follow the familiar steps to install keyviz.
 
 <details>
   <summary>🥄 Scoop</summary>
