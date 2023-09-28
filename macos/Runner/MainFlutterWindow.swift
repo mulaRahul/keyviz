@@ -1,6 +1,7 @@
 import Cocoa
 import FlutterMacOS
 import hid_listener
+import window_manager
 
 class MainFlutterWindow: NSWindow {
   // hid_listener instance
@@ -15,5 +16,9 @@ class MainFlutterWindow: NSWindow {
     RegisterGeneratedPlugins(registry: flutterViewController)
 
     super.awakeFromNib()
+  }
+  override public func order(_ place: NSWindow.OrderingMode, relativeTo otherWin: Int) {
+    super.order(place, relativeTo: otherWin)
+    hiddenWindowAtLaunch()
   }
 }

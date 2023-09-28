@@ -277,7 +277,7 @@ class KeyEventProvider extends ChangeNotifier with TrayListener {
   }
 
   _registerMouseListener() async {
-    _mouseListenerId = registerMouseListener(_onMouseEvent);
+    _mouseListenerId = getListenerBackend()!.addMouseListener(_onMouseEvent);
 
     if (_mouseListenerId == null) {
       _hasError = true;
@@ -457,12 +457,13 @@ class KeyEventProvider extends ChangeNotifier with TrayListener {
 
   _removeMouseListener() {
     if (_mouseListenerId != null) {
-      unregisterMouseListener(_mouseListenerId!);
+      getListenerBackend()!.removeKeyboardListener(_mouseListenerId!);
     }
   }
 
   _registerKeyboardListener() async {
-    _keyboardListenerId = registerKeyboardListener(_onRawKeyEvent);
+    _keyboardListenerId =
+        getListenerBackend()!.addKeyboardListener(_onRawKeyEvent);
 
     if (_keyboardListenerId == null) {
       _hasError = true;
@@ -725,7 +726,7 @@ class KeyEventProvider extends ChangeNotifier with TrayListener {
 
   _removeKeyboardListener() {
     if (_keyboardListenerId != null) {
-      unregisterKeyboardListener(_keyboardListenerId!);
+      getListenerBackend()!.removeKeyboardListener(_keyboardListenerId!);
     }
   }
 
@@ -772,7 +773,7 @@ class KeyEventProvider extends ChangeNotifier with TrayListener {
       await trayManager.setIcon(
         Platform.isWindows
             ? 'assets/img/tray-off.ico'
-            : 'assets/imag/tray-off.png',
+            : 'assets/img/tray-off.png',
       );
     }
   }
