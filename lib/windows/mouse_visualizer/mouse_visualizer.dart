@@ -13,10 +13,15 @@ class MouseVisualizer extends StatelessWidget {
   Widget build(BuildContext context) {
     return Selector<KeyEventProvider, Tuple2<bool, Offset>>(
       builder: (context, tuple, child) {
+        final devicePixelRatio = MediaQuery.of(context)
+            .devicePixelRatio; // Get the logical pixel ratio
+
         return tuple.item1
             ? Positioned(
-                left: tuple.item2.dx,
-                top: tuple.item2.dy,
+                left: tuple.item2.dx /
+                    devicePixelRatio, // Horizontal offset of the cursor divided by the logical pixel ratio
+                top: tuple.item2.dy /
+                    devicePixelRatio, // The vertical offset of the cursor divided by the logical pixel ratio
                 child: const IgnorePointer(
                   child: FractionalTranslation(
                     translation: Offset(-.5, -.5),

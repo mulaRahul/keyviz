@@ -214,7 +214,7 @@ final keymaps = <int, KeyMapData>{
     glyph: "⎋",
     icon: KeyIcons.escape,
   ),
-  LogicalKeyboardKey.tilde.keyId: const KeyMapData(
+  LogicalKeyboardKey.backquote.keyId: const KeyMapData(
     label: "`",
     symbol: "~",
   ),
@@ -262,7 +262,7 @@ final keymaps = <int, KeyMapData>{
     label: "-",
     symbol: "_",
   ),
-  LogicalKeyboardKey.add.keyId: const KeyMapData(
+  LogicalKeyboardKey.equal.keyId: const KeyMapData(
     label: "=",
     symbol: "+",
   ),
@@ -351,12 +351,12 @@ final keymaps = <int, KeyMapData>{
     symbol: "pg up",
   ),
   leftClickId: const KeyMapData(
-    label: "click",
+    label: "left click",
     icon: KeyIcons.leftClick,
   ),
   rightClickId: const KeyMapData(
     label: "right click",
-    shortLabel: "click",
+    // shortLabel: "click",
     icon: KeyIcons.rightClick,
   ),
   dragId: const KeyMapData(
