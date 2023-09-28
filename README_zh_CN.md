@@ -27,7 +27,7 @@ Keyviz也可以显示鼠标、键盘+鼠标的操作，比如 <kbd>Cmd</kbd> + <
 
 # 📥 安装
 
-在 [Github Releases](github.com/mulaRahul/keyviz/releases) 下载最新版，根据操作系统安装/解压即用，或者通过下面的包管理器安装
+在 [Github Releases](https://github.com/mulaRahul/keyviz/releases) 下载最新版，根据操作系统安装/解压即用，或者通过下面的包管理器安装
 
 <details>
   <summary>🥄 Scoop</summary>
