@@ -138,10 +138,10 @@ packages:
     dependency: "direct dev"
     description:
       name: flutter_lints
-      sha256: "2118df84ef0c3ca93f96123a616ae8540879991b8b57af2f81b76a7ada49b2a4"
+      sha256: ad76540d21c066228ee3f9d1dad64a9f7e46530e8bb7c85011a88bc1fd874bc5
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.2"
+    version: "3.0.0"
   flutter_svg:
     dependency: "direct main"
     description:
@@ -197,10 +197,10 @@ packages:
     dependency: transitive
     description:
       name: lints
-      sha256: "0a217c6c989d21039f1498c3ed9f3ed71b354e69873f13a8dfc3c9fe76f1b452"
+      sha256: cbf8d4b858bb0134ef3ef87841abdf8d63bfc255c266b7bf6b39daa1085c4290
       url: "https://pub.dev"
     source: hosted
-    version: "2.1.1"
+    version: "3.0.0"
   macos_window_utils:
     dependency: transitive
     description:
