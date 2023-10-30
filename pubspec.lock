@@ -245,10 +245,10 @@ packages:
     dependency: "direct dev"
     description:
       name: msix
-      sha256: "6e76e2491d5c809d784ce2b68e6c3426097fb5c68e61fe121c8c3341ab89bf46"
+      sha256: bbfccd26737c36ec9e6e1d21851d080216af407480d78f608dda6371fe668806
       url: "https://pub.dev"
     source: hosted
-    version: "3.16.4"
+    version: "3.16.5"
   nested:
     dependency: transitive
     description:
