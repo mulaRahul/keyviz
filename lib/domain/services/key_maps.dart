@@ -150,7 +150,7 @@ final keymaps = <int, KeyMapData>{
       macos: "frw del",
     ),
     glyph: "⌦",
-    icon: KeyIcons.insert,
+    icon: KeyIcons.delete,
   ),
   LogicalKeyboardKey.home.keyId: const KeyMapData(
     label: "home",
