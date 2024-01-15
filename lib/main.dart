@@ -1,6 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 import 'package:flutter_acrylic/flutter_acrylic.dart';
+import 'package:hid_listener/hid_listener.dart';
+import 'package:macos_window_utils/macos_window_utils.dart';
 import 'package:window_manager/window_manager.dart';
 
 import 'app.dart';
@@ -8,35 +12,46 @@ import 'app.dart';
 void main() async {
   // ensure flutter plugins are intialized and ready to use
   WidgetsFlutterBinding.ensureInitialized();
-  // make the window overlay above others
-  await _initWindow();
+  await Window.initialize();
+  await windowManager.ensureInitialized();
+
+  if (getListenerBackend() != null) {
+    if (!getListenerBackend()!.initialize()) {
+      print("Failed to initialize listener backend");
+    }
+  } else {
+    print("No listener backend for this platform");
+  }
 
   runApp(const KeyvizApp());
+
+  _initWindow();
 }
 
 _initWindow() async {
-  // make window see through
-  await Window.initialize();
-  await Window.setEffect(
-    effect: WindowEffect.transparent,
-    color: Colors.transparent,
-  );
-
-  // customize window properties
-  await windowManager.ensureInitialized();
-  windowManager.waitUntilReadyToShow(
-    const WindowOptions(
-      center: true,
-      fullScreen: true,
+  await windowManager.waitUntilReadyToShow(
+    WindowOptions(
       skipTaskbar: true,
       alwaysOnTop: true,
+      fullScreen: !Platform.isMacOS,
       titleBarStyle: TitleBarStyle.hidden,
     ),
     () async {
-      await windowManager.setIgnoreMouseEvents(true);
-      await windowManager.setHasShadow(false);
-      await windowManager.setAsFrameless();
-      await windowManager.show();
+      windowManager.setIgnoreMouseEvents(true);
+      windowManager.setHasShadow(false);
+      windowManager.setAsFrameless();
+      windowManager.show();
     },
   );
+
+  if (Platform.isMacOS) {
+    WindowManipulator.makeWindowFullyTransparent();
+    await WindowManipulator.zoomWindow();
+  } else {
+    Window.setEffect(
+      effect: WindowEffect.transparent,
+      color: Colors.transparent,
+    );
+  }
+  windowManager.blur();
 }

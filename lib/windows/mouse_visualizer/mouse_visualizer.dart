@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tuple/tuple.dart';
@@ -20,8 +22,17 @@ class MouseVisualizer extends StatelessWidget {
             ? Positioned(
                 left: tuple.item2.dx /
                     devicePixelRatio, // Horizontal offset of the cursor divided by the logical pixel ratio
-                top: tuple.item2.dy /
-                    devicePixelRatio, // The vertical offset of the cursor divided by the logical pixel ratio
+
+                // On macOS, the mouse offset is from the bottomLeft
+                // instead of the topLeft
+                top: Platform.isMacOS
+                    ? null
+                    : tuple.item2.dy /
+                        devicePixelRatio, // The vertical offset of the cursor divided by the logical pixel ratio
+                bottom: Platform.isMacOS
+                    ? tuple.item2.dy /
+                        devicePixelRatio // The vertical offset of the cursor divided by the logical pixel ratio
+                    : null,
                 child: const IgnorePointer(
                   child: FractionalTranslation(
                     translation: Offset(-.5, -.5),
