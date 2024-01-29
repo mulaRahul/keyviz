@@ -130,10 +130,10 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_animate
-      sha256: be54662837a6e66cc53ee88549e808c625275e0faf5a43e11cf3182cb0bd1b02
+      sha256: cabe33af6201144be052352d53572a1b8a4f5782b46080be7520d95abe763715
       url: "https://pub.dev"
     source: hosted
-    version: "4.2.0"
+    version: "4.4.1"
   flutter_lints:
     dependency: "direct dev"
     description:
