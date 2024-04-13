@@ -35,7 +35,7 @@ class AboutView extends StatelessWidget {
                   ),
                   const SmallColumnGap(),
                   Text(
-                    "Keyviz 2.0.0-alpha",
+                    "Keyviz 2.0.0-alpha2",
                     style: context.textTheme.titleSmall,
                   ),
                   Text(

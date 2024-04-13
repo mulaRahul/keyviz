@@ -92,6 +92,9 @@ class KeyEventProvider extends ChangeNotifier with TrayListener {
   // cursor position
   Offset _cursorOffset = Offset.zero;
 
+  // first cursor down offset
+  Offset? _firstCursorOffset;
+
   // cursor button down state
   bool _mouseButtonDown = false;
 
@@ -289,6 +292,9 @@ class KeyEventProvider extends ChangeNotifier with TrayListener {
   }
 
   _onMouseEvent(MouseEvent event) {
+    // visualizer toggle
+    if (!_visualizeEvents) return;
+
     // mouse moved
     if (event is MouseMoveEvent) {
       _onMouseMove(event);
@@ -310,8 +316,14 @@ class KeyEventProvider extends ChangeNotifier with TrayListener {
     if (_highlightCursor || _dragging) {
       notify = true;
     }
+
+    // drag threshold
+    final dragDistance = _firstCursorOffset == null
+        ? 0
+        : (_firstCursorOffset! - cursorOffset).distance.abs();
+
     // drag started
-    if (_mouseButtonDown && !_dragging) {
+    if (dragDistance >= 64 && !_dragging) {
       _dragging = true;
 
       // show mouse events in key visualizer
@@ -355,6 +367,7 @@ class KeyEventProvider extends ChangeNotifier with TrayListener {
     // mouse button down
     if (leftOrRightDown) {
       _mouseButtonDown = true;
+      _firstCursorOffset = event.offset;
 
       if (_showMouseClicks) {
         _mouseButtonDownTimestamp = DateTime.now().millisecondsSinceEpoch;
@@ -363,6 +376,8 @@ class KeyEventProvider extends ChangeNotifier with TrayListener {
     }
     // mouse button up
     else {
+      _firstCursorOffset = null;
+
       if (_showMouseClicks) {
         final diff = _mouseButtonDownTimestamp == null
             ? 200
@@ -495,11 +510,11 @@ class KeyEventProvider extends ChangeNotifier with TrayListener {
 
   _onKeyDown(RawKeyDownEvent event) {
     // filter hotkey
-    if (_filterHotkeys && !_eventIsHotkey(event)) return;
-    // {
-    //   debugPrint("⬇️ [${event.data.keyLabel}] not hotkey, returning...");
-    //   return;
-    // }
+    if (_filterHotkeys && !_eventIsHotkey(event)) //return;
+    {
+      debugPrint("⬇️ [${event.data.keyLabel}] not hotkey, returning...");
+      return;
+    }
 
     // filter unknown key
     if (event.logicalKey.keyLabel == "") {
@@ -730,30 +745,17 @@ class KeyEventProvider extends ChangeNotifier with TrayListener {
     }
   }
 
-  bool _eventIsHotkey(RawKeyEvent event) {
+  bool _eventIsHotkey(RawKeyDownEvent event) {
     if (_keyDown.isEmpty) {
       // event should be a modifier and not ignored
       return !event.isMouse &&
-              (!ignoreKeys[ModifierKey.control]! &&
-                  event.data.isControlPressed) ||
-          (!ignoreKeys[ModifierKey.meta]! && event.data.isMetaPressed) ||
-          (!ignoreKeys[ModifierKey.alt]! && event.data.isAltPressed) ||
-          (!ignoreKeys[ModifierKey.shift]! && event.data.isShiftPressed);
+              (!_ignoreKeys[ModifierKey.control]! && event.isControl) ||
+          (!_ignoreKeys[ModifierKey.meta]! && event.isMeta) ||
+          (!_ignoreKeys[ModifierKey.alt]! && event.isAlt) ||
+          (!_ignoreKeys[ModifierKey.shift]! && event.isShift);
     } else {
-      // if mouse event, should start with modifier
-      if (event.isMouse) {
-        return _keyDown.values.first.data.isControlPressed ||
-            _keyDown.values.first.data.isMetaPressed ||
-            _keyDown.values.first.data.isAltPressed ||
-            _keyDown.values.first.data.isShiftPressed;
-      }
       // modifier should be pressed down
-      else {
-        return event.data.isControlPressed ||
-            event.data.isMetaPressed ||
-            event.data.isAltPressed ||
-            event.data.isShiftPressed;
-      }
+      return _keyDown.values.first.isModifier;
     }
   }
 

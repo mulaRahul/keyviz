@@ -1,0 +1,24 @@
+name: window_size
+description: Allows resizing and repositioning the window containing Flutter.
+version: 0.1.0
+
+# Do not publish this plugin. See:
+# https://github.com/google/flutter-desktop-embedding/blob/master/plugins/README.md#using-plugins
+publish_to: none
+
+flutter:
+  plugin:
+    platforms:
+      linux:
+        pluginClass: WindowSizePlugin
+      macos:
+        pluginClass: WindowSizePlugin
+      windows:
+        pluginClass: WindowSizePlugin
+
+environment:
+  sdk: '>=2.12.0-0 <3.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter

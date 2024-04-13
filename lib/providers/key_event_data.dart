@@ -12,6 +12,24 @@ extension Ease on RawKeyEvent {
       return logicalKey.keyLabel;
     }
   }
+
+  bool get isModifier => _modifiers.contains(logicalKey);
+
+  bool get isControl =>
+      logicalKey == LogicalKeyboardKey.controlLeft ||
+      logicalKey == LogicalKeyboardKey.controlRight;
+
+  bool get isMeta =>
+      logicalKey == LogicalKeyboardKey.metaLeft ||
+      logicalKey == LogicalKeyboardKey.metaRight;
+
+  bool get isShift =>
+      logicalKey == LogicalKeyboardKey.shiftLeft ||
+      logicalKey == LogicalKeyboardKey.shiftRight;
+
+  bool get isAlt =>
+      logicalKey == LogicalKeyboardKey.altLeft ||
+      logicalKey == LogicalKeyboardKey.altRight;
 }
 
 const _modifiers = [

@@ -142,43 +142,49 @@ class _TopBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        const SizedBox(),
-        GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onPanUpdate: onPanUpdate,
-          child: SizedBox(
-            width: 80,
-            height: 8,
-            child: Center(
-              child: SizedBox(
-                width: 80,
-                height: 3,
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: context.colorScheme.primary.withOpacity(.2),
-                    borderRadius: BorderRadius.circular(2),
+    return MouseRegion(
+      cursor: SystemMouseCursors.grab,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onPanUpdate: onPanUpdate,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const SizedBox(),
+            SizedBox(
+              width: 80,
+              height: 8,
+              child: Center(
+                child: SizedBox(
+                  width: 80,
+                  height: 3,
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: context.colorScheme.primary.withOpacity(.2),
+                      borderRadius: BorderRadius.circular(2),
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
+            MouseRegion(
+              cursor: SystemMouseCursors.click,
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: () {
+                  context.keyEvent.styling = false;
+                  Vault.save(context);
+                },
+                child: SvgIcon(
+                  icon: VuesaxIcons.cross,
+                  size: defaultPadding * .5,
+                  color: context.colorScheme.primary.withOpacity(.4),
+                ),
+              ),
+            ),
+          ],
         ),
-        GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTap: () {
-            context.keyEvent.styling = false;
-            Vault.save(context);
-          },
-          child: SvgIcon(
-            icon: VuesaxIcons.cross,
-            size: defaultPadding * .5,
-            color: context.colorScheme.primary.withOpacity(.4),
-          ),
-        ),
-      ],
+      ),
     );
   }
 }
