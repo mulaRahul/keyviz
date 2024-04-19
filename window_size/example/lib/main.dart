@@ -35,8 +35,8 @@ void main() {
           screenFrame.top + ((screenFrame.height - height) / 3).roundToDouble();
       final frame = Rect.fromLTWH(left, top, width, height);
       window_size.setWindowFrame(frame);
-      // window_size.setWindowMinSize(Size(0.8 * width, 0.8 * height));
-      // window_size.setWindowMaxSize(Size(1.5 * width, 1.5 * height));
+      window_size.setWindowMinSize(Size(0.8 * width, 0.8 * height));
+      window_size.setWindowMaxSize(Size(1.5 * width, 1.5 * height));
       window_size
           .setWindowTitle('window_size Example on ${Platform.operatingSystem}');
     }
@@ -70,15 +70,20 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  final _screens = <window_size.Screen>[];
 
-  void _incrementCounter() {
-    window_size.setWindowFrame(Rect.fromLTWH(0, 0, 1500, 1500));
+  @override
+  void initState() {
+    super.initState();
 
-    setState(() {
-      _counter++;
-    });
+    window_size.getScreenList().then(
+          (screens) => setState(
+            () => _screens.addAll(screens),
+          ),
+        );
   }
+
+  void _incrementCounter() {}
 
   @override
   Widget build(BuildContext context) {
@@ -90,19 +95,29 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter\n',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-            FutureBuilder(
-              future: window_size.getCurrentScreen(),
-              builder: (context, snapshot) {
-                return Text("${snapshot.data}");
-                // return Text("${(snapshot.data as window_size.Screen).frame}");
-              },
+            SizedBox.square(
+              dimension: 500,
+              child: DecoratedBox(
+                decoration: BoxDecoration(border: Border.all()),
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    for (final screen in _screens)
+                      Positioned(
+                        top: screen.frame.top / 10,
+                        left: screen.frame.left / 10,
+                        width: screen.frame.size.width / 10,
+                        height: screen.frame.size.height / 10,
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(
+                            color: Colors.primaries[math.Random().nextInt(4)],
+                          ),
+                          child: Text(screen.frame.size.toString()),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
             ),
           ],
         ),

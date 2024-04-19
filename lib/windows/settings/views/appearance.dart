@@ -6,6 +6,7 @@ import 'package:keyviz/config/config.dart';
 import 'package:keyviz/providers/key_event.dart';
 import 'package:keyviz/providers/key_style.dart';
 import 'package:keyviz/windows/shared/shared.dart';
+import 'package:window_size/window_size.dart';
 
 import '../widgets/widgets.dart';
 
@@ -16,6 +17,26 @@ class AppearanceTabView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
+        if (context.keyEvent.screens.length > 1) ...[
+          PanelItem(
+            title: "Display",
+            subtitle: "Change monitor/display for the visualisation. "
+                "A restart\nmay be required in case of unsual behaviour.",
+            action: Selector<KeyEventProvider, int>(
+              selector: (_, keyEvent) => keyEvent.screenIndex,
+              builder: (context, value, _) => XDropdown<int>(
+                value: value,
+                options: List.generate(
+                  context.keyEvent.screens.length,
+                  (i) => i,
+                ),
+                labelBuilder: (option) => "Display ${option + 1}",
+                onChanged: (value) => context.keyEvent.screenIndex = value,
+              ),
+            ),
+          ),
+          const Divider(),
+        ],
         PanelItem(
           title: "Alignment",
           subtitle: "Position of the key visualization on the screen.\nIf "

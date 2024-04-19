@@ -15,6 +15,9 @@ dependencies:
   # cross-platform HID (Human Input Device) listener
   hid_listener: ^2.0.1
 
+  window_size:
+    path: window_size
+    
   tuple: ^2.0.2
   provider: ^6.1.2
   flutter_svg: ^2.0.9

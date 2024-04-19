@@ -40,7 +40,6 @@ _initWindow() async {
       windowManager.setIgnoreMouseEvents(true);
       windowManager.setHasShadow(false);
       windowManager.setAsFrameless();
-      windowManager.show();
     },
   );
 

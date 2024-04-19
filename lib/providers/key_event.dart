@@ -5,12 +5,13 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' hide ModifierKey;
 import 'package:hid_listener/hid_listener.dart';
+import 'package:window_size/window_size.dart';
+import 'package:tray_manager/tray_manager.dart';
+import 'package:window_manager/window_manager.dart';
 
 import 'package:keyviz/config/config.dart';
 import 'package:keyviz/domain/services/raw_keyboard_mouse.dart';
 import 'package:keyviz/domain/vault/vault.dart';
-import 'package:tray_manager/tray_manager.dart';
-import 'package:window_manager/window_manager.dart';
 
 import 'key_event_data.dart';
 
@@ -78,6 +79,12 @@ class KeyEventProvider extends ChangeNotifier with TrayListener {
   KeyEventProvider() {
     _init();
   }
+
+  // index of current screen in the screens list
+  int _screenIndex = 0;
+
+  // display/screens list
+  final List<Screen> _screens = [];
 
   // errors
   bool _hasError = false;
@@ -171,8 +178,11 @@ class KeyEventProvider extends ChangeNotifier with TrayListener {
   // show mouse events with keypress like, [Shift] + [Drag]
   bool _showMouseEvents = _Defaults.showMouseEvents;
 
-  Map<String, Map<int, KeyEventData>> get keyboardEvents => _keyboardEvents;
+  Screen get _currentScreen => _screens[_screenIndex];
 
+  Map<String, Map<int, KeyEventData>> get keyboardEvents => _keyboardEvents;
+  int get screenIndex => _screenIndex;
+  List<Screen> get screens => _screens;
   bool get styling => _styling;
   bool get visualizeEvents => _visualizeEvents;
   bool get hasError => _hasError;
@@ -207,6 +217,11 @@ class KeyEventProvider extends ChangeNotifier with TrayListener {
 
   bool get _ignoreHistory =>
       _historyMode == VisualizationHistoryMode.none || _styling;
+
+  set screenIndex(int value) {
+    _screenIndex = value;
+    _changeDisplay();
+  }
 
   set styling(bool value) {
     if (_hasError) return;
@@ -294,7 +309,14 @@ class KeyEventProvider extends ChangeNotifier with TrayListener {
   _onMouseEvent(MouseEvent event) {
     // visualizer toggle
     if (!_visualizeEvents) return;
+    // process mouse event
+    event.x -= _currentScreen.frame.left;
+    event.y -= _currentScreen.frame.top;
 
+    if (!Platform.isMacOS) {
+      event.x /= _currentScreen.scaleFactor;
+      event.y /= _currentScreen.scaleFactor;
+    }
     // mouse moved
     if (event is MouseMoveEvent) {
       _onMouseMove(event);
@@ -836,6 +858,10 @@ class KeyEventProvider extends ChangeNotifier with TrayListener {
   }
 
   Map<String, dynamic> get toJson => {
+        _JsonKeys.screenFrame: [
+          _screens[_screenIndex].frame.width,
+          _screens[_screenIndex].frame.height,
+        ],
         _JsonKeys.filterHotkeys: _filterHotkeys,
         _JsonKeys.ignoreKeys: {
           ModifierKey.control.name: _ignoreKeys[ModifierKey.control],
@@ -920,6 +946,39 @@ class KeyEventProvider extends ChangeNotifier with TrayListener {
 
     _showMouseEvents =
         data[_JsonKeys.showMouseEvents] ?? _Defaults.showMouseEvents;
+
+    // set preferred display
+    _setDisplay(data[_JsonKeys.screenFrame]);
+  }
+
+  _setDisplay(List? frame) async {
+    _screens.addAll(await getScreenList());
+
+    if (frame != null) {
+      final index = _screens.indexWhere(
+        (screen) =>
+            screen.frame.width == frame[0] && screen.frame.height == frame[1],
+      );
+
+      if (index != -1) _screenIndex = index;
+    }
+
+    setWindowFrame(_currentScreen.frame);
+
+    windowManager.show();
+  }
+
+  _changeDisplay() async {
+    await windowManager.setFullScreen(false);
+    await windowManager.hide();
+
+    setWindowFrame(_currentScreen.frame);
+    // simulate delay for above
+    await Future.delayed(Durations.extralong2);
+    await windowManager.setFullScreen(true);
+    await windowManager.show();
+
+    notifyListeners();
   }
 
   revertToDefaults() {
@@ -949,6 +1008,7 @@ class KeyEventProvider extends ChangeNotifier with TrayListener {
 }
 
 class _JsonKeys {
+  static const screenFrame = "screen_frame";
   static const filterHotkeys = "filter_hotkeys";
   static const ignoreKeys = "ignore_keys";
   static const historyMode = "history_mode";

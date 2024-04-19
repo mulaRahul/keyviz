@@ -9,11 +9,13 @@ class XDropdown<T> extends StatelessWidget {
     required this.options,
     required this.onChanged,
     this.decorated = true,
+    this.labelBuilder,
   });
 
   final T value;
   final bool decorated;
   final List<T> options;
+  final String Function(T option)? labelBuilder;
   final ValueChanged<T> onChanged;
 
   @override
@@ -24,7 +26,7 @@ class XDropdown<T> extends StatelessWidget {
         for (final option in options)
           DropdownMenuItem(
             value: option,
-            child: Text(option.toString()),
+            child: Text(labelBuilder?.call(option) ?? option.toString()),
           ),
       ],
       onChanged: (v) {

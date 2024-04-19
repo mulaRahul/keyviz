@@ -12,6 +12,7 @@ import screen_retriever
 import tray_manager
 import url_launcher_macos
 import window_manager
+import window_size
 
 func RegisterGeneratedPlugins(registry: FlutterPluginRegistry) {
   HidListenerPlugin.register(with: registry.registrar(forPlugin: "HidListenerPlugin"))
@@ -21,4 +22,5 @@ func RegisterGeneratedPlugins(registry: FlutterPluginRegistry) {
   TrayManagerPlugin.register(with: registry.registrar(forPlugin: "TrayManagerPlugin"))
   UrlLauncherPlugin.register(with: registry.registrar(forPlugin: "UrlLauncherPlugin"))
   WindowManagerPlugin.register(with: registry.registrar(forPlugin: "WindowManagerPlugin"))
+  WindowSizePlugin.register(with: registry.registrar(forPlugin: "WindowSizePlugin"))
 }

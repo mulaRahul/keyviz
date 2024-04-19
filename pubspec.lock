@@ -637,6 +637,13 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.3.8"
+  window_size:
+    dependency: "direct main"
+    description:
+      path: window_size
+      relative: true
+    source: path
+    version: "0.1.0"
   xdg_directories:
     dependency: transitive
     description:
