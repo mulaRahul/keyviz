@@ -640,9 +640,11 @@ packages:
   window_size:
     dependency: "direct main"
     description:
-      path: window_size
-      relative: true
-    source: path
+      path: "plugins/window_size"
+      ref: "6c66ad2"
+      resolved-ref: "6c66ad23ee79749f30a8eece542cf54eaf157ed8"
+      url: "https://github.com/google/flutter-desktop-embedding.git"
+    source: git
     version: "0.1.0"
   xdg_directories:
     dependency: transitive

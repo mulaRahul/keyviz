@@ -16,7 +16,10 @@ dependencies:
   hid_listener: ^2.0.1
 
   window_size:
-    path: window_size
+    git:
+      url: https://github.com/google/flutter-desktop-embedding.git
+      path: plugins/window_size
+      ref: 6c66ad2
     
   tuple: ^2.0.2
   provider: ^6.1.2

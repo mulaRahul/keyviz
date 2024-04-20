@@ -6,7 +6,6 @@ import 'package:keyviz/config/config.dart';
 import 'package:keyviz/providers/key_event.dart';
 import 'package:keyviz/providers/key_style.dart';
 import 'package:keyviz/windows/shared/shared.dart';
-import 'package:window_size/window_size.dart';
 
 import '../widgets/widgets.dart';
 

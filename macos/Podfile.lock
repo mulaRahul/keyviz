@@ -15,6 +15,8 @@ PODS:
     - FlutterMacOS
   - window_manager (0.2.0):
     - FlutterMacOS
+  - window_size (0.0.2):
+    - FlutterMacOS
 
 DEPENDENCIES:
   - FlutterMacOS (from `Flutter/ephemeral`)
@@ -25,6 +27,7 @@ DEPENDENCIES:
   - tray_manager (from `Flutter/ephemeral/.symlinks/plugins/tray_manager/macos`)
   - url_launcher_macos (from `Flutter/ephemeral/.symlinks/plugins/url_launcher_macos/macos`)
   - window_manager (from `Flutter/ephemeral/.symlinks/plugins/window_manager/macos`)
+  - window_size (from `Flutter/ephemeral/.symlinks/plugins/window_size/macos`)
 
 EXTERNAL SOURCES:
   FlutterMacOS:
@@ -43,17 +46,20 @@ EXTERNAL SOURCES:
     :path: Flutter/ephemeral/.symlinks/plugins/url_launcher_macos/macos
   window_manager:
     :path: Flutter/ephemeral/.symlinks/plugins/window_manager/macos
+  window_size:
+    :path: Flutter/ephemeral/.symlinks/plugins/window_size/macos
 
 SPEC CHECKSUMS:
   FlutterMacOS: 8f6f14fa908a6fb3fba0cd85dbd81ec4b251fb24
-  hid_listener: edd76cbd4d6cdc611fa6243c16c17c6b4e66a747
+  hid_listener: 3c81908608eecb6fa0f5cc3cc41f896f298f45d0
   macos_window_utils: 933f91f64805e2eb91a5bd057cf97cd097276663
-  path_provider_foundation: 29f094ae23ebbca9d3d0cec13889cd9060c0e943
+  path_provider_foundation: 3784922295ac71e43754bd15e0653ccfd36a147c
   screen_retriever: 59634572a57080243dd1bf715e55b6c54f241a38
   tray_manager: 9064e219c56d75c476e46b9a21182087930baf90
-  url_launcher_macos: 5335912b679c073563f29d89d33d10d459f95451
+  url_launcher_macos: d2691c7dd33ed713bf3544850a623080ec693d95
   window_manager: 3a1844359a6295ab1e47659b1a777e36773cd6e8
+  window_size: 339dafa0b27a95a62a843042038fa6c3c48de195
 
 PODFILE CHECKSUM: 16208599a12443d53889ba2270a4985981cfb204
 
-COCOAPODS: 1.13.0
+COCOAPODS: 1.15.2

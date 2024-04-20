@@ -22,10 +22,10 @@ class MouseVisualizer extends StatelessWidget {
                 // On macOS, the mouse offset is from the bottomLeft
                 // instead of the topLeft
                 bottom: Platform.isMacOS ? tuple.item2.dy : null,
-                child: const IgnorePointer(
+                child: IgnorePointer(
                   child: FractionalTranslation(
-                    translation: Offset(-.5, -.5),
-                    child: _MouseVisualizer(),
+                    translation: Offset(-.5, Platform.isMacOS ? .5 : -.5),
+                    child: const _MouseVisualizer(),
                   ),
                 ),
               )

@@ -86,6 +86,10 @@ class KeyEventProvider extends ChangeNotifier with TrayListener {
   // display/screens list
   final List<Screen> _screens = [];
 
+  // an offset to adapt origin from topLeft
+  // to bottomRight on macOS for mouse events
+  Offset _macOSMouseOriginOffset = Offset.zero;
+
   // errors
   bool _hasError = false;
 
@@ -209,7 +213,7 @@ class KeyEventProvider extends ChangeNotifier with TrayListener {
   Duration get animationDuration => Duration(milliseconds: _animationSpeed);
   KeyCapAnimationType get keyCapAnimation => _keyCapAnimation;
   bool get noKeyCapAnimation => _keyCapAnimation == KeyCapAnimationType.none;
-  bool get showMouseClicks => _showMouseClicks;
+  bool get showMouseClicks => _visualizeEvents ? _showMouseClicks : false;
   bool get highlightCursor => _highlightCursor;
   bool get showMouseEvents => _showMouseEvents;
   Offset get cursorOffset => _cursorOffset;
@@ -279,6 +283,7 @@ class KeyEventProvider extends ChangeNotifier with TrayListener {
     _visualizeEvents = !_visualizeEvents;
     _setTrayIcon();
     _setTrayContextMenu();
+    notifyListeners();
   }
 
   _init() async {
@@ -311,11 +316,13 @@ class KeyEventProvider extends ChangeNotifier with TrayListener {
     if (!_visualizeEvents) return;
     // process mouse event
     event.x -= _currentScreen.frame.left;
-    event.y -= _currentScreen.frame.top;
-
     if (!Platform.isMacOS) {
+      event.y -= _currentScreen.frame.top;
+
       event.x /= _currentScreen.scaleFactor;
       event.y /= _currentScreen.scaleFactor;
+    } else {
+      event.y -= _macOSMouseOriginOffset.dy;
     }
     // mouse moved
     if (event is MouseMoveEvent) {
@@ -963,21 +970,31 @@ class KeyEventProvider extends ChangeNotifier with TrayListener {
       if (index != -1) _screenIndex = index;
     }
 
+    if (Platform.isMacOS) {
+      _macOSMouseOriginOffset =
+          _screens[0].frame.bottomLeft - _currentScreen.frame.bottomLeft;
+    }
+
     setWindowFrame(_currentScreen.frame);
 
     windowManager.show();
   }
 
   _changeDisplay() async {
-    await windowManager.setFullScreen(false);
-    await windowManager.hide();
+    if (Platform.isMacOS) {
+      _macOSMouseOriginOffset =
+          _screens[0].frame.bottomLeft - _currentScreen.frame.bottomLeft;
+      setWindowFrame(_currentScreen.frame);
+    } else {
+      await windowManager.setFullScreen(false);
+      await windowManager.hide();
 
-    setWindowFrame(_currentScreen.frame);
-    // simulate delay for above
-    await Future.delayed(Durations.extralong2);
-    await windowManager.setFullScreen(true);
-    await windowManager.show();
-
+      setWindowFrame(_currentScreen.frame);
+      // simulate delay for above
+      await Future.delayed(Durations.extralong2);
+      await windowManager.setFullScreen(true);
+      await windowManager.show();
+    }
     notifyListeners();
   }
 

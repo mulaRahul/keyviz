@@ -32,7 +32,14 @@ class KeyCapContent extends StatelessWidget {
     );
     // spacebar
     if (event.isSpacebar) {
-      return Text(" " * 16, style: textStyle);
+      String spaceLabel = 'space';
+
+      if (style.textCap == TextCap.capitalize) {
+        spaceLabel = spaceLabel.capitalize();
+      } else if (style.textCap == TextCap.upper) {
+        spaceLabel = spaceLabel.toUpperCase();
+      }
+      return Text("    $spaceLabel    ", style: textStyle);
     }
     // has icon
     else if (icon != null) {
@@ -82,6 +89,7 @@ class KeyCapContent extends StatelessWidget {
     // has symbol
     else if (symbol != null) {
       return RichText(
+        textAlign: _textAlign(style),
         text: TextSpan(
           style: textStyle.copyWith(fontSize: style.fontSize * .6),
           children: [
@@ -136,6 +144,17 @@ class KeyCapContent extends StatelessWidget {
         return CrossAxisAlignment.center;
       case HorizontalAlignment.left:
         return CrossAxisAlignment.start;
+    }
+  }
+
+  TextAlign _textAlign(KeyStyleProvider style) {
+    switch (style.horizontalAlignment) {
+      case HorizontalAlignment.right:
+        return TextAlign.end;
+      case HorizontalAlignment.center:
+        return TextAlign.center;
+      case HorizontalAlignment.left:
+        return TextAlign.start;
     }
   }
 }
