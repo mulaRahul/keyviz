@@ -40,7 +40,7 @@ Future<void> dump(
   if (await file.exists()) {
     await file.writeAsString(json.encode(data));
   } else if (createFileIfNotFound) {
-    await file.create();
+    await file.create(recursive: true);
     await file.writeAsString(json.encode(data));
   }
 }

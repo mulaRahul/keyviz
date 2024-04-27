@@ -889,6 +889,9 @@ class KeyEventProvider extends ChangeNotifier with TrayListener {
   _updateFromJson() async {
     final data = await Vault.loadConfigData();
 
+    // set preferred display
+    _setDisplay(data?[_JsonKeys.screenFrame]);
+
     if (data == null) return;
 
     _filterHotkeys = data[_JsonKeys.filterHotkeys] ?? _Defaults.filterHotkeys;
@@ -953,9 +956,6 @@ class KeyEventProvider extends ChangeNotifier with TrayListener {
 
     _showMouseEvents =
         data[_JsonKeys.showMouseEvents] ?? _Defaults.showMouseEvents;
-
-    // set preferred display
-    _setDisplay(data[_JsonKeys.screenFrame]);
   }
 
   _setDisplay(List? frame) async {
