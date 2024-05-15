@@ -35,6 +35,9 @@ Below are the platform specifics options and requirements -
 
   <summary>🪟 Windows</summary>
 
+  ### 👜 Microsoft Store
+  You can download keyviz directly from the [microsoft store](https://apps.microsoft.com/detail/Keyviz/9phzpj643p7l?mode=direct).
+
   ### 🥄 Scoop
    ```bash
   scoop bucket add extras # first, add the bucket
