@@ -446,12 +446,12 @@ class KeyStyleProvider extends ChangeNotifier {
     switch (value) {
       case KeyCapStyle.minimal:
         _backgroundColor = Colors.black;
-        _fontColor = Colors.white;
+        _fontColor = _separatorColor = Colors.white;
         _addPlusSeparator = true;
         break;
 
       case KeyCapStyle.flat:
-        _fontColor = Colors.black;
+        _fontColor = _separatorColor = Colors.black;
 
         _primaryColor1 = Colors.white;
         _primaryColor2 = const Color(0xfff2f2f2);
@@ -466,7 +466,7 @@ class KeyStyleProvider extends ChangeNotifier {
         _primaryColor1 = Colors.white;
         _secondaryColor1 = _mSecondaryColor1 = Colors.black;
         _borderColor = _mBorderColor = Colors.black;
-        _fontColor = _mFontColor = Colors.black;
+        _fontColor = _separatorColor = _mFontColor = Colors.black;
         _isGradient = false;
 
         _mPrimaryColor1 = const Color(0xff3A86FF);
@@ -504,7 +504,7 @@ class KeyStyleProvider extends ChangeNotifier {
         _cornerSmoothing = .8;
         _primaryColor1 = const Color(0xff333f4d);
         _secondaryColor1 = const Color(0xff212932);
-        _fontColor = const Color(0xffff9b00);
+        _fontColor = _separatorColor = const Color(0xffff9b00);
 
         _mPrimaryColor1 = const Color(0xfff08200);
         _mSecondaryColor1 = const Color(0xffff8a00);
@@ -753,7 +753,7 @@ class KeyStyleProvider extends ChangeNotifier {
 
     _fontSize = data[_JsonKeys.fontSize] ?? _Defaults.fontSize;
 
-    _fontColor = HexColor.fromHex(
+    _fontColor = _separatorColor = HexColor.fromHex(
       data[_JsonKeys.fontColor] ?? "000000",
     );
     _mFontColor = HexColor.fromHex(
@@ -925,7 +925,7 @@ class KeyStyleProvider extends ChangeNotifier {
     _keyCapStyle = _Defaults.keyCapStyle;
     _fontSize = _Defaults.fontSize;
     _fontColor = _Defaults.fontColor;
-    _mFontColor = _Defaults.mFontColor;
+    _fontColor = _separatorColor = _Defaults.mFontColor;
     _textCap = _Defaults.textCap;
     _modifierTextLength = _Defaults.modifierTextLength;
     _verticalAlignment = _Defaults.verticalAlignment;

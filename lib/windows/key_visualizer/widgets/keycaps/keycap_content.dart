@@ -32,6 +32,19 @@ class KeyCapContent extends StatelessWidget {
     );
     // spacebar
     if (event.isSpacebar) {
+      if (icon != null) {
+        return Padding(
+          padding: EdgeInsets.symmetric(horizontal: style.fontSize * 2),
+          child: SizedBox.square(
+            dimension: style.fontSize * .8,
+            child: SvgIcon(
+              icon: icon,
+              color: fontColor,
+              size: style.fontSize * .8,
+            ),
+          ),
+        );
+      }
       String spaceLabel = 'space';
 
       if (style.textCap == TextCap.capitalize) {
