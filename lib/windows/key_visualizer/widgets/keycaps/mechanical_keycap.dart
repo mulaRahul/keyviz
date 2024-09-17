@@ -43,170 +43,173 @@ class MechanicalKeyCap extends KeyCap {
       },
       child: IntrinsicWidth(
         stepWidth: style.fontSize,
-        child: Stack(
-          alignment: Alignment.center,
-          fit: StackFit.expand,
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                border: border(style),
-                color: secondaryColor(style),
-                borderRadius: style.outerBorderRadius,
+        child: SizedBox(
+          height: outerSize.height,
+          child: Stack(
+            alignment: Alignment.center,
+            fit: StackFit.expand,
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  border: border(style),
+                  color: secondaryColor(style),
+                  borderRadius: style.outerBorderRadius,
+                ),
+                foregroundDecoration: BoxDecoration(
+                  borderRadius: style.outerBorderRadius,
+                ),
               ),
-              foregroundDecoration: BoxDecoration(
-                borderRadius: style.outerBorderRadius,
-              ),
-            ),
-            Column(
-              children: [
-                // highlight
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(
-                      height: style.fontSize,
-                      width: (outerSize.width - (outerSize.height * .5)) * .5,
-                      child: DecoratedBox(
-                        decoration: BoxDecoration(
-                          backgroundBlendMode: BlendMode.softLight,
-                          gradient: const LinearGradient(
-                            begin: Alignment.topRight,
-                            end: Alignment.bottomLeft,
-                            stops: [.24, 1.0],
-                            colors: [Colors.white54, Colors.transparent],
-                          ),
-                          borderRadius: BorderRadius.only(
-                            topLeft: style.outerBorderRadius.topLeft,
-                          ),
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      child: SizedBox(
-                        height: outerSize.height * .5,
-                        child: const DecoratedBox(
+              Column(
+                children: [
+                  // highlight
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(
+                        height: style.fontSize,
+                        width: (outerSize.width - (outerSize.height * .5)) * .5,
+                        child: DecoratedBox(
                           decoration: BoxDecoration(
                             backgroundBlendMode: BlendMode.softLight,
-                            gradient: LinearGradient(
-                              stops: [.6, 1.0],
-                              colors: [Colors.white54, Colors.white70],
+                            gradient: const LinearGradient(
+                              begin: Alignment.topRight,
+                              end: Alignment.bottomLeft,
+                              stops: [.24, 1.0],
+                              colors: [Colors.white54, Colors.transparent],
+                            ),
+                            borderRadius: BorderRadius.only(
+                              topLeft: style.outerBorderRadius.topLeft,
                             ),
                           ),
                         ),
                       ),
-                    ),
-                    SizedBox(
-                      height: style.fontSize,
-                      width: (outerSize.width - (outerSize.height * .5)) * .5,
-                      child: DecoratedBox(
-                        decoration: BoxDecoration(
-                          backgroundBlendMode: BlendMode.softLight,
-                          gradient: const LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            stops: [.24, 1.0],
-                            colors: [Colors.white70, Colors.transparent],
-                          ),
-                          borderRadius: BorderRadius.only(
-                            topRight: style.outerBorderRadius.topRight,
+                      Expanded(
+                        child: SizedBox(
+                          height: outerSize.height * .5,
+                          child: const DecoratedBox(
+                            decoration: BoxDecoration(
+                              backgroundBlendMode: BlendMode.softLight,
+                              gradient: LinearGradient(
+                                stops: [.6, 1.0],
+                                colors: [Colors.white54, Colors.white70],
+                              ),
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-                // shadow
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    SizedBox(
-                      height: style.fontSize * 1.25,
-                      width: (outerSize.width - (outerSize.height * .5)) * .5,
-                      child: DecoratedBox(
-                        decoration: BoxDecoration(
-                          backgroundBlendMode: BlendMode.multiply,
-                          gradient: const LinearGradient(
-                            begin: Alignment.bottomRight,
-                            end: Alignment.topCenter,
-                            stops: [.24, 1.0],
-                            colors: [Colors.black45, Colors.transparent],
-                          ),
-                          borderRadius: BorderRadius.only(
-                            bottomLeft: style.outerBorderRadius.bottomLeft,
+                      SizedBox(
+                        height: style.fontSize,
+                        width: (outerSize.width - (outerSize.height * .5)) * .5,
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(
+                            backgroundBlendMode: BlendMode.softLight,
+                            gradient: const LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              stops: [.24, 1.0],
+                              colors: [Colors.white70, Colors.transparent],
+                            ),
+                            borderRadius: BorderRadius.only(
+                              topRight: style.outerBorderRadius.topRight,
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                    Expanded(
-                      child: SizedBox(
-                        height: outerSize.height * .5,
-                        child: const DecoratedBox(
+                    ],
+                  ),
+                  // shadow
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      SizedBox(
+                        height: style.fontSize * 1.25,
+                        width: (outerSize.width - (outerSize.height * .5)) * .5,
+                        child: DecoratedBox(
                           decoration: BoxDecoration(
                             backgroundBlendMode: BlendMode.multiply,
-                            color: Colors.black45,
+                            gradient: const LinearGradient(
+                              begin: Alignment.bottomRight,
+                              end: Alignment.topCenter,
+                              stops: [.24, 1.0],
+                              colors: [Colors.black45, Colors.transparent],
+                            ),
+                            borderRadius: BorderRadius.only(
+                              bottomLeft: style.outerBorderRadius.bottomLeft,
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                    SizedBox(
-                      height: style.fontSize * 1.25,
-                      width: (outerSize.width - (outerSize.height * .5)) * .5,
-                      child: DecoratedBox(
-                        decoration: BoxDecoration(
-                          backgroundBlendMode: BlendMode.multiply,
-                          gradient: const LinearGradient(
-                            begin: Alignment.bottomLeft,
-                            end: Alignment.topCenter,
-                            stops: [.24, 1.0],
-                            colors: [Colors.black45, Colors.transparent],
-                          ),
-                          borderRadius: BorderRadius.only(
-                            bottomRight: style.outerBorderRadius.bottomRight,
+                      Expanded(
+                        child: SizedBox(
+                          height: outerSize.height * .5,
+                          child: const DecoratedBox(
+                            decoration: BoxDecoration(
+                              backgroundBlendMode: BlendMode.multiply,
+                              color: Colors.black45,
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            Container(
-              margin: style.containerPadding,
-              height: size.height,
-              constraints: BoxConstraints(minWidth: size.width),
-              padding: style.contentPadding,
-              decoration: BoxDecoration(
-                color: primaryColor(style),
-                borderRadius: style.borderRadius,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black12,
-                    offset:
-                        Offset(-style.fontSize * .05, -style.fontSize * .05),
-                  ),
-                  BoxShadow(
-                    color: Colors.white24,
-                    offset: Offset(style.fontSize * .04, 0),
-                  ),
-                  BoxShadow(
-                    color: Colors.white12,
-                    offset: Offset(0, -style.fontSize * .04),
+                      SizedBox(
+                        height: style.fontSize * 1.25,
+                        width: (outerSize.width - (outerSize.height * .5)) * .5,
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(
+                            backgroundBlendMode: BlendMode.multiply,
+                            gradient: const LinearGradient(
+                              begin: Alignment.bottomLeft,
+                              end: Alignment.topCenter,
+                              stops: [.24, 1.0],
+                              colors: [Colors.black45, Colors.transparent],
+                            ),
+                            borderRadius: BorderRadius.only(
+                              bottomRight: style.outerBorderRadius.bottomRight,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
-              foregroundDecoration: event.isModifier
-                  ? null
-                  : BoxDecoration(
-                      backgroundBlendMode: BlendMode.multiply,
-                      gradient: const LinearGradient(
-                        colors: [Colors.transparent, Colors.black38],
-                      ),
-                      borderRadius: style.borderRadius,
+              Container(
+                margin: style.containerPadding,
+                height: size.height,
+                constraints: BoxConstraints(minWidth: size.width),
+                padding: style.contentPadding,
+                decoration: BoxDecoration(
+                  color: primaryColor(style),
+                  borderRadius: style.borderRadius,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black12,
+                      offset:
+                          Offset(-style.fontSize * .05, -style.fontSize * .05),
                     ),
-              alignment: style.childrenAlignment,
-              child: KeyCapContent(event),
-            ),
-          ],
+                    BoxShadow(
+                      color: Colors.white24,
+                      offset: Offset(style.fontSize * .04, 0),
+                    ),
+                    BoxShadow(
+                      color: Colors.white12,
+                      offset: Offset(0, -style.fontSize * .04),
+                    ),
+                  ],
+                ),
+                foregroundDecoration: event.isModifier
+                    ? null
+                    : BoxDecoration(
+                        backgroundBlendMode: BlendMode.multiply,
+                        gradient: const LinearGradient(
+                          colors: [Colors.transparent, Colors.black38],
+                        ),
+                        borderRadius: style.borderRadius,
+                      ),
+                alignment: style.childrenAlignment,
+                child: KeyCapContent(event),
+              ),
+            ],
+          ),
         ),
       ),
     );
