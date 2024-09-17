@@ -526,6 +526,7 @@ class KeyStyleProvider extends ChangeNotifier {
 
   set fontColor(Color value) {
     _fontColor = value;
+    _separatorColor = value;
     notifyListeners();
   }
 
