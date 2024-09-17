@@ -22,7 +22,8 @@ enum ModifierKey {
   control("Control"),
   shift("Shift"),
   alt("Alt"),
-  meta("Meta");
+  meta("Meta"),
+  function("Fn");
 
   const ModifierKey(this.label);
   final String label;
@@ -147,6 +148,7 @@ class KeyEventProvider extends ChangeNotifier with TrayListener {
     ModifierKey.shift: true,
     ModifierKey.alt: false,
     ModifierKey.meta: false,
+    ModifierKey.function: false,
   };
 
   // whether to show history, if yes
@@ -781,7 +783,8 @@ class KeyEventProvider extends ChangeNotifier with TrayListener {
               (!_ignoreKeys[ModifierKey.control]! && event.isControl) ||
           (!_ignoreKeys[ModifierKey.meta]! && event.isMeta) ||
           (!_ignoreKeys[ModifierKey.alt]! && event.isAlt) ||
-          (!_ignoreKeys[ModifierKey.shift]! && event.isShift);
+          (!_ignoreKeys[ModifierKey.shift]! && event.isShift) ||
+          (!_ignoreKeys[ModifierKey.function]! && event.isFunction);
     } else {
       // modifier should be pressed down
       return _keyDown.values.first.isModifier;
@@ -875,6 +878,7 @@ class KeyEventProvider extends ChangeNotifier with TrayListener {
           ModifierKey.shift.name: _ignoreKeys[ModifierKey.shift],
           ModifierKey.alt.name: _ignoreKeys[ModifierKey.alt],
           ModifierKey.meta.name: _ignoreKeys[ModifierKey.meta],
+          ModifierKey.function.name: _ignoreKeys[ModifierKey.function],
         },
         _JsonKeys.historyMode: _historyMode.name,
         _JsonKeys.toggleShortcut: keyvizToggleShortcut,
@@ -1045,6 +1049,7 @@ class _Defaults {
     ModifierKey.shift: true,
     ModifierKey.alt: false,
     ModifierKey.meta: false,
+    ModifierKey.function: false,
   };
   static const historyMode = VisualizationHistoryMode.none;
   static const toggleShortcut = [8589934850, 4294969354];

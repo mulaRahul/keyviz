@@ -2,6 +2,8 @@ import 'package:flutter/services.dart';
 
 import 'package:keyviz/domain/services/services.dart';
 
+final fNumberPattern = RegExp(r"F\d");
+
 extension Ease on RawKeyEvent {
   int get keyId => logicalKey.keyId;
   bool get isMouse => data is RawKeyEventDataMouse;
@@ -30,6 +32,8 @@ extension Ease on RawKeyEvent {
   bool get isAlt =>
       logicalKey == LogicalKeyboardKey.altLeft ||
       logicalKey == LogicalKeyboardKey.altRight;
+
+  bool get isFunction => fNumberPattern.hasMatch(logicalKey.keyLabel);
 }
 
 const _modifiers = [
