@@ -2,7 +2,7 @@ import 'package:flutter/services.dart';
 
 import 'package:keyviz/domain/services/services.dart';
 
-final fNumberPattern = RegExp(r"F\d");
+final fNumberPattern = RegExp(r"^F\d+$");
 
 extension Ease on RawKeyEvent {
   int get keyId => logicalKey.keyId;

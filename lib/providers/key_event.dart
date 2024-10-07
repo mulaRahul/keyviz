@@ -335,7 +335,7 @@ class KeyEventProvider extends ChangeNotifier with TrayListener {
       _onMouseButton(event);
     }
     // mouse wheel scrolled
-    else if (event is MouseWheelEvent) {
+    else if (_showMouseEvents && event is MouseWheelEvent) {
       _onMouseWheel(event);
     }
   }
