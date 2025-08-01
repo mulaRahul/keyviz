@@ -1,82 +1,120 @@
 ![keyviz-2.0](previews/banner.svg)
 
-Keyviz，一个免费开源的实时键鼠输入可视化软件，让观众了解你在演示的过程中按下了什么快捷键
+Keyviz, 一个免费开源的实时键鼠输入可视化软件, 让观众了解你在演示过程中按下了哪些快捷键
 
 **简体中文** | [English](./README.md)
 
 # ⌨️ 键盘输入 & 🖱️ 鼠标操作
 
-Keyviz也可以显示鼠标、键盘+鼠标的操作，比如 <kbd>Cmd</kbd> + <kbd>Click</kbd> 或 <kbd>Alt</kbd> + <kbd>Drag</kbd>
+Keyviz 现在也可以显示鼠标操作！不仅是鼠标点击, 还可以显示与键盘组合的鼠标操作, 比如 <kbd>Cmd</kbd> + <kbd>Click</kbd> 或 <kbd>Alt</kbd> + <kbd>Drag</kbd> 等等
 
 ![key-visualizer](previews/visualizer-bar.svg)
 
 # 🎨 个性化
 
-不只有黑与白，Keyviz可以高度自定义按键的显示效果，包括但不限于：预设风格、尺寸、键位图标显示切换（Shift的↑）、辅助键和常规键的颜色、边框
+不仅限于黑白两色, Keyviz 可以高度自定义按键的显示效果, 包括但不限于：预设风格、尺寸、颜色（辅助键和常规键）、边框、图标等
 
 ![settings-window](previews/settings.svg)
 
-强大易用的设置菜单
+强大且易用的设置菜单
 
-- 隐藏常规键，留下组合键，比如只显示 <kbd>Cmd</kbd> + <kbd>K</kbd>**（默认）**
-- 显示位置（区域、距离主显示器边缘的距离）
-- 按键显示的停留时间
-- 按键切入切出的动画
+- 过滤常规键, 只显示快捷键组合, 比如 <kbd>Cmd</kbd> + <kbd>K</kbd> **（默认）**
+- 调整显示位置
+- 设置按键显示的停留时间
+- 切换动画预设, 设置按键显示和消失的动画效果
 
 </br>
 
 # 📥 安装
 
-在 [Github Releases](https://github.com/mulaRahul/keyviz/releases) 下载最新版，根据操作系统安装/解压即用，或者通过下面的包管理器安装
+你可以从 [Github Releases](https://github.com/mulaRahul/keyviz/releases) 页面下载最新版的 Keyviz, 根据操作系统安装或解压即可
+
+或者通过以下包管理器安装
 
 <details>
-  <summary>🥄 Scoop</summary>
-    
+
+  <summary>🪟 Windows</summary>
+
+  ### 👜 Microsoft Store
+  可以直接从 [Microsoft Store](https://apps.microsoft.com/detail/Keyviz/9phzpj643p7l?mode=direct) 下载 Keyviz
+
+  ### 🥄 Scoop
   ```bash
-  scoop bucket add extras # first, add the bucket
+  scoop bucket add extras # 首先添加 bucket
   scoop install keyviz
   ```
 
-</details>
-
-<details>
-  <summary>🪟 Winget</summary>
-    
+  ### 📦 Winget
   ```bash
   winget install mulaRahul.Keyviz
   ```
+
+  </br>
+
+  <details>
+  <summary>提示缺少<code>*.dll</code>?</summary>
+
+  如果运行程序时提示缺少 `.dll` 文件, 可能是缺少 VC++ 运行库，你可以在[这里](https://learn.microsoft.com/zh-cn/cpp/windows/latest-supported-vc-redist?view=msvc-170)下载安装
+
+  </details>
 
 </details>
 
 </br>
 
 <details>
-  <summary>提示缺少<code>*.dll</code>？</summary>
-    
-  如果运行程序弹出了缺少`.dll`文件的错误，大概率是环境缺少了VC++运行库，你可以在[**这里**](https://learn.microsoft.com/zh-cn/cpp/windows/latest-supported-vc-redist?view=msvc-170)下载安装
+
+  <summary>🍎 MacOS</summary>
+
+  ### 🔒 权限
+  
+  Keyviz 需要 **输入监控** 和 **辅助功能** 权限，请在设置中启用：
+  </br>
+  ```
+  设置 > 隐私与安全 > 输入监控/辅助功能
+  ```
+
+  </br>
 
 </details>
+
+</br>
+
+<details>
+
+  <summary>🐧 Linux</summary>
+
+  ### ❗ v2.x.x 需求
+  ```bash
+  sudo apt-get install libayatana-appindicator3-dev
+  ```
+  或
+  ```bash
+  sudo apt-get install appindicator3-0.1 libappindicator3-dev
+  ```
+
+  </br>
+
+</details>
+
 
 </br>
 
 # 🛠️ 构建说明
 
-在进一步开发、编译之前，请确保在系统上安装好了Flutter，可以参照[官方的安装指南](https://docs.flutter.dev/get-started/install)
+在开发/编译之前, 请确保在系统上安装好了 Flutter, 可以参照[官方的安装指南](https://docs.flutter.dev/get-started/install)
 
-安装并设置好Flutter后，克隆仓库或下载zip并解压
+安装并设置好 Flutter 后, 克隆仓库或下载 zip 并解压
 
 ```bash
 mkdir keyviz
+cd keyviz
 git clone https://github.com/mulaRahul/keyviz.git .
 ```
 
-cd到项目文件夹内 开始编译
+进入项目文件夹并开始编译：
 
 ```bash
-cd keyviz
-# 获取依赖
-flutter pub get
-# 编译可执行文件
 flutter build windows
 ```
 
@@ -84,11 +122,4 @@ flutter build windows
 
 # 💖 支持该项目
 
-Keyviz是一个免费项目，唯一的收益来源只有你们的慷慨捐赠，这将有助于我腾出更多的空余时间用于开发Keyviz
-
-</br>
-
-<details>
-  <summary></summary>
-  译于23/7/18，v2.0.0a发布的七天后，有些条目是作者还没改上去的，部分描述其实跟软件本体差挺多的
-</details>
+Keyviz 是一个免费项目, 唯一的收益来源是你们的慷慨捐赠, 这将有助于我腾出更多的时间用于开发 Keyviz
