@@ -95,7 +95,7 @@ class _IconButton extends StatelessWidget {
         fixedSize: Size.square(size),
         backgroundColor: selected
             ? context.colorScheme.secondaryContainer
-            : context.colorScheme.secondaryContainer.withOpacity(0),
+            : context.colorScheme.secondaryContainer.withValues(alpha: 0),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(defaultPadding * .5),
         ),

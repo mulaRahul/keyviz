@@ -12,15 +12,18 @@ import 'app.dart';
 void main() async {
   // ensure flutter plugins are intialized and ready to use
   WidgetsFlutterBinding.ensureInitialized();
-  await Window.initialize();
-  await windowManager.ensureInitialized();
+  await Window.initialize(); // flutter_acrylic
+  await windowManager.ensureInitialized(); // window_manager
+  if (Platform.isMacOS) {
+    await WindowManipulator.initialize(); // macos_window_utils
+  }
 
   if (getListenerBackend() != null) {
     if (!getListenerBackend()!.initialize()) {
-      print("Failed to initialize listener backend");
+      debugPrint("Failed to initialize listener backend");
     }
   } else {
-    print("No listener backend for this platform");
+    debugPrint("No listener backend for this platform");
   }
 
   runApp(const KeyvizApp());
@@ -45,6 +48,7 @@ _initWindow() async {
 
   if (Platform.isMacOS) {
     WindowManipulator.makeWindowFullyTransparent();
+    WindowManipulator.enableFullSizeContentView();
     await WindowManipulator.zoomWindow();
   } else {
     Window.setEffect(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:keyviz/windows/settings/widgets/cross_number_input.dart';
 import 'package:provider/provider.dart';
 
 import 'package:keyviz/config/config.dart';
@@ -80,6 +81,21 @@ class MouseTabView extends StatelessWidget {
                 },
               ),
             ),
+          ),
+        ),
+        const Divider(),
+        PanelItem(
+          title: "Drag Threshold",
+          subtitle:
+              "Minimum distance to show Drag event. Set to a higher value "
+              "to avoid accidental drags.",
+          action: XNumberInput(
+            title: "Drag Threshold",
+            suffix: "px",
+            defaultValue: context.keyEvent.dragThreshold.toInt(),
+            onChanged: (value) {
+              context.keyEvent.dragThreshold = value.toDouble();
+            },
           ),
         ),
         const Divider(),

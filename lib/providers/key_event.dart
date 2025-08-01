@@ -178,8 +178,11 @@ class KeyEventProvider extends ChangeNotifier with TrayListener {
   // mouse visualize clicks
   bool _showMouseClicks = _Defaults.showMouseClicks;
 
-  // mouse visualize clicks
+  // cursor highlight
   bool _highlightCursor = _Defaults.highlightCursor;
+
+  // minimum distance to start dragging
+  double _dragThreshold = 100.0;
 
   // show mouse events with keypress like, [Shift] + [Drag]
   bool _showMouseEvents = _Defaults.showMouseEvents;
@@ -218,6 +221,7 @@ class KeyEventProvider extends ChangeNotifier with TrayListener {
   bool get showMouseClicks => _visualizeEvents ? _showMouseClicks : false;
   bool get highlightCursor => _highlightCursor;
   bool get showMouseEvents => _showMouseEvents;
+  double get dragThreshold => _dragThreshold;
   Offset get cursorOffset => _cursorOffset;
   bool get mouseButtonDown => _mouseButtonDown;
 
@@ -278,6 +282,11 @@ class KeyEventProvider extends ChangeNotifier with TrayListener {
 
   set showMouseEvents(bool value) {
     _showMouseEvents = value;
+    notifyListeners();
+  }
+
+  set dragThreshold(double value) {
+    _dragThreshold = value;
     notifyListeners();
   }
 
@@ -344,7 +353,7 @@ class KeyEventProvider extends ChangeNotifier with TrayListener {
     bool notify = false;
     _cursorOffset = event.offset;
     // animate cursor position when cursor highlighted
-    if (_highlightCursor || _dragging) {
+    if (_highlightCursor || _mouseButtonDown) {
       notify = true;
     }
 
@@ -354,7 +363,7 @@ class KeyEventProvider extends ChangeNotifier with TrayListener {
         : (_firstCursorOffset! - cursorOffset).distance.abs();
 
     // drag started
-    if (dragDistance >= 64 && !_dragging) {
+    if (dragDistance >= _dragThreshold && !_dragging) {
       _dragging = true;
 
       // show mouse events in key visualizer
@@ -887,6 +896,7 @@ class KeyEventProvider extends ChangeNotifier with TrayListener {
         _JsonKeys.keyCapAnimation: _keyCapAnimation.name,
         _JsonKeys.showMouseClicks: _showMouseClicks,
         _JsonKeys.highlightCursor: _highlightCursor,
+        _JsonKeys.dragThreshold: _dragThreshold,
         _JsonKeys.showMouseEvents: _showMouseEvents,
       };
 
@@ -958,6 +968,8 @@ class KeyEventProvider extends ChangeNotifier with TrayListener {
     _highlightCursor =
         data[_JsonKeys.highlightCursor] ?? _Defaults.highlightCursor;
 
+    _dragThreshold = data[_JsonKeys.dragThreshold] ?? _Defaults.dragThreshold;
+
     _showMouseEvents =
         data[_JsonKeys.showMouseEvents] ?? _Defaults.showMouseEvents;
   }
@@ -1015,6 +1027,7 @@ class KeyEventProvider extends ChangeNotifier with TrayListener {
     _showMouseClicks = _Defaults.showMouseClicks;
     _highlightCursor = _Defaults.highlightCursor;
     _showMouseEvents = _Defaults.showMouseEvents;
+    _dragThreshold = _Defaults.dragThreshold;
 
     notifyListeners();
   }
@@ -1039,6 +1052,7 @@ class _JsonKeys {
   static const keyCapAnimation = "keycap_animation";
   static const showMouseClicks = "show_clicks";
   static const highlightCursor = "highlight_cursor";
+  static const dragThreshold = "drag_threshold";
   static const showMouseEvents = "show_mouse_events";
 }
 
@@ -1058,5 +1072,6 @@ class _Defaults {
   static const keyCapAnimation = KeyCapAnimationType.none;
   static const showMouseClicks = true;
   static const highlightCursor = false;
+  static const dragThreshold = 100.0;
   static const showMouseEvents = true;
 }
