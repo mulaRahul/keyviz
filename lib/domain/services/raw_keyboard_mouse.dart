@@ -2,6 +2,7 @@ import 'package:flutter/services.dart';
 
 // key id's for fake mouse events
 const leftClickId = 0x00900000011;
+const middleClickId = 0x00900000015;
 const rightClickId = 0x00900000012;
 const dragId = 0x00900000013;
 const scrollId = 0x00900000014;
@@ -30,6 +31,9 @@ class RawKeyEventDataMouse extends RawKeyEventData {
       case leftClickId:
         return "Left Click";
 
+      case middleClickId:
+        return "Middle Click";
+
       case rightClickId:
         return "Right Click";
 
@@ -50,6 +54,9 @@ class RawKeyEventDataMouse extends RawKeyEventData {
 
   // mouse left button down/up
   const RawKeyEventDataMouse.leftClick() : id = leftClickId;
+
+  // mouse middle button down/up
+  const RawKeyEventDataMouse.middleClick() : id = middleClickId;
 
   // mouse right button down/up
   const RawKeyEventDataMouse.rightClick() : id = rightClickId;

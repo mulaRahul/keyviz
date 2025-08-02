@@ -33,7 +33,7 @@ class _XNumberInputState extends State<XNumberInput> {
 
   @override
   Widget build(BuildContext context) {
-    final textStyle = context.textTheme.labelMedium!.copyWith(
+    final textStyle = context.textTheme.labelSmall!.copyWith(
       fontWeight: FontWeight.w500,
     );
     return Container(
@@ -45,7 +45,7 @@ class _XNumberInputState extends State<XNumberInput> {
       ),
       padding: const EdgeInsets.symmetric(
         horizontal: defaultPadding * .5,
-        vertical: defaultPadding * .2,
+        vertical: defaultPadding * .4,
       ),
       child: SizedBox(
         // height: textStyle.fontSize! * 2,

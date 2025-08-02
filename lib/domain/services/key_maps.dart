@@ -354,6 +354,10 @@ final keymaps = <int, KeyMapData>{
     label: "left click",
     icon: KeyIcons.leftClick,
   ),
+  middleClickId: const KeyMapData(
+    label: "middle click",
+    icon: KeyIcons.middleClick,
+  ),
   rightClickId: const KeyMapData(
     label: "right click",
     // shortLabel: "click",

@@ -65,6 +65,7 @@ class KeyIcons {
   static const numLocked = "$_dir/num-locked.svg";
   // mouse
   static const leftClick = "$_dir/left-click.svg";
+  static const middleClick = "$_dir/middle-click.svg";
   static const rightClick = "$_dir/right-click.svg";
   static const drag = "$_dir/drag.svg";
   static const scroll = "$_dir/scroll.svg";

@@ -13,7 +13,10 @@ dependencies:
     sdk: flutter
 
   # cross-platform HID (Human Input Device) listener
-  hid_listener: ^2.0.1
+  hid_listener:
+    git:
+      url: https://github.com/mulaRahul/hid_listener.git
+      ref: main
 
   window_size:
     git:

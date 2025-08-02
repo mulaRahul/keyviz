@@ -163,10 +163,11 @@ packages:
   hid_listener:
     dependency: "direct main"
     description:
-      name: hid_listener
-      sha256: "056472f6f4df29c9d040948740c71fa7fc346feda2c209b65f628e0749f3adfc"
-      url: "https://pub.dev"
-    source: hosted
+      path: "."
+      ref: main
+      resolved-ref: "5d3fb374573c4c8c1d56f271eecb48e9171156a6"
+      url: "https://github.com/mulaRahul/hid_listener.git"
+    source: git
     version: "2.0.1"
   http:
     dependency: transitive

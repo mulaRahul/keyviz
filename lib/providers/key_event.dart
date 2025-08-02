@@ -368,15 +368,17 @@ class KeyEventProvider extends ChangeNotifier with TrayListener {
 
       // show mouse events in key visualizer
       if (_showMouseEvents) {
-        // remove left/right click event
+        // remove left/middle/right click event
         _keyDown.removeWhere(
           (_, event) =>
               event.logicalKey.keyId == leftClickId ||
+              event.logicalKey.keyId == middleClickId ||
               event.logicalKey.keyId == rightClickId,
         );
         _keyboardEvents[_groupId]?.removeWhere(
           (_, value) =>
               value.rawEvent.logicalKey.keyId == leftClickId ||
+              value.rawEvent.logicalKey.keyId == middleClickId ||
               value.rawEvent.logicalKey.keyId == rightClickId,
         );
 
@@ -394,10 +396,11 @@ class KeyEventProvider extends ChangeNotifier with TrayListener {
 
   _onMouseButton(MouseButtonEvent event) {
     final wasDragging = _dragging;
-    final leftOrRightDown = event.type == MouseButtonEventType.leftButtonDown ||
+    final mouseDown = event.type == MouseButtonEventType.leftButtonDown ||
+        event.type == MouseButtonEventType.middleButtonDown ||
         event.type == MouseButtonEventType.rightButtonDown;
 
-    if (_dragging && leftOrRightDown) {
+    if (_dragging && mouseDown) {
       _dragging = false;
     }
 
@@ -405,7 +408,7 @@ class KeyEventProvider extends ChangeNotifier with TrayListener {
     _cursorOffset = event.offset;
 
     // mouse button down
-    if (leftOrRightDown) {
+    if (mouseDown) {
       _mouseButtonDown = true;
       _firstCursorOffset = event.offset;
 
@@ -462,6 +465,22 @@ class KeyEventProvider extends ChangeNotifier with TrayListener {
           );
           break;
 
+        case MouseButtonEventType.middleButtonDown:
+          _onKeyDown(
+            const RawKeyDownEvent(data: RawKeyEventDataMouse.middleClick()),
+          );
+          break;
+
+        case MouseButtonEventType.middleButtonUp:
+          _onKeyUp(
+            RawKeyUpEvent(
+              data: wasDragging
+                  ? const RawKeyEventDataMouse.drag()
+                  : const RawKeyEventDataMouse.middleClick(),
+            ),
+          );
+          break;
+
         case MouseButtonEventType.rightButtonDown:
           _onKeyDown(
             const RawKeyDownEvent(data: RawKeyEventDataMouse.rightClick()),
@@ -498,7 +517,7 @@ class KeyEventProvider extends ChangeNotifier with TrayListener {
   }
 
   _isScrollStopped(int delta) async {
-    await Future.delayed(const Duration(milliseconds: 1200));
+    await Future.delayed(const Duration(milliseconds: 750));
     // scroll stopped
     if (delta == _wheelDelta) {
       // dispatch key up event
@@ -904,7 +923,7 @@ class KeyEventProvider extends ChangeNotifier with TrayListener {
     final data = await Vault.loadConfigData();
 
     // set preferred display
-    _setDisplay(data?[_JsonKeys.screenFrame]);
+    await _setDisplay(data?[_JsonKeys.screenFrame]);
 
     if (data == null) return;
 

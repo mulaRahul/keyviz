@@ -252,20 +252,19 @@ class _RawColorInputSubPanelItemState extends State<RawColorInputSubPanelItem> {
         const SmallRowGap(),
         SizedBox(
           width: defaultPadding * 5,
-          child: SizedBox(
-            height: textStyle.fontSize!,
-            child: TextField(
-              controller: _ctrl,
-              focusNode: _focusNode,
-              onSubmitted: _onChanged,
-              onTapOutside: _onChanged,
-              style: textStyle,
-              decoration: const InputDecoration.collapsed(hintText: "#hexcode"),
-              textAlign: TextAlign.start,
-              textAlignVertical: TextAlignVertical.bottom,
-              keyboardType: TextInputType.number,
-              inputFormatters: [LengthLimitingTextInputFormatter(7)],
+          child: TextField(
+            controller: _ctrl,
+            focusNode: _focusNode,
+            onSubmitted: _onChanged,
+            onTapOutside: _onChanged,
+            style: textStyle,
+            decoration: const InputDecoration.collapsed(
+              hintText: "#hexcode",
             ),
+            textAlign: TextAlign.start,
+            textAlignVertical: TextAlignVertical.top,
+            keyboardType: TextInputType.number,
+            inputFormatters: [LengthLimitingTextInputFormatter(7)],
           ),
         ),
         const Spacer(),

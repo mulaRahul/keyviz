@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -143,7 +145,9 @@ class _TopBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MouseRegion(
-      cursor: SystemMouseCursors.grab,
+      cursor: Platform.isMacOS
+          ? SystemMouseCursors.grabbing
+          : SystemMouseCursors.move,
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onPanUpdate: onPanUpdate,
@@ -157,10 +161,10 @@ class _TopBar extends StatelessWidget {
               child: Center(
                 child: SizedBox(
                   width: 80,
-                  height: 3,
+                  height: 4,
                   child: DecoratedBox(
                     decoration: BoxDecoration(
-                      color: context.colorScheme.primary.withOpacity(.2),
+                      color: context.colorScheme.primary.withValues(alpha: .2),
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),
@@ -177,7 +181,7 @@ class _TopBar extends StatelessWidget {
                 },
                 child: SvgIcon(
                   icon: VuesaxIcons.cross,
-                  size: defaultPadding * .5,
+                  size: defaultPadding * .75,
                   color: context.colorScheme.primary.withOpacity(.4),
                 ),
               ),
