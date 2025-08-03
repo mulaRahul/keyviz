@@ -84,13 +84,23 @@ Below are the platform specifics options and requirements -
 
   <summary>🐧 Linux</summary>
 
-  ### ❗ v2.x.x Requirements
+  ### v2.x.x Requirements
    ```bash
   sudo apt-get install libayatana-appindicator3-dev
   ```
   or
   ```bash
   sudo apt-get install appindicator3-0.1 libappindicator3-dev
+  ```
+
+  ### Install debian package
+  ```bash
+  sudo apt install ./keyviz.deb
+  ```
+  or
+  ### Install RPM
+  ```bash
+  sudo rpm -i app.rpm
   ```
 
   </br>
