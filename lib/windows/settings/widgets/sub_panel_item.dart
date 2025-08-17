@@ -450,8 +450,8 @@ class _RawGradientInputSubPanelItemState
   late Color _color2;
 
   bool _showPicker = false;
-
   OverlayEntry? _overlayEntry;
+  bool _isDisposed = false;
 
   @override
   void initState() {
@@ -496,9 +496,12 @@ class _RawGradientInputSubPanelItemState
   }
 
   _showOverlay() {
+    if (_isDisposed) return;
     final overlay = Overlay.of(context);
 
-    final renderBox = context.findRenderObject() as RenderBox;
+    final renderBox = context.findRenderObject() as RenderBox?;
+    if (renderBox == null || !renderBox.hasSize) return;
+
     final offset = renderBox.localToGlobal(Offset.zero);
 
     _showPicker = true;
@@ -511,8 +514,8 @@ class _RawGradientInputSubPanelItemState
           child: GradientPicker(
             show: _showPicker,
             title: widget.title,
-            initialColor1: widget.initialColor1,
-            initialColor2: widget.initialColor2,
+            initialColor1: _color1,
+            initialColor2: _color2,
             onClose: _removeOverlay,
             onColor1Changed: _onColor1Changed,
             onColor2Changed: _onColor2Changed,
@@ -525,30 +528,41 @@ class _RawGradientInputSubPanelItemState
   }
 
   _onColor1Changed(Color color) {
-    _color1 = color;
-    widget.onColor1Changed(color);
+    if (_isDisposed) return;
+    setState(() {
+      _color1 = color;
+    });
+    widget.onColor1Changed.call(color);
   }
 
   _onColor2Changed(Color color) {
-    _color2 = color;
-    widget.onColor2Changed(color);
+    if (_isDisposed) return;
+    setState(() {
+      _color2 = color;
+    });
+    widget.onColor2Changed.call(color);
   }
 
-  _removeOverlay() async {
-    // reflect color changes
-    setState(() {});
+  Future<void> _removeOverlay() async {
+    if (_isDisposed || _overlayEntry == null) return;
 
     _showPicker = false;
-    _overlayEntry?.markNeedsBuild();
 
-    await Future.delayed(transitionDuration);
+    // Update state before removing overlay
+    if (mounted) {
+      setState(() {});
+    }
 
+    // Remove overlay immediately without delay
     _overlayEntry?.remove();
     _overlayEntry = null;
   }
 
   @override
   void dispose() {
+    _isDisposed = true;
+    _overlayEntry?.remove();
+    _overlayEntry = null;
     if (_overlayEntry != null) _removeOverlay();
     super.dispose();
   }
