@@ -34,7 +34,7 @@ dependencies:
   path_provider: ^2.1.2
   flutter_animate: ^4.5.2
   flutter_acrylic: ^1.1.4
-  macos_window_utils: ^1.8.4
+  macos_window_utils: ^1.9.0
 
 dev_dependencies:
   flutter_test:
