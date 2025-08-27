@@ -114,7 +114,7 @@ class AboutView extends StatelessWidget {
                           ),
                           IconButton(
                             onPressed: () => launchUrl(
-                              Uri.parse("mailto:rahulmula10@gmail.com"),
+                              Uri.parse("https://mail.google.com/mail/u/0/#inbox?compose=DmwnWtMgBvjfGQMlLgJZwhjKxPxXLmmfCXbkrBKwrtdFgVwmlDQmmNRjhbJdnQzGhwwPMDsdQnLv"),
                             ),
                             tooltip: "Email",
                             icon: const SvgIcon(icon: VuesaxIcons.mail),
