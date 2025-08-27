@@ -14,9 +14,6 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Window.initialize(); // flutter_acrylic
   await windowManager.ensureInitialized(); // window_manager
-  if (Platform.isMacOS) {
-    await WindowManipulator.initialize(); // macos_window_utils
-  }
 
   if (getListenerBackend() != null) {
     if (!getListenerBackend()!.initialize()) {
