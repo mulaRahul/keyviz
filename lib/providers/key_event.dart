@@ -890,7 +890,11 @@ class KeyEventProvider extends ChangeNotifier with TrayListener {
         break;
 
       case "quit":
-        windowManager.close();
+        try {
+          await trayManager.destroy();
+        } catch (_) {}
+        // Ensure the application terminates on all desktop platforms
+        exit(0);
         break;
     }
   }
