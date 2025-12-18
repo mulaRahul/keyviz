@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import "./App.css";
 
@@ -31,16 +30,11 @@ interface DisplayedEvent {
 
 function App() {
   const [events, setEvents] = useState<DisplayedEvent[]>([]);
-  const [isListening, setIsListening] = useState(false);
 
   useEffect(() => {
-    if (!isListening) return;
-
     const unlisten = listen<HidEvent>("hid-event", (event) => {
       const payload = event.payload;
       let display: string;
-
-      console.log("Received event:", payload);
 
       if (payload.type === "Keyboard") {
         display = `Key ${payload.key_name} was ${payload.event_type} (vk: ${payload.vk_code})`;
@@ -65,22 +59,10 @@ function App() {
     return () => {
       unlisten.then((fn) => fn());
     };
-  }, [isListening]);
-
-  const startListening = async () => {
-    try {
-      await invoke("start_listener");
-      setIsListening(true);
-    } catch (error) {
-      console.error("Failed to start listener:", error);
-    }
-  };
+  }, []);
 
   return (
     <div className="app">
-      {
-        !isListening && <button onClick={startListening}>Start</button>
-      }
       {events.map((event) => (
         <div key={event.id} className="label">
           {event.display}
