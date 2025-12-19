@@ -1,75 +1,28 @@
-import { useState, useEffect } from "react";
 import { listen } from "@tauri-apps/api/event";
 import "./App.css";
-
-interface KeyboardEvent {
-  type: "Keyboard";
-  event_type: "keydown" | "keyup";
-  key_name: string;
-  vk_code: number;
-  modifiers: string[];
-}
-
-interface MouseEvent {
-  type: "Mouse";
-  event_type: string;
-  x: number;
-  y: number;
-  modifiers: string[];
-}
-
-type HidEvent = KeyboardEvent | MouseEvent;
-
-interface DisplayedEvent {
-  id: number;
-  display: string;
-  eventType: string;
-  isMouseEvent: boolean;
-  timestamp: number;
-}
+import { Overlay } from "./components/overlay";
+import { useEffect } from "react";
+import { HidEvent, useHidStore } from "./hooks/store";
+import { getCurrentWindow } from "@tauri-apps/api/window";
 
 function App() {
-  const [events, setEvents] = useState<DisplayedEvent[]>([]);
+  const onEvent = useHidStore((state) => state.onEvent);
 
+  
   useEffect(() => {
-    const unlisten = listen<HidEvent>("hid-event", (event) => {
-      const payload = event.payload;
-      let display: string;
+    getCurrentWindow().setDecorations(false);
+    // getCurrentWindow().setFullscreen(true);
+    // getCurrentWindow().setIgnoreCursorEvents(true);
 
-      if (payload.type === "Keyboard") {
-        display = `Key ${payload.key_name} was ${payload.event_type} (vk: ${payload.vk_code})`;
-      } else {
-        display = `Mouse event: ${payload.event_type} at (${payload.x}, ${payload.y})`;
-      }
-      const newEvent: DisplayedEvent = {
-        id: Date.now() + Math.random(),
-        display,
-        eventType: payload.event_type,
-        isMouseEvent: payload.type === "Mouse",
-        timestamp: Date.now(),
-      };
-      setEvents((prev) => [...prev.slice(-8), newEvent]);
-
-      // Remove after animation
-      setTimeout(() => {
-        setEvents((prev) => prev.filter((e) => e.id !== newEvent.id));
-      }, 2000);
+    const unlisten = listen("hid-event", (event) => {
+      onEvent(event.payload as HidEvent);
     });
-
     return () => {
-      unlisten.then((fn) => fn());
+      unlisten.then((f) => f());
     };
-  }, []);
+  }, [onEvent]);
 
-  return (
-    <div className="app">
-      {events.map((event) => (
-        <div key={event.id} className="label">
-          {event.display}
-        </div>
-      ))}
-    </div>
-  );
+  return <Overlay />;
 }
 
 export default App;

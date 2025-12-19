@@ -1,87 +1,58 @@
 //! Windows-specific keyboard and mouse listener using low-level hooks.
-//! Uses LowLevelKeyboardProc and LowLevelMouseProc via SetWindowsHookExW.
+//! Provides start/stop control via posting WM_QUIT to the hook thread.
 
-use serde::{Deserialize, Serialize};
+use crate::domain::event::{KeyEventType, KeyboardEvent, Modifiers, MouseEvent, MouseEventType};
 use std::sync::mpsc::{self, Sender};
-use std::sync::OnceLock;
-use std::thread;
-
+use std::sync::{OnceLock, RwLock};
+use std::thread::{self, JoinHandle};
 use windows_sys::Win32::Foundation::{LPARAM, LRESULT, WPARAM};
+use windows_sys::Win32::System::Threading::GetCurrentThreadId;
 use windows_sys::Win32::UI::Input::KeyboardAndMouse::{
     GetKeyState, VIRTUAL_KEY, VK_CAPITAL, VK_CONTROL, VK_LCONTROL, VK_LMENU, VK_LSHIFT, VK_LWIN,
     VK_MENU, VK_NUMLOCK, VK_RCONTROL, VK_RMENU, VK_RSHIFT, VK_RWIN, VK_SCROLL, VK_SHIFT,
 };
 use windows_sys::Win32::UI::WindowsAndMessaging::{
-    CallNextHookEx, DispatchMessageW, GetMessageW, SetWindowsHookExW, TranslateMessage,
-    UnhookWindowsHookEx, HC_ACTION, HHOOK, KBDLLHOOKSTRUCT, MSLLHOOKSTRUCT, MSG, WH_KEYBOARD_LL,
-    WH_MOUSE_LL, WM_KEYDOWN, WM_KEYUP, WM_LBUTTONDOWN, WM_LBUTTONUP, WM_MBUTTONDOWN, WM_MBUTTONUP,
-    WM_MOUSEMOVE, WM_MOUSEWHEEL, WM_RBUTTONDOWN, WM_RBUTTONUP, WM_SYSKEYDOWN, WM_SYSKEYUP,
-    WM_XBUTTONDOWN, WM_XBUTTONUP,
+    CallNextHookEx, DispatchMessageW, GetMessageW, PostThreadMessageW, SetWindowsHookExW,
+    TranslateMessage, UnhookWindowsHookEx, HC_ACTION, HHOOK, KBDLLHOOKSTRUCT, MSLLHOOKSTRUCT, MSG,
+    WH_KEYBOARD_LL, WH_MOUSE_LL, WM_KEYDOWN, WM_KEYUP, WM_LBUTTONDOWN, WM_LBUTTONUP, WM_MBUTTONDOWN,
+    WM_MBUTTONUP, WM_MOUSEMOVE, WM_MOUSEWHEEL, WM_QUIT, WM_RBUTTONDOWN, WM_RBUTTONUP, WM_SYSKEYDOWN,
+    WM_SYSKEYUP, WM_XBUTTONDOWN, WM_XBUTTONUP,
 };
 
-// Global sender for keyboard events
-static KEYBOARD_SENDER: OnceLock<Sender<KeyboardEvent>> = OnceLock::new();
-// Global sender for mouse events
-static MOUSE_SENDER: OnceLock<Sender<MouseEvent>> = OnceLock::new();
-// Store hook handles for cleanup
+static KEYBOARD_SENDER: OnceLock<RwLock<Option<Sender<KeyboardEvent>>>> = OnceLock::new();
+static MOUSE_SENDER: OnceLock<RwLock<Option<Sender<MouseEvent>>>> = OnceLock::new();
 static mut KEYBOARD_HOOK: HHOOK = std::ptr::null_mut();
 static mut MOUSE_HOOK: HHOOK = std::ptr::null_mut();
 
-/// Keyboard event types
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
-pub enum KeyEventType {
-    KeyDown,
-    KeyUp,
+pub struct HidListenerHandles {
+    pub kb_rx: mpsc::Receiver<KeyboardEvent>,
+    pub mouse_rx: mpsc::Receiver<MouseEvent>,
+    pub thread_id: u32,
+    pub thread: JoinHandle<()>,
 }
 
-/// Mouse event types
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
-pub enum MouseEventType {
-    LeftButtonDown,
-    LeftButtonUp,
-    RightButtonDown,
-    RightButtonUp,
-    MiddleButtonDown,
-    MiddleButtonUp,
-    XButtonDown,
-    XButtonUp,
-    MouseMove,
-    MouseWheel,
+fn set_senders(kb_tx: Sender<KeyboardEvent>, mouse_tx: Sender<MouseEvent>) {
+    KEYBOARD_SENDER
+        .get_or_init(|| RwLock::new(None))
+        .write()
+        .expect("lock poisoned")
+        .replace(kb_tx);
+    MOUSE_SENDER
+        .get_or_init(|| RwLock::new(None))
+        .write()
+        .expect("lock poisoned")
+        .replace(mouse_tx);
 }
 
-/// Modifier key states
-#[derive(Debug, Clone, Serialize, Deserialize, Default)]
-pub struct Modifiers {
-    pub ctrl: bool,
-    pub shift: bool,
-    pub alt: bool,
-    pub meta: bool,
-    pub caps_lock: bool,
-    pub num_lock: bool,
-    pub scroll_lock: bool,
+fn clear_senders() {
+    if let Some(lock) = KEYBOARD_SENDER.get() {
+        let _ = lock.write().map(|mut guard| guard.take());
+    }
+    if let Some(lock) = MOUSE_SENDER.get() {
+        let _ = lock.write().map(|mut guard| guard.take());
+    }
 }
 
-/// Keyboard event data
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct KeyboardEvent {
-    pub event_type: KeyEventType,
-    pub vk_code: u32,
-    pub scan_code: u32,
-    pub key_name: String,
-    pub modifiers: Modifiers,
-}
-
-/// Mouse event data
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct MouseEvent {
-    pub event_type: MouseEventType,
-    pub x: i32,
-    pub y: i32,
-    pub wheel_delta: i16,
-    pub modifiers: Modifiers,
-}
-
-/// Get current modifier key states
 fn get_modifiers() -> Modifiers {
     unsafe {
         Modifiers {
@@ -97,7 +68,6 @@ fn get_modifiers() -> Modifiers {
     }
 }
 
-/// Convert virtual key code to readable key name
 fn vk_to_key_name(vk_code: u32) -> String {
     match vk_code as VIRTUAL_KEY {
         0x08 => "Backspace".to_string(),
@@ -121,32 +91,25 @@ fn vk_to_key_name(vk_code: u32) -> String {
         0x2C => "PrtSc".to_string(),
         0x2D => "Insert".to_string(),
         0x2E => "Delete".to_string(),
-        // Numbers 0-9 (use chars so we don't emit decimal values like "48")
         0x30..=0x39 => char::from((vk_code - 0x30) as u8 + b'0').to_string(),
-        // Letters A-Z
         0x41..=0x5A => char::from((vk_code - 0x41) as u8 + b'A').to_string(),
-        // Left/Right Win keys
         0x5B => "Win".to_string(),
         0x5C => "Win".to_string(),
-        // Numpad 0-9
         0x60..=0x69 => format!("Num{}", vk_code - 0x60),
         0x6A => "*".to_string(),
         0x6B => "+".to_string(),
         0x6D => "-".to_string(),
         0x6E => ".".to_string(),
         0x6F => "/".to_string(),
-        // Function keys F1-F12
         0x70..=0x7B => format!("F{}", vk_code - 0x70 + 1),
         0x90 => "NumLock".to_string(),
         0x91 => "ScrollLock".to_string(),
-        // Shift, Ctrl, Alt variants
         VK_LSHIFT => "LShift".to_string(),
         VK_RSHIFT => "RShift".to_string(),
         VK_LCONTROL => "LCtrl".to_string(),
         VK_RCONTROL => "RCtrl".to_string(),
         VK_LMENU => "LAlt".to_string(),
         VK_RMENU => "RAlt".to_string(),
-        // OEM keys
         0xBA => ";".to_string(),
         0xBB => "=".to_string(),
         0xBC => ",".to_string(),
@@ -162,7 +125,6 @@ fn vk_to_key_name(vk_code: u32) -> String {
     }
 }
 
-/// Low-level keyboard hook callback
 unsafe extern "system" fn keyboard_proc(n_code: i32, w_param: WPARAM, l_param: LPARAM) -> LRESULT {
     if n_code == HC_ACTION as i32 {
         let kb_struct = &*(l_param as *const KBDLLHOOKSTRUCT);
@@ -181,15 +143,18 @@ unsafe extern "system" fn keyboard_proc(n_code: i32, w_param: WPARAM, l_param: L
             modifiers: get_modifiers(),
         };
 
-        if let Some(sender) = KEYBOARD_SENDER.get() {
-            let _ = sender.send(event);
+        if let Some(lock) = KEYBOARD_SENDER.get() {
+            if let Ok(guard) = lock.read() {
+                if let Some(tx) = guard.as_ref() {
+                    let _ = tx.send(event);
+                }
+            }
         }
     }
 
     CallNextHookEx(KEYBOARD_HOOK, n_code, w_param, l_param)
 }
 
-/// Low-level mouse hook callback
 unsafe extern "system" fn mouse_proc(n_code: i32, w_param: WPARAM, l_param: LPARAM) -> LRESULT {
     if n_code == HC_ACTION as i32 {
         let mouse_struct = &*(l_param as *const MSLLHOOKSTRUCT);
@@ -222,52 +187,77 @@ unsafe extern "system" fn mouse_proc(n_code: i32, w_param: WPARAM, l_param: LPAR
             modifiers: get_modifiers(),
         };
 
-        if let Some(sender) = MOUSE_SENDER.get() {
-            let _ = sender.send(event);
+        if let Some(lock) = MOUSE_SENDER.get() {
+            if let Ok(guard) = lock.read() {
+                if let Some(tx) = guard.as_ref() {
+                    let _ = tx.send(event);
+                }
+            }
         }
     }
 
     CallNextHookEx(MOUSE_HOOK, n_code, w_param, l_param)
 }
 
-/// Start the keyboard and mouse listener
-/// Returns receivers for keyboard and mouse events
-pub fn start_listener() -> (mpsc::Receiver<KeyboardEvent>, mpsc::Receiver<MouseEvent>) {
+pub fn start_listener() -> Result<HidListenerHandles, String> {
     let (kb_tx, kb_rx) = mpsc::channel::<KeyboardEvent>();
     let (mouse_tx, mouse_rx) = mpsc::channel::<MouseEvent>();
+    let (tid_tx, tid_rx) = mpsc::channel::<u32>();
 
-    let _ = KEYBOARD_SENDER.set(kb_tx);
-    let _ = MOUSE_SENDER.set(mouse_tx);
+    set_senders(kb_tx, mouse_tx);
 
-    // Start the message loop in a separate thread
-    thread::spawn(|| unsafe {
-        // Install keyboard hook
+    let thread = thread::spawn(move || unsafe {
+        let thread_id = GetCurrentThreadId();
+        let _ = tid_tx.send(thread_id);
+
         KEYBOARD_HOOK = SetWindowsHookExW(WH_KEYBOARD_LL, Some(keyboard_proc), std::ptr::null_mut(), 0);
         if KEYBOARD_HOOK.is_null() {
             eprintln!("Failed to install keyboard hook");
         }
 
-        // Install mouse hook
         MOUSE_HOOK = SetWindowsHookExW(WH_MOUSE_LL, Some(mouse_proc), std::ptr::null_mut(), 0);
         if MOUSE_HOOK.is_null() {
             eprintln!("Failed to install mouse hook");
         }
 
-        // Message loop - required for hooks to work
         let mut msg: MSG = std::mem::zeroed();
         while GetMessageW(&mut msg, std::ptr::null_mut(), 0, 0) > 0 {
             TranslateMessage(&msg);
             DispatchMessageW(&msg);
         }
 
-        // Cleanup hooks when message loop ends
         if !KEYBOARD_HOOK.is_null() {
             UnhookWindowsHookEx(KEYBOARD_HOOK);
+            KEYBOARD_HOOK = std::ptr::null_mut();
         }
         if !MOUSE_HOOK.is_null() {
             UnhookWindowsHookEx(MOUSE_HOOK);
+            MOUSE_HOOK = std::ptr::null_mut();
         }
+
+        clear_senders();
     });
 
-    (kb_rx, mouse_rx)
+    let thread_id = tid_rx.recv().unwrap_or(0);
+    if thread_id == 0 {
+        return Err("failed to start listener thread".into());
+    }
+
+    Ok(HidListenerHandles {
+        kb_rx,
+        mouse_rx,
+        thread_id,
+        thread,
+    })
+}
+
+pub fn stop_listener(thread_id: u32) -> Result<(), String> {
+    if thread_id == 0 {
+        return Ok(());
+    }
+    let posted = unsafe { PostThreadMessageW(thread_id, WM_QUIT, 0, 0) };
+    if posted == 0 {
+        return Err("failed to stop listener thread".into());
+    }
+    Ok(())
 }

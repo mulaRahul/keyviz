@@ -19,10 +19,9 @@
         "decorations": false,
         "shadow": false,
         "alwaysOnTop": true,
-        "resizable": true,
-        "titleBarStyle": "Overlay",
-        "hiddenTitle": true,
-        "skipTaskbar": true
+        "resizable": false,
+        "skipTaskbar": true,
+        "titleBarStyle": "Transparent"
       }
     ],
     "security": {
