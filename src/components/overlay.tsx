@@ -1,17 +1,12 @@
-import { useHidStore } from "../hooks/store";
-import { AnimatePresence } from "framer-motion";
-import { KeyCap } from "./keycap";
+import { useKeyEvent } from "../stores/key_event";
 
-export function Overlay() {
-  const events = useHidStore((s) => s.events);
+export const Overlay = () => {
+    const { pressedKeys, pressedMouseButton, mouse } = useKeyEvent();
 
-  return (
-    <div className="overlay">
-      <AnimatePresence>
-        {events.map((e) => (
-          <KeyCap key={e.id} event={e} />
-        ))}
-      </AnimatePresence>
-    </div>
-  );
+    return <div>
+        <div>Pressed Keys: {[...pressedKeys].join(" + ")}</div>
+        <div>Pressed Mouse Button: {pressedMouseButton ?? "None"}</div>
+        <div>Mouse Position: ({mouse.x}, {mouse.y})</div>
+        <div>Mouse Wheel Delta: {mouse.wheel}</div>
+    </div>;
 }

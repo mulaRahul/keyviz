@@ -1,28 +1,29 @@
-import { listen } from "@tauri-apps/api/event";
 import "./App.css";
+
+import { listen } from "@tauri-apps/api/event";
+import { useEffect, } from "react";
+import { useKeyEvent } from "./stores/key_event";
+import { EventPayload } from "./types/event";
 import { Overlay } from "./components/overlay";
-import { useEffect } from "react";
-import { HidEvent, useHidStore } from "./hooks/store";
-import { getCurrentWindow } from "@tauri-apps/api/window";
 
 function App() {
-  const onEvent = useHidStore((state) => state.onEvent);
+  const onEvent = useKeyEvent((state) => state.onEvent);
 
-  
   useEffect(() => {
-    getCurrentWindow().setDecorations(false);
-    // getCurrentWindow().setFullscreen(true);
-    // getCurrentWindow().setIgnoreCursorEvents(true);
-
-    const unlisten = listen("hid-event", (event) => {
-      onEvent(event.payload as HidEvent);
-    });
+    const unsubscribe = listen<EventPayload>(
+      "input-event",
+      (event) => onEvent(event.payload)
+    );
     return () => {
-      unlisten.then((f) => f());
+      unsubscribe.then(f => f());
     };
-  }, [onEvent]);
+  }, []);
 
-  return <Overlay />;
+  return (
+    <>
+      <Overlay />
+    </>
+  );
 }
 
 export default App;

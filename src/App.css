@@ -1,20 +1,15 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+:root {
+  font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 400;
 
-.overlay {
-  width: 100vw;
-  height: 100vh;
-  display: flex;
-  overflow: hidden;
-}
+  background-color: #0f0f0f;
+  color: #f6f6f6;
 
-.keycap {
-  height: fit-content;
-  font-size: 1.25rem;
-  padding: 0.5rem 1rem;
-  color: black;
-  background-color: white;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
 }
