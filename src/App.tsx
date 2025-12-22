@@ -8,13 +8,16 @@ import { Overlay } from "./components/overlay";
 
 function App() {
   const onEvent = useKeyEvent((state) => state.onEvent);
+  const tick = useKeyEvent((state) => state.tick);
 
   useEffect(() => {
     const unsubscribe = listen<EventPayload>(
       "input-event",
       (event) => onEvent(event.payload)
     );
+    const intervalId = setInterval(tick, 250);
     return () => {
+      clearInterval(intervalId);
       unsubscribe.then(f => f());
     };
   }, []);

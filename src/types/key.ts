@@ -1,11 +1,13 @@
-export interface KeyGroup {
-    id: string;
-    keys: Key[];
-}
-
-export interface Key {
+export class Key {
     name: string;
-    count: number;
+    pressedCount: number;
+    lastPressedAt: number;
+
+    constructor(name: string) {
+        this.name = name;
+        this.pressedCount = 0;
+        this.lastPressedAt = Date.now();
+    }
 }
 
 const MODIFIERS = [
