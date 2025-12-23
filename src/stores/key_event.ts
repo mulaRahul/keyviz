@@ -1,7 +1,12 @@
 import { create } from "zustand";
 import { EventPayload, KeyEvent, MouseButton, MouseButtonEvent, MouseMoveEvent, MouseWheelEvent } from "../types/event";
 import { Key } from "../types/key";
+import { invoke } from "@tauri-apps/api/core";
 
+
+function log(message: string) {
+    invoke("log", { message });
+}
 
 export interface KeyEventStore {
     // ───────────── physical state ─────────────
@@ -79,18 +84,24 @@ export const useKeyEvent = create<KeyEventStore>((set, get) => ({
 
         // 2. check if pressed again
         const existingKey = groupIndex >= 0 ? state.groups[groupIndex].find(k => k.name === key.name) : undefined;
-        if (existingKey !== undefined) {
-            // increment pressed count and update timestamp
-            existingKey.pressedCount += 1;
-            existingKey.lastPressedAt = key.lastPressedAt;
-            // replace mode
-            if (!state.showEventHistory) {
+        if (existingKey) {
+            
+            // handle pressedKeys.size > 1
+
+            if (
                 // replace group with only this key
-                state.groups[groupIndex] = [key];
+                !state.showEventHistory ||
+                // history mode, last group has only this key
+                state.groups[groupIndex].length === 1
+            ) {
+                // increment pressed count and update timestamp
+                existingKey.pressedCount += 1;
+                existingKey.lastPressedAt = key.lastPressedAt;
+                state.groups[groupIndex] = [existingKey];
             }
-            // history mode, last group has only this key
-            else if (state.groups[groupIndex].length === 1) {
-                state.groups[groupIndex].push(existingKey);
+            else {
+                // history mode, add new group
+                state.groups.push([key]);
             }
         }
         // 3. add to group

@@ -13,3 +13,20 @@
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
 }
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.keygroup {
+  width: fit-content;
+  display: flex;
+  gap: 5px;
+}
+
+.keycap {
+  font-size: 20px;
+  font-weight: 500;
+}

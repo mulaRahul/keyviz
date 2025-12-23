@@ -5,7 +5,7 @@ export class Key {
 
     constructor(name: string) {
         this.name = name;
-        this.pressedCount = 0;
+        this.pressedCount = 1;
         this.lastPressedAt = Date.now();
     }
 }
