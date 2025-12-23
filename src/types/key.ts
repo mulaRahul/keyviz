@@ -8,6 +8,15 @@ export class Key {
         this.pressedCount = 1;
         this.lastPressedAt = Date.now();
     }
+
+    press() {
+        this.pressedCount += 1;
+        this.lastPressedAt = Date.now();
+    }
+
+    in(set: Set<string>): boolean {
+        return set.has(this.name);
+    }
 }
 
 const MODIFIERS = [

@@ -18,6 +18,7 @@ export interface KeyEventStore {
     // ───────────── config ─────────────
     lingerDurationMs: number;
     showEventHistory: boolean;
+    maxGroups: number;
     // ───────────── actions ─────────────
     onEvent(event: EventPayload): void;
     onKeyPress(event: KeyEvent): void;
@@ -35,8 +36,9 @@ export const useKeyEvent = create<KeyEventStore>((set, get) => ({
     pressedMouseButton: null,
     mouse: { x: 0, y: 0, wheel: 0 },
     groups: [],
-    lingerDurationMs: 3000,
-    showEventHistory: false,
+    lingerDurationMs: 6_000,
+    showEventHistory: true,
+    maxGroups: 5,
     onEvent(event: EventPayload) {
         const state = get();
         switch (event.type) {
@@ -67,58 +69,80 @@ export const useKeyEvent = create<KeyEventStore>((set, get) => ({
     },
     onKeyPress(event: KeyEvent) {
         const state = get();
+        let groups = [...state.groups];
+        let pressedKeys = new Set(state.pressedKeys);
 
         // 0. track pyhsical state
-        if (state.pressedKeys.has(event.name)) {
+        if (pressedKeys.has(event.name)) {
+            // ignore repeat events
             return;
         }
-        state.pressedKeys.add(event.name);
+        pressedKeys.add(event.name);
 
         // 1. filter event
         if (event.name === "Unknown") {
+            // update pressed keys only
+            set({ pressedKeys });
             return;
         }
 
         const key = new Key(event.name);
-        const groupIndex = state.groups.length - 1;
+        const last = groups.length - 1;
 
         // 2. check if pressed again
-        const existingKey = groupIndex >= 0 ? state.groups[groupIndex].find(k => k.name === key.name) : undefined;
+        const existingKey = last >= 0 ? groups[last].find(gKey => gKey.name === key.name) : undefined;
         if (existingKey) {
-            
-            // handle pressedKeys.size > 1
-
-            if (
-                // replace group with only this key
-                !state.showEventHistory ||
-                // history mode, last group has only this key
-                state.groups[groupIndex].length === 1
-            ) {
-                // increment pressed count and update timestamp
-                existingKey.pressedCount += 1;
-                existingKey.lastPressedAt = key.lastPressedAt;
-                state.groups[groupIndex] = [existingKey];
+            // history mode, add new group
+            if (state.showEventHistory && groups[last].length > 1) {
+                const group = groups[last].filter(gKey => gKey.in(pressedKeys));
+                groups.push(group); // todo: ensure max history
             }
+            // replace mode, only currently pressed keys
+            // or
+            // history mode, last group has only this key
             else {
-                // history mode, add new group
-                state.groups.push([key]);
+                let group = <Key[]>[];
+
+                groups[last].forEach(gKey => {
+                    if (gKey.name === key.name) {
+                        existingKey.press();
+                        group.push(existingKey);
+                    } else if (gKey.in(pressedKeys)) {
+                        group.push(gKey);
+                    }
+                });
+
+                groups[last] = group;
             }
         }
         // 3. add to group
         else {
-            // check if need to create new group
-            if (state.pressedKeys.size === 1 || groupIndex < 0) {
+            // add new group
+            if (pressedKeys.size === 1 || last < 0) {
                 if (state.showEventHistory) {
-                    state.groups.push([key]);
+                    groups.push([key]);
                 } else {
-                    state.groups = [[key]];
+                    groups = [[key]];
                 }
-            } else {
-                state.groups[groupIndex].push(key);
+            }
+            // key combination
+            else {
+                if (state.showEventHistory && groups[last].some(gKey => !gKey.in(pressedKeys))) {
+                    // history mode, partial combination, add new group
+                    const group = groups[last].filter(gKey => gKey.in(pressedKeys));
+                    group.push(key);
+                    groups.push(group);
+                } else {
+                    groups[last].push(key);
+                }
             }
         }
+        // ensure max history
+        if (state.showEventHistory && groups.length > state.maxGroups) {
+            groups = groups.slice(groups.length - state.maxGroups);
+        }
 
-        set({ pressedKeys: state.pressedKeys, groups: state.groups });
+        set({ pressedKeys, groups });
         // Old logic:
         // 1. hotkey filter
         // 2. filter unknown
