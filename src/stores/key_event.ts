@@ -1,14 +1,16 @@
-import { invoke } from "@tauri-apps/api/core";
 import { create } from "zustand";
 import { EventPayload, KeyEvent, MouseButton, MouseButtonEvent, MouseMoveEvent, MouseWheelEvent } from "../types/event";
 import { Key } from "../types/key";
 
-
-function log(message: string) {
-    invoke("log", { message });
-}
-
 const SCROLL_LINGER_MS = 300;
+const MODIFIERS = new Set([
+    "Shift",
+    "Ctrl",
+    "Alt",
+    "Meta",
+    "Fn",
+]);
+
 
 export interface MouseState {
     x: number;
@@ -19,21 +21,25 @@ export interface MouseState {
     dragging: boolean;
 }
 
+
 export interface KeyEventStore {
     // ───────────── physical state ─────────────
-    pressedKeys: Set<string>;
+    pressedKeys: string[];
     pressedMouseButton: MouseButton | null;
     mouse: MouseState;
     // ───────────── visual state ─────────────
     groups: Key[][];
     // ───────────── config ─────────────
-    lingerDurationMs: number;
-    showEventHistory: boolean;
-    maxGroups: number;
     dragThresholdPx: number;
+    filterHotkeys: boolean;
+    ignoreModifiers: Set<string>;
+    showEventHistory: boolean;
+    maxHistory: number;
+    lingerDurationMs: number;
     // ───────────── actions ─────────────
     onEvent(event: EventPayload): void;
     onKeyPress(event: KeyEvent): void;
+    isHotkey(event: KeyEvent, pressedKeys: string[]): boolean;
     onKeyRelease(event: KeyEvent): void;
     onMouseMove(event: MouseMoveEvent): void;
     onMouseButtonPress(event: MouseButtonEvent): void;
@@ -44,14 +50,16 @@ export interface KeyEventStore {
 
 
 export const useKeyEvent = create<KeyEventStore>((set, get) => ({
-    pressedKeys: new Set<string>(),
+    pressedKeys: <string[]>[],
     pressedMouseButton: null,
     mouse: { x: 0, y: 0, wheel: 0, dragging: false },
     groups: [],
-    lingerDurationMs: 5_000,
-    showEventHistory: true,
-    maxGroups: 5,
     dragThresholdPx: 50,
+    filterHotkeys: true,
+    ignoreModifiers: new Set<string>([ "Shift" ]),
+    showEventHistory: true,
+    maxHistory: 5,
+    lingerDurationMs: 5_000,
     onEvent(event: EventPayload) {
         const state = get();
         switch (event.type) {
@@ -82,25 +90,23 @@ export const useKeyEvent = create<KeyEventStore>((set, get) => ({
     },
     onKeyPress(event: KeyEvent) {
         const state = get();
-        let groups = [...state.groups];
-        let pressedKeys = new Set(state.pressedKeys);
-
         // 0. track pyhsical state
-        if (pressedKeys.has(event.name)) {
+        const pressedKeys = [...state.pressedKeys];
+        if (pressedKeys.includes(event.name)) {
             // ignore repeat events
             return;
         }
-        pressedKeys.add(event.name);
+        pressedKeys.push(event.name);
 
         // 1. filter event
-        if (event.name === "Unknown") {
-            // update pressed keys only
+        if (state.filterHotkeys && !state.isHotkey(event, pressedKeys)) {
             set({ pressedKeys });
             return;
         }
 
-        const key = new Key(event.name);
+        let groups = [...state.groups];
         const last = groups.length - 1;
+        const key = new Key(event.name);
 
         // 2. check if pressed again
         const existingKey = last >= 0 ? groups[last].find(gKey => gKey.name === key.name) : undefined;
@@ -108,30 +114,29 @@ export const useKeyEvent = create<KeyEventStore>((set, get) => ({
             // history mode, add new group
             if (state.showEventHistory && groups[last].length > 1) {
                 const group = groups[last].filter(gKey => gKey.in(pressedKeys));
-                groups.push(group); // todo: ensure max history
+                groups.push(group);
             }
             // replace mode, only currently pressed keys
             // or
             // history mode, last group has only this key
             else {
                 let group = <Key[]>[];
-
                 groups[last].forEach(gKey => {
                     if (gKey.name === key.name) {
+                        // update existing key's pressed count and time
                         existingKey.press();
                         group.push(existingKey);
                     } else if (gKey.in(pressedKeys)) {
                         group.push(gKey);
                     }
                 });
-
                 groups[last] = group;
             }
         }
         // 3. add to group
         else {
             // add new group
-            if (pressedKeys.size === 1 || last < 0) {
+            if (pressedKeys.length === 1 || last < 0) {
                 if (state.showEventHistory) {
                     groups.push([key]);
                 } else {
@@ -151,114 +156,118 @@ export const useKeyEvent = create<KeyEventStore>((set, get) => ({
             }
         }
         // ensure max history
-        if (state.showEventHistory && groups.length > state.maxGroups) {
-            groups = groups.slice(groups.length - state.maxGroups);
+        if (state.showEventHistory && groups.length > state.maxHistory) {
+            groups = groups.slice(groups.length - state.maxHistory);
         }
 
         set({ pressedKeys, groups });
-        // Old logic:
-        // 1. hotkey filter
-        // 2. filter unknown
-        // 3. key pressed again
-        // └─| show history
-        //   ├─ yes - update key, remove all but this, return
-        //   └─ no - update key, if last group has only this, return
-        // 4. find group index
-        // 5. show history
-        // ├─ yes - ensure max history
-        // └─ no - remove all if this is only in pressed
-        // 6. add key to group
+    },
+    isHotkey(event, pressedKeys) {
+        const state = get();
+        if (pressedKeys.length === 1) {
+            // only modifier keys
+            return MODIFIERS.has(event.name) && !state.ignoreModifiers.has(event.name);
+        } else {
+            // combination starts with modifier
+            return MODIFIERS.has(pressedKeys[0]) && !state.ignoreModifiers.has(pressedKeys[0]);
+        }
     },
     onKeyRelease(event: KeyEvent) {
         const state = get();
-
         // track physical state
-        state.pressedKeys.delete(event.name);
+        const pressedKeys = state.pressedKeys.filter(keyName => keyName !== event.name);
 
-        // todo: update last pressed time
-        // find key in last group
-        // const groupIndex = state.groups.length - 1;
-        // const key = groupIndex >= 0 ? state.groups[groupIndex].find(k => k.name === event.name) : undefined;
-
-        // if (key !== undefined) {
-        //     key.lastPressedAt = Date.now();
-        //     state.groups[groupIndex].push(key);
-        // }
-
-        set({ pressedKeys: state.pressedKeys, groups: state.groups });
+        // update last pressed time
+        const groups = [...state.groups];
+        const last = groups.length - 1;
+        
+        const kIndex = last >= 0 ? groups[last].findIndex(key => key.name === event.name) : undefined;
+        if (kIndex && kIndex >= 0) {
+            groups[last][kIndex].lastPressedAt = Date.now();
+            set({ pressedKeys, groups });
+        } else {
+            set({ pressedKeys });
+        }
     },
     onMouseMove(event: MouseMoveEvent) {
         const state = get();
         const mouse = { ...state.mouse };
-
         // update position
         mouse.x = event.x;
         mouse.y = event.y;
-
         // check dragging
         if (mouse.dragStart && !mouse.dragging) {
             const dx = mouse.x - mouse.dragStart.x;
             const dy = mouse.y - mouse.dragStart.y;
-            if (Math.hypot(dx, dy) > state.dragThresholdPx) {
+            const dragDistance = Math.hypot(dx, dy);
+            
+            if (dragDistance > state.dragThresholdPx) {
                 mouse.dragging = true;
-
-                const groups = [...state.groups];
-                const pressedKeys = new Set(state.pressedKeys);
+                
                 // remove mouse button from pressed keys
-                pressedKeys.delete(state.pressedMouseButton?.toString() ?? "");
+                const pressedKeys = state.pressedKeys.filter(keyName => keyName !== state.pressedMouseButton?.toString());
+                
                 // remove mouse button from last group
+                const groups = [...state.groups];
                 const last = groups.length - 1;
-                groups[last] = groups[last].filter(k => k.name !== state.pressedMouseButton?.toString());
-                
+                groups[last] = groups[last].filter(key => key.name !== state.pressedMouseButton?.toString());
+
                 set({ pressedKeys, mouse, groups });
-                
+
+                // simulate drag as key press
                 state.onKeyPress({ type: "KeyEvent", name: "Drag", pressed: true });
                 return;
             }
         }
-
         set({ mouse });
     },
     onMouseButtonPress(event: MouseButtonEvent) {
         const state = get();
-        const mouse = { ...state.mouse };
+        // set drag start position
+        const mouse = { 
+            ...state.mouse,
+            dragStart: { x: state.mouse.x, y: state.mouse.y },
+        };
+
         // simulate mouse button press as key
         state.onKeyPress({ type: "KeyEvent", name: event.button.toString(), pressed: true });
-        // set drag start position
-        mouse.dragStart = { x: state.mouse.x, y: state.mouse.y };
 
         set({ pressedMouseButton: event.button, mouse });
     },
     onMouseButtonRelease(event: MouseButtonEvent) {
         const state = get();
-        const mouse = { 
-            ...state.mouse, 
+        // reset drag state
+        const mouse = {
+            ...state.mouse,
             dragging: false,
             dragStart: undefined
         };
-        // simulate mouse button release as key
-        state.onKeyRelease({ type: "KeyEvent", name: event.button.toString(), pressed: false });
-        // remove drag key if dragging
+        // check if was dragging
         if (state.mouse.dragging) {
+            // simulate drag release as key
             state.onKeyRelease({ type: "KeyEvent", name: "Drag", pressed: false });
+        } else {
+            // simulate mouse button release as key
+            state.onKeyRelease({ type: "KeyEvent", name: event.button.toString(), pressed: false });
         }
 
         set({ pressedMouseButton: null, mouse });
     },
     onMouseWheel(event: MouseWheelEvent) {
         const state = get();
+        // update mouse wheel state
         const mouse = {
             ...state.mouse,
-            wheel: Math.sign(event.delta_y),
+            wheel: Math.sign(event.delta_y), // -1 for up, 1 for down
             lastScrollAt: Date.now()
-        }
-
+        };
         // simulate mouse wheel as key press
         state.onKeyPress({ type: "KeyEvent", name: "Scroll", pressed: true });
 
         set({ mouse });
     },
     tick() {
+        // todo: remove pressed keys with unsually long linger duration
         const state = get();
         const now = Date.now();
         let notify = false;
@@ -271,19 +280,20 @@ export const useKeyEvent = create<KeyEventStore>((set, get) => ({
                 state.onKeyRelease({ type: "KeyEvent", name: "Scroll", pressed: false });
                 set({ mouse: { ...state.mouse, wheel: 0, lastScrollAt: undefined } });
             }
-            const g = group.filter((key) => {
+            const updatedGroup = group.filter((key) => {
+                // keep key if
                 return (
                     // is pressed
-                    state.pressedKeys.has(key.name) ||
+                    state.pressedKeys.includes(key.name) ||
                     // within linger duration 
                     now - key.lastPressedAt < state.lingerDurationMs
                 );
             })
-            if (g.length !== group.length) {
+            if (updatedGroup.length !== group.length) {
                 notify = true;
             }
-            if (g.length > 0) {
-                groups.push(g);
+            if (updatedGroup.length > 0) {
+                groups.push(updatedGroup);
             }
         }
 

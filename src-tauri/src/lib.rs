@@ -1,6 +1,6 @@
 use std::thread;
-use rdev::listen;
 use tauri::Emitter;
+use rdev::listen;
 
 mod event;
 use event::convert_event;

@@ -30,29 +30,6 @@ pub enum MouseButton {
     Other,
 }
 
-pub fn log_event(event: &Event) {
-    match &event.event_type {
-        EventType::KeyPress(key) => {
-            println!("[KEY DOWN] key={:?}", key);
-        }
-        EventType::KeyRelease(key) => {
-            println!("[KEY UP] key={:?}", key);
-        }
-        EventType::ButtonPress(button) => {
-            println!("[MOUSE DOWN] button={:?}", button);
-        }
-        EventType::ButtonRelease(button) => {
-            println!("[MOUSE UP] button={:?}", button);
-        }
-        EventType::MouseMove { x, y } => {
-            println!("[MOUSE MOVE] x={}, y={}", x, y);
-        }
-        EventType::Wheel { delta_x, delta_y } => {
-            println!("[MOUSE WHEEL] delta_x={}, delta_y={}", delta_x, delta_y);
-        }
-    }
-}
-
 pub fn convert_event(event: Event) -> Option<InputEvent> {
     match event.event_type {
         EventType::KeyPress(key) => {
