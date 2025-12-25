@@ -56,7 +56,7 @@ export const useKeyEvent = create<KeyEventStore>((set, get) => ({
     groups: [],
     dragThresholdPx: 50,
     filterHotkeys: true,
-    ignoreModifiers: new Set<string>([ "Shift" ]),
+    ignoreModifiers: new Set<string>(["Shift"]),
     showEventHistory: true,
     maxHistory: 5,
     lingerDurationMs: 5_000,
@@ -92,10 +92,6 @@ export const useKeyEvent = create<KeyEventStore>((set, get) => ({
         const state = get();
         // 0. track pyhsical state
         const pressedKeys = [...state.pressedKeys];
-        if (pressedKeys.includes(event.name)) {
-            // ignore repeat events
-            return;
-        }
         pressedKeys.push(event.name);
 
         // 1. filter event
@@ -180,7 +176,7 @@ export const useKeyEvent = create<KeyEventStore>((set, get) => ({
         // update last pressed time
         const groups = [...state.groups];
         const last = groups.length - 1;
-        
+
         const kIndex = last >= 0 ? groups[last].findIndex(key => key.name === event.name) : undefined;
         if (kIndex && kIndex >= 0) {
             groups[last][kIndex].lastPressedAt = Date.now();
@@ -200,13 +196,13 @@ export const useKeyEvent = create<KeyEventStore>((set, get) => ({
             const dx = mouse.x - mouse.dragStart.x;
             const dy = mouse.y - mouse.dragStart.y;
             const dragDistance = Math.hypot(dx, dy);
-            
+
             if (dragDistance > state.dragThresholdPx) {
                 mouse.dragging = true;
-                
+
                 // remove mouse button from pressed keys
                 const pressedKeys = state.pressedKeys.filter(keyName => keyName !== state.pressedMouseButton?.toString());
-                
+
                 // remove mouse button from last group
                 const groups = [...state.groups];
                 const last = groups.length - 1;
@@ -224,7 +220,7 @@ export const useKeyEvent = create<KeyEventStore>((set, get) => ({
     onMouseButtonPress(event: MouseButtonEvent) {
         const state = get();
         // set drag start position
-        const mouse = { 
+        const mouse = {
             ...state.mouse,
             dragStart: { x: state.mouse.x, y: state.mouse.y },
         };
