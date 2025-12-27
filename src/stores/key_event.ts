@@ -34,6 +34,7 @@ export interface KeyEventStore {
     ignoreModifiers: Set<string>;
     showEventHistory: boolean;
     maxHistory: number;
+    showMouseEvents: boolean;
     lingerDurationMs: number;
     // ───────────── setters ─────────────
     setFilterHotkeys(value: boolean): void;
@@ -64,6 +65,7 @@ export const useKeyEvent = create<KeyEventStore>((set, get) => ({
     showEventHistory: true,
     maxHistory: 5,
     lingerDurationMs: 5_000,
+    showMouseEvents: true,
     setFilterHotkeys(value: boolean) {
         set({ filterHotkeys: value });
     },

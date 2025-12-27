@@ -5,7 +5,7 @@ function NumberInput({ ...props }: NumberFieldProps) {
   return (
     <NumberField {...props}>
       <Group className="relative inline-flex h-full w-full items-center overflow-hidden rounded-md border border-input text-sm whitespace-nowrap shadow-xs transition-[color,box-shadow] outline-none data-disabled:opacity-50 data-focus-within:border-ring data-focus-within:ring-[3px] data-focus-within:ring-ring/50 data-focus-within:has-aria-invalid:border-destructive data-focus-within:has-aria-invalid:ring-destructive/20 dark:data-focus-within:has-aria-invalid:ring-destructive/40">
-        <Input className="w-full dark:bg-background/50 bg-transparent px-3 py-2 text-foreground tabular-nums" />
+        <Input className="w-full bg-background/50 px-3 py-2 text-foreground tabular-nums" />
         <div className="flex h-[calc(100%+2px)] flex-col">
           <Button
             slot="increment"

@@ -1,4 +1,4 @@
-import { GeneralSettings } from "@/components/settings/general";
+import { AppearanceSettings, GeneralSettings, KeycapSettings } from "@/components/settings";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { SidebarItem } from "@/components/ui/sidebar-item";
@@ -39,7 +39,15 @@ const Settings = () => {
             </div>
             <Separator orientation="vertical" />
             <ScrollArea className="flex-1 relative">
-                <GeneralSettings />
+                {
+                    activeTab === "General" && <GeneralSettings />
+                }
+                {
+                    activeTab === "Appearance" && <AppearanceSettings />
+                }
+                {
+                    activeTab === "Keycap" && <KeycapSettings />
+                }
             </ScrollArea>
         </div>
     );

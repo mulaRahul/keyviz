@@ -35,13 +35,13 @@ export const GeneralSettings = () => {
 
     const [toggleShortcut, setToggleShortcut] = useState<string[]>(["Shift", "F10"]);
 
-    return <div className="flex flex-col gap-y-4 p-6">
+    return <div className="flex flex-col gap-y-4 p-6 pb-10">
         <h1 className="text-xl font-semibold">General</h1>
 
         <Item variant="muted">
             <ItemContent>
                 <ItemTitle>
-                    <HugeiconsIcon icon={CommandIcon} size="1.1em" />
+                    <HugeiconsIcon icon={CommandIcon} size="1em" />
                     Hotkey Filter
                 </ItemTitle>
                 <ItemDescription>
@@ -56,7 +56,7 @@ export const GeneralSettings = () => {
         <Item variant="muted" className={cn("transition-opacity", filterHotkeys ? "" : "pointer-events-none opacity-50")}>
             <ItemHeader className="flex-col items-start">
                 <ItemTitle>
-                    <HugeiconsIcon icon={FilterHorizontalIcon} size="1.1em" />
+                    <HugeiconsIcon icon={FilterHorizontalIcon} size="1em" />
                     Allowed Modifiers
                 </ItemTitle>
                 <ItemDescription>
@@ -89,7 +89,7 @@ export const GeneralSettings = () => {
         <Item variant="muted">
             <ItemContent>
                 <ItemTitle>
-                    <HugeiconsIcon icon={LayerIcon} size="1.1em" />
+                    <HugeiconsIcon icon={LayerIcon} size="1em" />
                     Show History
                 </ItemTitle>
                 <ItemDescription>
@@ -115,15 +115,12 @@ export const GeneralSettings = () => {
                         defaultValue="horizontal"
                         variant="outline"
                         size="sm"
-                        className="bg-background"
                     >
                         <ToggleGroupItem value="horizontal" aria-label="Horizontal">
-                            <HugeiconsIcon icon={ArrowHorizontalIcon} strokeWidth={2} />
-                            Horizontal
+                            <HugeiconsIcon icon={ArrowHorizontalIcon} strokeWidth={2} size={10} /> Row
                         </ToggleGroupItem>
                         <ToggleGroupItem value="vertical" aria-label="Vertical">
-                            <HugeiconsIcon icon={ArrowVerticalIcon} strokeWidth={2} />
-                            Vertical
+                            <HugeiconsIcon icon={ArrowVerticalIcon} strokeWidth={2} /> Column
                         </ToggleGroupItem>
                     </ToggleGroup>
                 </ItemActions>
@@ -144,7 +141,7 @@ export const GeneralSettings = () => {
         <Item variant="muted">
             <ItemHeader className="flex-col items-start">
                 <ItemTitle>
-                    <HugeiconsIcon icon={ToggleOnIcon} size="1.1em" />
+                    <HugeiconsIcon icon={ToggleOnIcon} size="1em" />
                     Toggle Shortcut
                 </ItemTitle>
                 <ItemDescription>
@@ -158,8 +155,6 @@ export const GeneralSettings = () => {
                 }} />
             </ItemContent>
         </Item>
-
-        <div className="h-10"></div>
     </div>;
 }
 

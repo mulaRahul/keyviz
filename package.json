@@ -10,6 +10,7 @@
     "tauri": "tauri"
   },
   "dependencies": {
+    "@ark-ui/react": "^5.30.0",
     "@base-ui/react": "^1.0.0",
     "@fontsource-variable/inter": "^5.2.8",
     "@hugeicons/core-free-icons": "^3.1.0",
@@ -21,6 +22,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
+    "colord": "^2.9.3",
     "embla-carousel-react": "^8.6.0",
     "hugeicons-react": "^0.3.0",
     "input-otp": "^1.4.2",
