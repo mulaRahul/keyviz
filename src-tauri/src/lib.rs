@@ -5,7 +5,7 @@ use tauri::{
     include_image,
     menu::{Menu, MenuItem},
     tray::TrayIconBuilder,
-    Manager,
+    Manager, WebviewWindowBuilder,
 };
 
 mod app;
@@ -16,6 +16,7 @@ use app::state::AppState;
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_opener::init())
         .setup(|app| {
             let app_handle = app.handle();
@@ -29,7 +30,8 @@ pub fn run() {
             let quit_item = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
 
             // start global input listener
-            start_listener(app_handle.clone(), toggle_item.clone());
+            // !DEBUG: Disabled for settings ui development
+            // start_listener(app_handle.clone(), toggle_item.clone());
 
             // setup tray menu
             let tray_icon = Image::from(include_image!("icons/tray.png"));
@@ -63,7 +65,13 @@ pub fn run() {
                                 .unwrap();
                         }
                     }
-                    "settings" => {}
+                    "settings" => {
+                        let webview_url = tauri::WebviewUrl::App("index.html#/settings".into());
+                        WebviewWindowBuilder::new(app, "settings", webview_url.clone())
+                            .title("Settings")
+                            .build()
+                            .unwrap();
+                    }
                     "quit" => std::process::exit(0),
                     _ => println!("um... what?"),
                 })

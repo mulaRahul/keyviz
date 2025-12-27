@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { EventPayload, KeyEvent, MouseButton, MouseButtonEvent, MouseMoveEvent, MouseWheelEvent } from "../types/event";
 import { Key } from "../types/key";
 
+
 const SCROLL_LINGER_MS = 300;
 const MODIFIERS = new Set([
     "Shift",
@@ -11,7 +12,6 @@ const MODIFIERS = new Set([
     "Fn",
 ]);
 
-
 export interface MouseState {
     x: number;
     y: number;
@@ -20,7 +20,6 @@ export interface MouseState {
     dragStart?: { x: number; y: number; };
     dragging: boolean;
 }
-
 
 export interface KeyEventStore {
     // ───────────── physical state ─────────────
@@ -36,6 +35,12 @@ export interface KeyEventStore {
     showEventHistory: boolean;
     maxHistory: number;
     lingerDurationMs: number;
+    // ───────────── setters ─────────────
+    setFilterHotkeys(value: boolean): void;
+    setIgnoreModifiers(modifiers: Set<string>): void;
+    setShowEventHistory(value: boolean): void;
+    setMaxHistory(value: number): void;
+    setLingerDurationMs(value: number): void;
     // ───────────── actions ─────────────
     onEvent(event: EventPayload): void;
     onKeyPress(event: KeyEvent): void;
@@ -48,7 +53,6 @@ export interface KeyEventStore {
     tick(): void;
 }
 
-
 export const useKeyEvent = create<KeyEventStore>((set, get) => ({
     pressedKeys: <string[]>[],
     pressedMouseButton: null,
@@ -60,6 +64,21 @@ export const useKeyEvent = create<KeyEventStore>((set, get) => ({
     showEventHistory: true,
     maxHistory: 5,
     lingerDurationMs: 5_000,
+    setFilterHotkeys(value: boolean) {
+        set({ filterHotkeys: value });
+    },
+    setIgnoreModifiers(modifiers: Set<string>) {
+        set({ ignoreModifiers: modifiers });
+    },
+    setShowEventHistory(value: boolean) {
+        set({ showEventHistory: value });
+    },
+    setMaxHistory(value: number) {
+        set({ maxHistory: value });
+    },
+    setLingerDurationMs(value: number) {
+        set({ lingerDurationMs: value });
+    },
     onEvent(event: EventPayload) {
         const state = get();
         switch (event.type) {

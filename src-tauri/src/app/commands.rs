@@ -2,7 +2,7 @@ use std::sync::Mutex;
 
 use tauri::Manager;
 
-use crate::app::{state::AppState};
+use crate::app::state::AppState;
 
 #[tauri::command]
 pub fn log(message: String) {

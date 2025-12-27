@@ -1,31 +1,22 @@
 import "./App.css";
 
-import { listen } from "@tauri-apps/api/event";
-import { useEffect, } from "react";
-import { useKeyEvent } from "./stores/key_event";
-import { EventPayload } from "./types/event";
-import { Overlay } from "./components/overlay";
+import { Suspense, lazy } from "react";
+import { HashRouter, Routes, Route } from "react-router-dom";
+import { ThemeProvider } from "./components/theme-provider";
+
+const Settings = lazy(() => import("./pages/settings"));
 
 function App() {
-  const onEvent = useKeyEvent((state) => state.onEvent);
-  const tick = useKeyEvent((state) => state.tick);
-
-  useEffect(() => {
-    const unsubscribe = listen<EventPayload>(
-      "input-event",
-      (event) => onEvent(event.payload)
-    );
-    const intervalId = setInterval(tick, 250);
-    return () => {
-      clearInterval(intervalId);
-      unsubscribe.then(f => f());
-    };
-  }, []);
-
   return (
-    <>
-      <Overlay />
-    </>
+    <HashRouter>
+      <Suspense fallback={<div>Loading...</div>}>
+        <Routes>
+          {/* <Route path="/" element={<Visualization />} /> */}
+          <Route path="/" element={<ThemeProvider><Settings /></ThemeProvider>} />
+          <Route path="/settings" element={<Settings />} />
+        </Routes>
+      </Suspense>
+    </HashRouter>
   );
 }
 
