@@ -10,12 +10,8 @@
 
 Keyviz is a **free and open-source** tool that visualizes your keypresses and mouse actions in real-time. Let your audience know what handy shortcuts you're pressing during tutorials, presentations, collaborations, or whenever you need.
 
-Support the launch on product hunt!
-
-<a href="https://www.producthunt.com/products/keyviz-2?embed=true&amp;utm_source=badge-featured&amp;utm_medium=badge&amp;utm_campaign=badge-keyviz-2" target="_blank" rel="noopener noreferrer"><img alt="Keyviz - A free, open-source keypress and mouse visualizer | Product Hunt" width="250" height="54" src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1068241&amp;theme=light&amp;t=1769510424282"></a>
-
 ## ⌨️ Keypress & 🖱️ Mouse Actions
-Along with normal keys, can also visualize mouse actions like <kbd>Cmd</kbd> + <kbd>Click</kbd>, <kbd>Alt</kbd> + <kbd>Drag</kbd>, etc.
+Along with normal keys, you can also visualize mouse actions like <kbd>Cmd</kbd> + <kbd>Click</kbd>, <kbd>Alt</kbd> + <kbd>Drag</kbd>, etc.
 
 <img src="previews/visualization.png" alt="Keystroke Visualization" width="450">
 
@@ -27,8 +23,8 @@ Display mouse clicks and scroll wheel movements alongside your cursor.
 
 ## ⚙️ Full Customization
 Don't settle for defaults. Every aspect of the visualization is under your control:
-- **Styling:** Change colors (modifier vs. regular keys), size, border radius, and icons.
-- **Filtering:** Control which keys are shown using hotkeys or custom filters.
+- **Styling:** Change colors (modifier vs. regular keys), size, layout, border, and background.
+- **Filtering:** Control which keys are shown using hotkey or custom filters.
 - **History:** Keep a visual trail of your recent inputs.
 - **Position:** Move the visualization to any part of your screen.
 - **Animations:** Customize how inputs appear and disappear with preset entry and exit animations.
