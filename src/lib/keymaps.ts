@@ -314,8 +314,8 @@ export const keymaps: Record<string, DisplayData> = {
         category: "punctuation",
     },
     Slash: {
-        label: "?",
-        symbol: "/",
+        label: "/",
+        symbol: "?",
         category: "punctuation",
     },
     // ───────────── Numpad ─────────────
@@ -502,4 +502,4 @@ export const keymaps: Record<string, DisplayData> = {
         icon: ArrowBigUpIcon,
         category: "modifier",
     };
-});
+});k

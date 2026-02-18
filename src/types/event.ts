@@ -200,11 +200,15 @@ export class KeyEvent {
   name: string;
   pressedCount: number;
   lastPressedAt: number;
+  shifted: boolean;
+  capsLock: boolean;
 
-  constructor(name: string) {
+  constructor(name: string, options?: { shifted?: boolean; capsLock?: boolean }) {
     this.name = name;
     this.pressedCount = 1;
     this.lastPressedAt = Date.now();
+    this.shifted = options?.shifted ?? false;
+    this.capsLock = options?.capsLock ?? false;
   }
 
   press() {
