@@ -28,7 +28,8 @@ export const GeneralSettings = () => {
         allowedKeys,
         showEventHistory, setShowEventHistory,
         maxHistory, setMaxHistory,
-        toggleShortcut, setToggleShortcut
+        toggleShortcut, setToggleShortcut,
+        textSequenceEnabled, setTextSequenceEnabled
     } = useKeyEvent();
 
     const direction = useKeyStyle(state => state.appearance.flexDirection);
@@ -93,6 +94,20 @@ export const GeneralSettings = () => {
             </ItemContent>
             <ItemActions>
                 <Switch checked={showEventHistory} onCheckedChange={setShowEventHistory} />
+            </ItemActions>
+        </Item>
+
+        <Item variant="muted">
+            <ItemContent>
+                <ItemTitle>
+                    <HugeiconsIcon icon={ToggleOnIcon} size="1em" /> Text Sequences
+                </ItemTitle>
+                <ItemDescription>
+                    Render sequential letters and digits as plain text when no modifiers are held
+                </ItemDescription>
+            </ItemContent>
+            <ItemActions>
+                <Switch checked={textSequenceEnabled} onCheckedChange={setTextSequenceEnabled} />
             </ItemActions>
         </Item>
 

@@ -4,6 +4,50 @@ import { createJSONStorage, persist } from "zustand/middleware";
 import { tauriStorage } from "./storage";
 import { createSyncedStore } from "./sync";
 
+const HARD_MODIFIERS = new Set<string>([
+    RawKey.ControlLeft,
+    RawKey.ControlRight,
+    RawKey.Alt,
+    RawKey.MetaLeft,
+    RawKey.MetaRight,
+]);
+
+const SOFT_MODIFIERS = new Set<string>([
+    RawKey.ShiftLeft,
+    RawKey.ShiftRight,
+]);
+
+const PUNCTUATION_KEYS = new Set<string>([
+    RawKey.BackQuote,
+    RawKey.Minus,
+    RawKey.Equal,
+    RawKey.LeftBracket,
+    RawKey.RightBracket,
+    RawKey.BackSlash,
+    RawKey.SemiColon,
+    RawKey.Quote,
+    RawKey.Comma,
+    RawKey.Dot,
+    RawKey.Slash,
+    RawKey.Space,
+    RawKey.KpDecimal,
+    RawKey.KpComma,
+    RawKey.KpDivide,
+    RawKey.KpMultiply,
+    RawKey.KpMinus,
+    RawKey.KpPlus,
+    RawKey.KpEqual,
+]);
+
+const isPrintableKeyName = (name: string) => {
+    if (name.startsWith("Key")) return true;
+    if (/^Num[0-9]$/.test(name)) return true;
+    if (name.startsWith("Kp") && /^Kp[0-9]$/.test(name)) return true;
+    return PUNCTUATION_KEYS.has(name);
+};
+
+const isHardModifierName = (name: string) => HARD_MODIFIERS.has(name);
+
 
 export const KEY_EVENT_STORE = "key_event_store";
 const SCROLL_LINGER_MS = 300;
@@ -37,6 +81,8 @@ export interface KeyEventState {
     showMouseEvents: boolean;
     lingerDurationMs: number;
     toggleShortcut: string[];
+    textSequenceEnabled: boolean;
+    capsLockOn: boolean;
 }
 
 interface KeyEventActions {
@@ -49,6 +95,7 @@ interface KeyEventActions {
     setShowMouseEvents(value: KeyEventState["showMouseEvents"]): void;
     setLingerDurationMs(value: KeyEventState["lingerDurationMs"]): void;
     setToggleShortcut(value: KeyEventState["toggleShortcut"]): void;
+    setTextSequenceEnabled(value: KeyEventState["textSequenceEnabled"]): void;
     // ───────────── event actions ─────────────
     onEvent(event: EventPayload): void;
     onKeyPress(event: RawKeyEvent): void;
@@ -81,9 +128,11 @@ const createKeyEventStore = createSyncedStore<KeyEventStore>(
         ],
         showEventHistory: false,
         maxHistory: 5,
-        lingerDurationMs: 5_000,
+        lingerDurationMs: 3_000,
         showMouseEvents: true,
         toggleShortcut: [RawKey.ShiftLeft, RawKey.F10],
+        textSequenceEnabled: true,
+        capsLockOn: false,
 
         setDragThreshold(value: number) {
             set({ dragThreshold: value });
@@ -108,6 +157,9 @@ const createKeyEventStore = createSyncedStore<KeyEventStore>(
         },
         setToggleShortcut(value: string[]) {
             set({ toggleShortcut: value });
+        },
+        setTextSequenceEnabled(value: boolean) {
+            set({ textSequenceEnabled: value });
         },
         onEvent(event: EventPayload) {
             const state = get();
@@ -140,19 +192,76 @@ const createKeyEventStore = createSyncedStore<KeyEventStore>(
         },
         onKeyPress(event: RawKeyEvent) {
             const state = get();
+            const nextCapsLockOn = event.name === RawKey.CapsLock && event.pressed
+                ? !state.capsLockOn
+                : state.capsLockOn;
             // 0. track physical state
             const pressedKeys = [...state.pressedKeys];
             pressedKeys.push(event.name);
 
             // 1. filter event
             if (state.filter !== "none" && state.ignoreEvent(event, pressedKeys)) {
-                set({ pressedKeys });
+                if (nextCapsLockOn !== state.capsLockOn) {
+                    set({ pressedKeys, capsLockOn: nextCapsLockOn });
+                } else {
+                    set({ pressedKeys });
+                }
                 return;
             }
 
             let groups = [...state.groups];
             const last = groups.length - 1;
-            const key = new KeyEvent(event.name);
+            const shiftActive = pressedKeys.includes(RawKey.ShiftLeft) || pressedKeys.includes(RawKey.ShiftRight);
+            const key = new KeyEvent(event.name, { shifted: shiftActive, capsLock: nextCapsLockOn });
+
+            const hardModifierDown = pressedKeys.some((keyName) => isHardModifierName(keyName));
+            const textSequenceActive = state.textSequenceEnabled && isPrintableKeyName(key.name) && !hardModifierDown;
+
+            if (textSequenceActive) {
+                const createdAt = state.showEventHistory ? Date.now() : 0;
+                if (last < 0) {
+                    groups = [{ keys: [key], createdAt }];
+                } else {
+                    const lastGroup = groups[last];
+                    const canAppend = lastGroup.keys.every((gKey) => (
+                        isPrintableKeyName(gKey.name) || SOFT_MODIFIERS.has(gKey.name)
+                    ));
+                    if (canAppend) {
+                        let lastPrintableIndex = -1;
+                        for (let i = lastGroup.keys.length - 1; i >= 0; i -= 1) {
+                            if (isPrintableKeyName(lastGroup.keys[i].name)) {
+                                lastPrintableIndex = i;
+                                break;
+                            }
+                        }
+                        if (lastPrintableIndex >= 0) {
+                            const lastPrintable = lastGroup.keys[lastPrintableIndex];
+                            if (
+                                lastPrintable.name === key.name &&
+                                lastPrintable.shifted === key.shifted &&
+                                lastPrintable.capsLock === key.capsLock
+                            ) {
+                                lastPrintable.press();
+                            } else {
+                                lastGroup.keys.push(key);
+                            }
+                        } else {
+                            lastGroup.keys.push(key);
+                        }
+                    } else {
+                        if (state.showEventHistory) {
+                            groups.push({ keys: [key], createdAt });
+                        } else {
+                            groups = [{ keys: [key], createdAt }];
+                        }
+                    }
+                }
+                if (state.showEventHistory && groups.length > state.maxHistory) {
+                    groups = groups.slice(groups.length - state.maxHistory);
+                }
+                set({ pressedKeys, groups, capsLockOn: nextCapsLockOn });
+                return;
+            }
 
             // 2. check if pressed again
             const existingKey = last >= 0 ? groups[last].keys.find(gKey => gKey.name === key.name) : undefined;
@@ -162,7 +271,7 @@ const createKeyEventStore = createSyncedStore<KeyEventStore>(
                     const groupKeys: KeyEvent[] = [];
                     groups[last].keys.forEach(gKey => {
                         if (gKey.in(pressedKeys)) {
-                            groupKeys.push(new KeyEvent(gKey.name));
+                            groupKeys.push(new KeyEvent(gKey.name, { shifted: gKey.shifted, capsLock: gKey.capsLock }));
                         }
                     });
                     groups.push({ keys: groupKeys, createdAt: state.showEventHistory ? Date.now() : 0 });
@@ -212,7 +321,7 @@ const createKeyEventStore = createSyncedStore<KeyEventStore>(
                 groups = groups.slice(groups.length - state.maxHistory);
             }
 
-            set({ pressedKeys, groups });
+            set({ pressedKeys, groups, capsLockOn: nextCapsLockOn });
         },
         ignoreEvent(event, pressedKeys) {
             const state = get();
@@ -381,7 +490,7 @@ const createKeyEventStore = createSyncedStore<KeyEventStore>(
         name: KEY_EVENT_STORE,
         storage: createJSONStorage(() => tauriStorage),
         partialize: (state) => {
-            const { pressedKeys, pressedMouseButton, mouse, groups, settingsOpen, ...persistedState } = state;
+            const { pressedKeys, pressedMouseButton, mouse, groups, settingsOpen, capsLockOn, ...persistedState } = state;
             return persistedState;
         },
     }),
