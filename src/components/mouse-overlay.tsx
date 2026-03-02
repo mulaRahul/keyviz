@@ -63,26 +63,29 @@ export const MouseOverlay = () => {
 
         // Zustand subscribe allows us to listen to changes without triggering a component re-render
         const unsubscribe = useKeyEvent.subscribe((state) => {
-            const { x, y } = state.mouse;
+            const el = positionRef.current;
+            if (!el) return;
 
-            // Basic visibility check inside the loop to avoid lagging behind state updates
-            if (!style.keepHighlight && !state.pressedMouseButton && !style.showIndicator) {
-                // positionRef.current.style.opacity = '0'; 
-                return;
-            }
+            const shouldUpdatePosition =
+                style.keepHighlight ||
+                state.pressedMouseButton ||
+                style.showIndicator ||
+                style.keepIndicator;
+
+            if (!shouldUpdatePosition) return;
+
             const dpr = isMacos ? 1 : window.devicePixelRatio || 1;
-            positionRef.current!.style.transform =
-                `translate3d(${x / dpr}px, ${y / dpr}px, 0) translate(-50%, -50%)`;
+            el.style.transform =
+                `translate3d(${state.mouse.x / dpr}px, ${state.mouse.y / dpr}px, 0) translate(-50%, -50%)`;
         });
 
         return () => unsubscribe();
-    }, [style.showClicks, style.keepHighlight, style.showIndicator]);
+    }, [style.showClicks, style.keepHighlight, style.showIndicator, style.keepIndicator]);
 
     // Logic to determine if we should render anything at all to keep DOM light
-    const shouldRender = style.showClicks || style.keepHighlight || style.showIndicator;
+    const shouldRender = style.showClicks || style.keepHighlight || style.showIndicator || style.keepIndicator;
     if (!shouldRender) return null;
 
-    const isVisible = show || style.keepHighlight;
 
     return (
         <div className="absolute top-0 left-0 w-full h-full pointer-events-none overflow-hidden">
@@ -99,7 +102,7 @@ export const MouseOverlay = () => {
                         className="w-full h-full"
                         initial={false}
                         animate={{
-                            opacity: isVisible ? 1 : 0,
+                            opacity: show || style.keepHighlight ? 1 : 0,
                             scale: show ? 0.5 : 1.0,
                             borderWidth: style.size / 20,
                         }}
@@ -118,7 +121,7 @@ export const MouseOverlay = () => {
                 {style.showIndicator &&
                     <motion.div
                         className="absolute left-1/2 top-1/2"
-                        animate={{ opacity: isVisible || wheel !== 0 ? 1 : 0 }}
+                        animate={{ opacity: show || style.keepIndicator || wheel !== 0 ? 1 : 0 }}
                         transition={{ duration: 0.2 }}
                     >
                         <MouseIndicator />

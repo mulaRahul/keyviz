@@ -84,14 +84,14 @@ export const MouseSettings = () => {
                     <HugeiconsIcon icon={Cursor01Icon} size="1em" /> Always Highlight
                 </ItemTitle>
                 <ItemDescription>
-                    Permanently show the ring/icon around the cursor
+                    Permanently show the ring around the cursor
                 </ItemDescription>
             </ItemContent>
             <ItemActions>
                 <Switch
                     checked={mouse.keepHighlight}
                     onCheckedChange={(keepHighlight) => setMouseStyle({ keepHighlight })}
-                    disabled={!mouse.showClicks && !mouse.showIndicator}
+                    disabled={!mouse.showClicks}
                 />
             </ItemActions>
         </Item>
@@ -110,6 +110,24 @@ export const MouseSettings = () => {
                 <Switch
                     checked={mouse.showIndicator}
                     onCheckedChange={(showIndicator) => setMouseStyle({ showIndicator })}
+                />
+            </ItemActions>
+        </Item>
+
+        <Item variant="muted">
+            <ItemContent>
+                <ItemTitle>
+                    <HugeiconsIcon icon={Cursor01Icon} size="1em" /> Keep Indicator
+                </ItemTitle>
+                <ItemDescription>
+                    Permanently show the icon beside the cursor
+                </ItemDescription>
+            </ItemContent>
+            <ItemActions>
+                <Switch
+                    checked={mouse.keepIndicator}
+                    onCheckedChange={(keepIndicator) => setMouseStyle({ keepIndicator })}
+                    disabled={!mouse.showIndicator}
                 />
             </ItemActions>
         </Item>

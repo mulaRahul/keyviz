@@ -67,6 +67,7 @@ export interface MouseSettings {
     color: string;
     keepHighlight: boolean;
     showIndicator: boolean;
+    keepIndicator: boolean;
     indicatorSize: number;
     indicatorOffsetX: number;
     indicatorOffsetY: number;
@@ -150,8 +151,9 @@ const createKeyStyleStore = createSyncedStore<KeyStyleStore>(
             showClicks: false,
             size: 150,
             color: "#009dff",
-            keepHighlight: true,
+            keepHighlight: false,
             showIndicator: true,
+            keepIndicator: true,
             indicatorSize: 50,
             indicatorOffsetX: 50,
             indicatorOffsetY: 50,

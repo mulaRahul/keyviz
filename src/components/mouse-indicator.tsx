@@ -69,11 +69,11 @@ export const MouseIndicator = () => {
         <div
             className="bg-black/50 text-white"
             style={{
-                width: style.indicatorSize,
+                width: style.indicatorSize * 0.92,
                 height: style.indicatorSize,
                 marginTop: style.indicatorOffsetY,
-                marginLeft: style.indicatorOffsetX, 
-                borderRadius: "40%",
+                marginLeft: style.indicatorOffsetX,
+                borderRadius: "45%",
                 padding: style.indicatorSize * 0.2,
             }}
         >
