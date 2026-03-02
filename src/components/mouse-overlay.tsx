@@ -4,8 +4,10 @@ import { useKeyStyle } from "@/stores/key_style";
 import { motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { MouseIndicator } from "./mouse-indicator";
+import { platform } from "@tauri-apps/plugin-os";
 
 const MIN_CLICK_DISPLAY_MS = 200;
+const isMacos = platform() === "macos";
 
 export const MouseOverlay = () => {
     const wheel = useKeyEvent(state => state.mouse.wheel);
@@ -33,7 +35,7 @@ export const MouseOverlay = () => {
         } else if (show && pressTimestampRef.current) {
             // Mouse button released - check if minimum duration has passed
             const elapsed = Date.now() - pressTimestampRef.current;
-            
+
             if (elapsed >= MIN_CLICK_DISPLAY_MS) {
                 // Already displayed long enough - hide immediately
                 setShow(false);
@@ -68,9 +70,9 @@ export const MouseOverlay = () => {
                 // positionRef.current.style.opacity = '0'; 
                 return;
             }
-
+            const dpr = isMacos ? 1 : window.devicePixelRatio || 1;
             positionRef.current!.style.transform =
-                `translate3d(${x}px, ${y}px, 0) translate(-50%, -50%)`;
+                `translate3d(${x / dpr}px, ${y / dpr}px, 0) translate(-50%, -50%)`;
         });
 
         return () => unsubscribe();

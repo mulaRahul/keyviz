@@ -114,9 +114,8 @@ pub fn start_listener(app_handle: AppHandle, toggle_menu_item: MenuItem<Wry>) {
 
                     #[cfg(not(target_os = "macos"))]
                     let (logical_x, logical_y) = {
-                        let scale = app_state.monitor_scale;
                         let (offset_x, offset_y) = app_state.monitor_position;
-                        ((x - offset_x as f64) / scale, (y - offset_y as f64) / scale)
+                        (x - offset_x as f64, y - offset_y as f64)
                     };
 
                     Some(InputEvent::MouseMoveEvent {
