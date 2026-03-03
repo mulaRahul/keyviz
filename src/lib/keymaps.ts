@@ -104,6 +104,7 @@ export const keymaps: Record<string, DisplayData> = {
         shortLabel: "ins",
         glyph: "⇥",
         icon: ArrowRightToLineIcon,
+        category: "special",
     },
     Delete: {
         label: "delete",

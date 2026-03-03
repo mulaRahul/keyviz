@@ -1,8 +1,9 @@
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { keymaps } from "@/lib/keymaps";
 import { cn } from "@/lib/utils";
 import { useKeyEvent } from "@/stores/key_event";
 import { RawKey } from "@/types/event";
-import { useState, useEffect, createContext, useContext, useRef } from "react";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 
 // Context for shared state
 interface KeyboardContextType {
@@ -37,10 +38,6 @@ const ButtonKey: React.FC<{
   const category = keyData?.category;
   const enabled = allowedKeys.includes(rawKey);
   const isHighlighted = isCtrlHeld && hoveredCategory && category === hoveredCategory;
-
-  if (rawKey === RawKey.KeyA) {
-    console.log(isHighlighted);
-  }
 
   let content = <>{displayLabel}</>;
   if (symbol) {
@@ -88,9 +85,9 @@ const ButtonKey: React.FC<{
       onMouseEnter={() => setHoveredKey(rawKey)}
       onMouseLeave={() => setHoveredKey(undefined)}
       className={cn(
-        'h-10 flex items-center justify-center text-xs text-primary text-center bg-secondary rounded-lg cursor-pointer',
+        !flexGrow && 'w-10 h-10',
+        'flex items-center justify-center text-xs text-primary text-center bg-secondary rounded-lg cursor-pointer',
         className,
-        !flexGrow && 'w-10',
         !enabled && 'opacity-50',
         isHighlighted ? 'outline-2 outline-blue-500' : 'hover:outline-2 hover:outline-blue-500'
       )}
@@ -106,6 +103,7 @@ const ButtonKey: React.FC<{
 };
 
 export const CustomFilter = () => {
+  const [activeTab, setActiveTab] = useState<'Keyboard' | 'Mouse' | 'Numpad'>('Keyboard');
   const [isCtrlHeld, setIsCtrlHeld] = useState(false);
   const [hoveredKey, setHoveredKey] = useState<string | undefined>(undefined);
   const [hoveredCategory, setHoveredCategory] = useState<string | undefined>(undefined);
@@ -143,121 +141,179 @@ export const CustomFilter = () => {
 
   return (
     <KeyboardContext.Provider value={{ isCtrlHeld, hoveredKey, hoveredCategory, setHoveredKey, setHoveredCategory }}>
-      <div className="w-full h-[44vw] flex items-center justify-center">
-        <div
-          className="relative box-border w-full p-3 max-w-180 flex flex-col gap-2 bg-secondary rounded-2xl"
-        >
-          {/* Row 1: Function Keys */}
-          <div className="flex gap-2 justify-between w-full">
-            <ButtonKey rawKey={RawKey.Escape} />
-            <ButtonKey rawKey={RawKey.F1} />
-            <ButtonKey rawKey={RawKey.F2} />
-            <ButtonKey rawKey={RawKey.F3} />
-            <ButtonKey rawKey={RawKey.F4} />
-            <ButtonKey rawKey={RawKey.F5} />
-            <ButtonKey rawKey={RawKey.F6} />
-            <ButtonKey rawKey={RawKey.F7} />
-            <ButtonKey rawKey={RawKey.F8} />
-            <ButtonKey rawKey={RawKey.F9} />
-            <ButtonKey rawKey={RawKey.F10} />
-            <ButtonKey rawKey={RawKey.F11} />
-            <ButtonKey rawKey={RawKey.F12} />
-            <ButtonKey rawKey={RawKey.Delete} />
-          </div>
+      <div className="w-full h-100 flex flex-col gap-4 items-center justify-center">
+        {activeTab === 'Keyboard' &&
+          <div
+            className="w-full p-3 max-w-196 flex flex-col gap-2 bg-secondary rounded-2xl"
+          >
+            {/* Row 1: Function Keys */}
+            <div className="flex gap-2 justify-between w-full">
+              <ButtonKey rawKey={RawKey.Escape} />
+              <ButtonKey rawKey={RawKey.F1} />
+              <ButtonKey rawKey={RawKey.F2} />
+              <ButtonKey rawKey={RawKey.F3} />
+              <ButtonKey rawKey={RawKey.F4} />
+              <ButtonKey rawKey={RawKey.F5} />
+              <ButtonKey rawKey={RawKey.F6} />
+              <ButtonKey rawKey={RawKey.F7} />
+              <ButtonKey rawKey={RawKey.F8} />
+              <ButtonKey rawKey={RawKey.F9} />
+              <ButtonKey rawKey={RawKey.F10} />
+              <ButtonKey rawKey={RawKey.F11} />
+              <ButtonKey rawKey={RawKey.F12} />
+              <ButtonKey rawKey={RawKey.Insert} />
+              <ButtonKey rawKey={RawKey.Delete} />
+            </div>
 
-          {/* Row 2: Numbers */}
-          <div className="flex gap-2 justify-between w-full">
-            <ButtonKey rawKey={RawKey.BackQuote} />
-            <ButtonKey rawKey={RawKey.Num1} />
-            <ButtonKey rawKey={RawKey.Num2} />
-            <ButtonKey rawKey={RawKey.Num3} />
-            <ButtonKey rawKey={RawKey.Num4} />
-            <ButtonKey rawKey={RawKey.Num5} />
-            <ButtonKey rawKey={RawKey.Num6} />
-            <ButtonKey rawKey={RawKey.Num7} />
-            <ButtonKey rawKey={RawKey.Num8} />
-            <ButtonKey rawKey={RawKey.Num9} />
-            <ButtonKey rawKey={RawKey.Num0} />
-            <ButtonKey rawKey={RawKey.Minus} />
-            <ButtonKey rawKey={RawKey.Equal} />
-            <ButtonKey rawKey={RawKey.Backspace} className="flex-2" flexGrow />
-          </div>
+            {/* Row 2: Numbers */}
+            <div className="flex gap-2 justify-between w-full">
+              <ButtonKey rawKey={RawKey.BackQuote} />
+              <ButtonKey rawKey={RawKey.Num1} />
+              <ButtonKey rawKey={RawKey.Num2} />
+              <ButtonKey rawKey={RawKey.Num3} />
+              <ButtonKey rawKey={RawKey.Num4} />
+              <ButtonKey rawKey={RawKey.Num5} />
+              <ButtonKey rawKey={RawKey.Num6} />
+              <ButtonKey rawKey={RawKey.Num7} />
+              <ButtonKey rawKey={RawKey.Num8} />
+              <ButtonKey rawKey={RawKey.Num9} />
+              <ButtonKey rawKey={RawKey.Num0} />
+              <ButtonKey rawKey={RawKey.Minus} />
+              <ButtonKey rawKey={RawKey.Equal} />
+              <ButtonKey rawKey={RawKey.Backspace} className="flex-2" flexGrow />
+              <ButtonKey rawKey={RawKey.Home} />
+            </div>
 
-          {/* Row 3: QWERTY */}
-          <div className="flex gap-2 justify-between w-full">
-            <ButtonKey rawKey={RawKey.Tab} className="flex-3" flexGrow />
-            <ButtonKey rawKey={RawKey.KeyQ} />
-            <ButtonKey rawKey={RawKey.KeyW} />
-            <ButtonKey rawKey={RawKey.KeyE} />
-            <ButtonKey rawKey={RawKey.KeyR} />
-            <ButtonKey rawKey={RawKey.KeyT} />
-            <ButtonKey rawKey={RawKey.KeyY} />
-            <ButtonKey rawKey={RawKey.KeyU} />
-            <ButtonKey rawKey={RawKey.KeyI} />
-            <ButtonKey rawKey={RawKey.KeyO} />
-            <ButtonKey rawKey={RawKey.KeyP} />
-            <ButtonKey rawKey={RawKey.LeftBracket} />
-            <ButtonKey rawKey={RawKey.RightBracket} />
-            <ButtonKey rawKey={RawKey.BackSlash} className="flex-2" />
-          </div>
+            {/* Row 3: QWERTY */}
+            <div className="flex gap-2 justify-between w-full">
+              <ButtonKey rawKey={RawKey.Tab} className="flex-3" flexGrow />
+              <ButtonKey rawKey={RawKey.KeyQ} />
+              <ButtonKey rawKey={RawKey.KeyW} />
+              <ButtonKey rawKey={RawKey.KeyE} />
+              <ButtonKey rawKey={RawKey.KeyR} />
+              <ButtonKey rawKey={RawKey.KeyT} />
+              <ButtonKey rawKey={RawKey.KeyY} />
+              <ButtonKey rawKey={RawKey.KeyU} />
+              <ButtonKey rawKey={RawKey.KeyI} />
+              <ButtonKey rawKey={RawKey.KeyO} />
+              <ButtonKey rawKey={RawKey.KeyP} />
+              <ButtonKey rawKey={RawKey.LeftBracket} />
+              <ButtonKey rawKey={RawKey.RightBracket} />
+              <ButtonKey rawKey={RawKey.BackSlash} className="flex-2" />
+              <ButtonKey rawKey={RawKey.End} />
+            </div>
 
-          {/* Row 4: ASDF */}
-          <div className="flex gap-2 justify-between w-full">
-            <ButtonKey rawKey={RawKey.CapsLock} className="flex-4" flexGrow />
-            <ButtonKey rawKey={RawKey.KeyA} />
-            <ButtonKey rawKey={RawKey.KeyS} />
-            <ButtonKey rawKey={RawKey.KeyD} />
-            <ButtonKey rawKey={RawKey.KeyF} />
-            <ButtonKey rawKey={RawKey.KeyG} />
-            <ButtonKey rawKey={RawKey.KeyH} />
-            <ButtonKey rawKey={RawKey.KeyJ} />
-            <ButtonKey rawKey={RawKey.KeyK} />
-            <ButtonKey rawKey={RawKey.KeyL} />
-            <ButtonKey rawKey={RawKey.SemiColon} />
-            <ButtonKey rawKey={RawKey.Quote} />
-            <ButtonKey rawKey={RawKey.Return} className="flex-4" flexGrow />
-          </div>
+            {/* Row 4: ASDF */}
+            <div className="flex gap-2 justify-between w-full">
+              <ButtonKey rawKey={RawKey.CapsLock} className="flex-4" flexGrow />
+              <ButtonKey rawKey={RawKey.KeyA} />
+              <ButtonKey rawKey={RawKey.KeyS} />
+              <ButtonKey rawKey={RawKey.KeyD} />
+              <ButtonKey rawKey={RawKey.KeyF} />
+              <ButtonKey rawKey={RawKey.KeyG} />
+              <ButtonKey rawKey={RawKey.KeyH} />
+              <ButtonKey rawKey={RawKey.KeyJ} />
+              <ButtonKey rawKey={RawKey.KeyK} />
+              <ButtonKey rawKey={RawKey.KeyL} />
+              <ButtonKey rawKey={RawKey.SemiColon} />
+              <ButtonKey rawKey={RawKey.Quote} />
+              <ButtonKey rawKey={RawKey.Return} className="flex-4" flexGrow />
+              <ButtonKey rawKey={RawKey.PageUp} />
+            </div>
 
-          {/* Row 5: ZXCV */}
-          <div className="flex gap-2 justify-between w-full">
-            <ButtonKey rawKey={RawKey.ShiftLeft} className="flex-5" flexGrow />
-            <ButtonKey rawKey={RawKey.KeyZ} />
-            <ButtonKey rawKey={RawKey.KeyX} />
-            <ButtonKey rawKey={RawKey.KeyC} />
-            <ButtonKey rawKey={RawKey.KeyV} />
-            <ButtonKey rawKey={RawKey.KeyB} />
-            <ButtonKey rawKey={RawKey.KeyN} />
-            <ButtonKey rawKey={RawKey.KeyM} />
-            <ButtonKey rawKey={RawKey.Comma} />
-            <ButtonKey rawKey={RawKey.Dot} />
-            <ButtonKey rawKey={RawKey.Slash} />
-            <ButtonKey rawKey={RawKey.ShiftRight} className="flex-5" flexGrow />
-          </div>
+            {/* Row 5: ZXCV */}
+            <div className="flex gap-2 justify-between w-full">
+              <ButtonKey rawKey={RawKey.ShiftLeft} className="flex-5" flexGrow />
+              <ButtonKey rawKey={RawKey.KeyZ} />
+              <ButtonKey rawKey={RawKey.KeyX} />
+              <ButtonKey rawKey={RawKey.KeyC} />
+              <ButtonKey rawKey={RawKey.KeyV} />
+              <ButtonKey rawKey={RawKey.KeyB} />
+              <ButtonKey rawKey={RawKey.KeyN} />
+              <ButtonKey rawKey={RawKey.KeyM} />
+              <ButtonKey rawKey={RawKey.Comma} />
+              <ButtonKey rawKey={RawKey.Dot} />
+              <ButtonKey rawKey={RawKey.Slash} />
+              <ButtonKey rawKey={RawKey.ShiftRight} className="flex-4" flexGrow />
+              <ButtonKey rawKey={RawKey.UpArrow} />
+              <ButtonKey rawKey={RawKey.PageDown} />
+            </div>
 
-          {/* Row 6: Bottom & Arrows */}
-          <div className="flex gap-2 justify-between h-12 w-full">
-            <ButtonKey rawKey={RawKey.ControlLeft} className="flex-1" />
-            <ButtonKey rawKey={RawKey.Alt} className="flex-1" />
-            <ButtonKey rawKey={RawKey.MetaLeft} className="flex-1" />
-
-            {/* Spacebar */}
-            <ButtonKey rawKey={RawKey.Space} className="flex-4" flexGrow />
-
-            <ButtonKey rawKey={RawKey.ControlRight} className="flex-1" />
-
-            {/* Arrow Keys Container */}
-            <div className="h-10 flex flex-col justify-between items-center">
-              <div className="h-4 flex justify-center">
-                <ButtonKey rawKey={RawKey.UpArrow} className="h-full" />
-              </div>
-              <div className="h-4 flex gap-2 justify-center">
-                <ButtonKey rawKey={RawKey.LeftArrow} className="h-full" />
-                <ButtonKey rawKey={RawKey.DownArrow} className="h-full" />
-                <ButtonKey rawKey={RawKey.RightArrow} className="h-full" />
-              </div>
+            {/* Row 6: Bottom & Arrows */}
+            <div className="flex gap-2 justify-between h-12 w-full">
+              <ButtonKey rawKey={RawKey.ControlLeft} className="flex-1" />
+              <ButtonKey rawKey={RawKey.Alt} className="flex-1" />
+              <ButtonKey rawKey={RawKey.MetaLeft} className="flex-1" />
+              <ButtonKey rawKey={RawKey.Space} className="flex-4" flexGrow />
+              <ButtonKey rawKey={RawKey.ControlRight} className="flex-1" />
+              <ButtonKey rawKey={RawKey.LeftArrow} />
+              <ButtonKey rawKey={RawKey.DownArrow} />
+              <ButtonKey rawKey={RawKey.RightArrow} />
             </div>
           </div>
-        </div>
+        }
+        {
+          activeTab === 'Mouse' &&
+          <div
+            className="h-fit w-fit p-5 grid grid-cols-3 gap-4 justify-center bg-secondary rounded-t-[44%] rounded-b-[40%]"
+          >
+            <ButtonKey rawKey={RawKey.Left} className="mt-7" />
+            <div className="flex flex-col gap-4 items-center">
+              <ButtonKey rawKey={RawKey.Middle} />
+              <ButtonKey rawKey={RawKey.ScrollUp} />
+              <ButtonKey rawKey={RawKey.ScrollDown} />
+              <ButtonKey rawKey={RawKey.Drag} />
+            </div>
+            <ButtonKey rawKey={RawKey.Right} className="mt-7" />
+          </div>
+        }
+        {
+          activeTab === 'Numpad' &&
+          <div
+            className="w-56 p-3 grid grid-cols-4 gap-2 bg-secondary rounded-2xl"
+          >
+            {/* Row 1 */}
+            <ButtonKey rawKey={RawKey.NumLock} />
+            <ButtonKey rawKey={RawKey.KpDivide} />
+            <ButtonKey rawKey={RawKey.KpMultiply} />
+            <ButtonKey rawKey={RawKey.KpMinus} />
+
+            {/* Row 2 */}
+            <ButtonKey rawKey={RawKey.Kp7} />
+            <ButtonKey rawKey={RawKey.Kp8} />
+            <ButtonKey rawKey={RawKey.Kp9} />
+            <ButtonKey rawKey={RawKey.KpPlus} className="row-span-2" flexGrow />
+
+            {/* Row 3 */}
+            <ButtonKey rawKey={RawKey.Kp4} />
+            <ButtonKey rawKey={RawKey.Kp5} />
+            <ButtonKey rawKey={RawKey.Kp6} />
+            {/* <div /> */}
+
+            {/* Row 4 */}
+            <ButtonKey rawKey={RawKey.Kp3} />
+            <ButtonKey rawKey={RawKey.Kp2} />
+            <ButtonKey rawKey={RawKey.Kp1} />
+            <ButtonKey rawKey={RawKey.KpReturn} className="row-span-2" flexGrow />
+
+            {/* Row 5 */}
+            <ButtonKey className="col-span-2" rawKey={RawKey.Kp0} flexGrow />
+            <ButtonKey rawKey={RawKey.KpDecimal} />
+            <div />
+          </div>
+        }
+
+        <ToggleGroup
+          type="single"
+          spacing={4}
+          className="p-1 border rounded-xl"
+          value={activeTab}
+          onValueChange={(value) => setActiveTab(value as 'Keyboard' | 'Mouse' | 'Numpad')}
+        >
+          <ToggleGroupItem value="Keyboard">Keyboard</ToggleGroupItem>
+          <ToggleGroupItem value="Mouse">Mouse</ToggleGroupItem>
+          <ToggleGroupItem value="Numpad">Numpad</ToggleGroupItem>
+        </ToggleGroup>
       </div>
     </KeyboardContext.Provider>
   );

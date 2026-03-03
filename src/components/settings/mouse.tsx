@@ -18,9 +18,6 @@ export const MouseSettings = () => {
     const dragThreshold = useKeyEvent(state => state.dragThreshold);
     const setDragThreshold = useKeyEvent(state => state.setDragThreshold);
 
-    const showMouseEvents = useKeyEvent(state => state.showMouseEvents);
-    const setShowMouseEvents = useKeyEvent(state => state.setShowMouseEvents);
-
     const [offsetLinked, setOffsetLinked] = useState(true);
 
     return <div className="flex flex-col gap-y-4 p-6">
@@ -203,23 +200,6 @@ export const MouseSettings = () => {
                     className="w-32 h-8"
                     value={dragThreshold}
                     onChange={setDragThreshold}
-                />
-            </ItemActions>
-        </Item>
-
-        <Item variant="muted">
-            <ItemContent>
-                <ItemTitle>
-                    <HugeiconsIcon icon={KeyboardIcon} size="1em" /> Mouse Events
-                </ItemTitle>
-                <ItemDescription>
-                    Visualize mouse events like click, drag, etc. <br /> along with key events
-                </ItemDescription>
-            </ItemContent>
-            <ItemActions>
-                <Switch
-                    checked={showMouseEvents}
-                    onCheckedChange={(checked) => setShowMouseEvents(checked)}
                 />
             </ItemActions>
         </Item>

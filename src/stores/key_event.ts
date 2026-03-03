@@ -34,7 +34,6 @@ export interface KeyEventState {
     allowedKeys: string[];
     showEventHistory: boolean;
     maxHistory: number;
-    showMouseEvents: boolean;
     lingerDurationMs: number;
     toggleShortcut: string[];
 }
@@ -46,13 +45,13 @@ interface KeyEventActions {
     setAllowedKeys(keys: KeyEventState["allowedKeys"]): void;
     setShowEventHistory(value: KeyEventState["showEventHistory"]): void;
     setMaxHistory(value: KeyEventState["maxHistory"]): void;
-    setShowMouseEvents(value: KeyEventState["showMouseEvents"]): void;
+    // setShowMouseEvents(value: KeyEventState["showMouseEvents"]): void;
     setLingerDurationMs(value: KeyEventState["lingerDurationMs"]): void;
     setToggleShortcut(value: KeyEventState["toggleShortcut"]): void;
     // ───────────── event actions ─────────────
     onEvent(event: EventPayload): void;
     onKeyPress(event: RawKeyEvent): void;
-    ignoreEvent(event: RawKeyEvent, pressedKeys: string[]): boolean;
+    ignoreEvent(pressedKeys: string[]): boolean;
     onKeyRelease(event: RawKeyEvent): void;
     onMouseMove(event: MouseMoveEvent): void;
     onMouseButtonPress(event: MouseButtonEvent): void;
@@ -82,7 +81,6 @@ const createKeyEventStore = createSyncedStore<KeyEventStore>(
         showEventHistory: false,
         maxHistory: 5,
         lingerDurationMs: 5_000,
-        showMouseEvents: true,
         toggleShortcut: [RawKey.ShiftLeft, RawKey.F10],
 
         setDragThreshold(value: number) {
@@ -99,9 +97,6 @@ const createKeyEventStore = createSyncedStore<KeyEventStore>(
         },
         setMaxHistory(value: number) {
             set({ maxHistory: value });
-        },
-        setShowMouseEvents(value: boolean) {
-            set({ showMouseEvents: value });
         },
         setLingerDurationMs(value: number) {
             set({ lingerDurationMs: value });
@@ -145,7 +140,7 @@ const createKeyEventStore = createSyncedStore<KeyEventStore>(
             pressedKeys.push(event.name);
 
             // 1. filter event
-            if (state.filter !== "none" && state.ignoreEvent(event, pressedKeys)) {
+            if (state.filter !== "none" && state.ignoreEvent(pressedKeys)) {
                 set({ pressedKeys });
                 return;
             }
@@ -214,17 +209,13 @@ const createKeyEventStore = createSyncedStore<KeyEventStore>(
 
             set({ pressedKeys, groups });
         },
-        ignoreEvent(event, pressedKeys) {
+        ignoreEvent(pressedKeys) {
             const state = get();
             if (state.filter === "modifiers") {
-                return pressedKeys.length === 1
-                    ? !MODIFIERS.has(event.name) // single non-modifier
-                    : !MODIFIERS.has(pressedKeys[0]); // combination not starting with modifier
+                return !MODIFIERS.has(pressedKeys[0]);
             }
             else if (state.filter === "custom") {
-                return pressedKeys.length === 1
-                    ? !state.allowedKeys.includes(event.name)
-                    : !state.allowedKeys.includes(pressedKeys[0]);
+                return !state.allowedKeys.includes(pressedKeys[0]);
             }
             return false;
         },
@@ -252,7 +243,7 @@ const createKeyEventStore = createSyncedStore<KeyEventStore>(
             mouse.x = event.x;
             mouse.y = event.y;
             // check dragging
-            if (state.showMouseEvents && mouse.dragStart && !mouse.dragging) {
+            if (mouse.dragStart && !mouse.dragging) {
                 const dx = mouse.x - mouse.dragStart.x;
                 const dy = mouse.y - mouse.dragStart.y;
                 const dragDistance = Math.hypot(dx, dy);
@@ -272,8 +263,18 @@ const createKeyEventStore = createSyncedStore<KeyEventStore>(
 
                     set({ pressedKeys, mouse, groups });
 
-                    // simulate drag as key press
-                    state.onKeyPress({ type: "KeyEvent", name: "Drag", pressed: true });
+                    // Check if group has any keys to visualize (in combination) or simulate drag if allowed
+                    const hasGroupKeys = last >= 0 && groups[last].keys.length > 0;
+                    const dragAllowed = state.filter != "custom" || (
+                        state.pressedMouseButton &&
+                        state.allowedKeys.includes(state.pressedMouseButton.toString()) &&
+                        state.allowedKeys.includes("Drag")
+                    );
+
+                    if (hasGroupKeys || dragAllowed) {
+                        // simulate drag as key press
+                        state.onKeyPress({ type: "KeyEvent", name: "Drag", pressed: true });
+                    }
                     return;
                 }
             }
@@ -288,9 +289,7 @@ const createKeyEventStore = createSyncedStore<KeyEventStore>(
             };
 
             // simulate mouse button press as key
-            if (state.showMouseEvents) {
-                state.onKeyPress({ type: "KeyEvent", name: event.button.toString(), pressed: true });
-            }
+            state.onKeyPress({ type: "KeyEvent", name: event.button.toString(), pressed: true });
 
             set({
                 pressedMouseButton: event.button,
@@ -309,7 +308,7 @@ const createKeyEventStore = createSyncedStore<KeyEventStore>(
             if (state.mouse.dragging) {
                 // simulate drag release as key
                 state.onKeyRelease({ type: "KeyEvent", name: "Drag", pressed: false });
-            } else if (state.showMouseEvents) {
+            } else {
                 // simulate mouse button release as key
                 state.onKeyRelease({ type: "KeyEvent", name: event.button.toString(), pressed: false });
             }
@@ -329,7 +328,7 @@ const createKeyEventStore = createSyncedStore<KeyEventStore>(
             };
             const raw_key = event.delta_y > 0 ? RawKey.ScrollUp : RawKey.ScrollDown;
             // simulate mouse wheel as key press
-            if (state.showMouseEvents && !state.pressedKeys.includes(raw_key)) {
+            if (!state.pressedKeys.includes(raw_key)) {
                 state.onKeyPress({ type: "KeyEvent", name: raw_key, pressed: true });
             }
 
