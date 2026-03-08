@@ -1,3 +1,4 @@
+import { useI18n } from '@/hooks/use-i18n';
 import { keymaps } from '@/lib/keymaps';
 import { RawKey } from '@/types/event';
 import { useEffect, useRef, useState } from 'react';
@@ -48,10 +49,12 @@ const formatKey = (key: string) => {
 const ShortcutRecorder: React.FC<ShortcutInputProps> = ({
   value,
   onChange,
-  placeholder = "Click to set shortcut"
+  placeholder
 }) => {
+  const { t } = useI18n();
   const [isRecording, setIsRecording] = useState(false);
   const inputRef = useRef<HTMLDivElement>(null);
+  const resolvedPlaceholder = placeholder ?? t("settings.general.toggleShortcut.placeholder");
 
   // --- Logic: Handle Key Down ---
   useEffect(() => {
@@ -135,14 +138,14 @@ const ShortcutRecorder: React.FC<ShortcutInputProps> = ({
       >
         {isRecording ? (
           <span className="text-primary font-medium ml-2">
-            Press your combination. Esc to cancel.
+            {t("settings.general.toggleShortcut.recording")}
           </span>
         ) : (
           <div className="flex gap-2">
             {value.length > 0 ? (
               value.map(k => <KeyCap key={k} label={keymaps[k]?.label ?? k} />)
             ) : (
-              <span className="text-gray-400 select-none">{placeholder}</span>
+              <span className="text-gray-400 select-none">{resolvedPlaceholder}</span>
             )}
           </div>
         )}

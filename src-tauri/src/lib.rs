@@ -9,7 +9,7 @@ use tauri::{
 };
 
 mod app;
-use app::commands::{log, set_main_window_monitor, set_toggle_shortcut};
+use app::commands::{log, set_app_language, set_main_window_monitor, set_toggle_shortcut};
 use app::event::start_listener;
 use app::state::AppState;
 use app::window::config_window;
@@ -34,10 +34,30 @@ pub fn run() {
             // manage app state
             app.manage(Mutex::new(AppState::new(&app_handle)));
 
+            let (toggle_label, settings_label, quit_label) = {
+                let state = app.state::<Mutex<AppState>>();
+                let app_state = state.lock().unwrap();
+                (
+                    app_state.label_toggle(),
+                    app_state.label_settings(),
+                    app_state.label_quit(),
+                )
+            };
+
             // tray actions
-            let toggle_item = MenuItem::with_id(app, "toggle", "Stop", true, None::<&str>)?;
-            let settings_item = MenuItem::with_id(app, "settings", "Settings", true, None::<&str>)?;
-            let quit_item = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
+            let toggle_item = MenuItem::with_id(app, "toggle", toggle_label, true, None::<&str>)?;
+            let settings_item = MenuItem::with_id(app, "settings", settings_label, true, None::<&str>)?;
+            let quit_item = MenuItem::with_id(app, "quit", quit_label, true, None::<&str>)?;
+
+            {
+                let state = app.state::<Mutex<AppState>>();
+                let mut app_state = state.lock().unwrap();
+                app_state.set_tray_items(
+                    toggle_item.clone(),
+                    settings_item.clone(),
+                    quit_item.clone(),
+                );
+            }
 
             // start global input listener
             start_listener(app_handle.clone(), toggle_item.clone());
@@ -95,6 +115,7 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             log,
             set_toggle_shortcut,
+            set_app_language,
             set_main_window_monitor
         ])
         .run(tauri::generate_context!())

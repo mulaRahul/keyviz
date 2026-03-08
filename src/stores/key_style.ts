@@ -1,4 +1,5 @@
 import { Alignment } from "@/types/style";
+import { translate, type TranslationKey } from "@/i18n";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { tauriStorage } from "./storage";
 import { createSyncedStore } from "./sync";
@@ -6,6 +7,7 @@ import { getCurrentWindow } from "@tauri-apps/api/window";
 import { readTextFile, writeTextFile } from "@tauri-apps/plugin-fs";
 import { open, save } from "@tauri-apps/plugin-dialog";
 import { toast } from "sonner";
+import { usePreferences } from "./preferences";
 
 export const KEY_STYLE_STORE = "key_style_store";
 
@@ -99,6 +101,9 @@ interface KeyStyleActions {
 
 export type KeyStyleStore = KeyStyleState & KeyStyleActions;
 
+const i18nToast = (key: TranslationKey, params?: Record<string, string | number>) =>
+    translate(usePreferences.getState().language, key, params);
+
 const createKeyStyleStore = createSyncedStore<KeyStyleStore>(
     KEY_STYLE_STORE,
     (set, get) => ({
@@ -173,7 +178,7 @@ const createKeyStyleStore = createSyncedStore<KeyStyleStore>(
                 const filePath = await open({
                     multiple: false,
                     filters: [{
-                        name: 'JSON Files',
+                        name: i18nToast("dialog.filter.jsonFiles"),
                         extensions: ['json']
                     }]
                 });
@@ -187,7 +192,7 @@ const createKeyStyleStore = createSyncedStore<KeyStyleStore>(
                     !parsedData.modifier || !parsedData.text || !parsedData.border ||
                     !parsedData.background || !parsedData.mouse
                 ) {
-                    toast.warning("Invalid file format", { description: filePath });
+                    toast.warning(i18nToast("toast.style.invalidFileFormat"), { description: filePath });
                     return;
                 }
                 set(() => ({
@@ -200,9 +205,9 @@ const createKeyStyleStore = createSyncedStore<KeyStyleStore>(
                     background: parsedData.background,
                     mouse: parsedData.mouse,
                 }));
-                toast.success("Imported successfully", { description: filePath });
+                toast.success(i18nToast("toast.style.imported"), { description: filePath });
             } catch (err) {
-                toast.error("Error importing file", {
+                toast.error(i18nToast("toast.style.importError"), {
                     description: err instanceof Error ? err.message : String(err),
                 })
             }
@@ -222,13 +227,13 @@ const createKeyStyleStore = createSyncedStore<KeyStyleStore>(
             try {
                 const filePath = await save({
                     defaultPath: "key_style.json",
-                    filters: [{ name: "JSON Files", extensions: ["json"] }],
+                    filters: [{ name: i18nToast("dialog.filter.jsonFiles"), extensions: ["json"] }],
                 });
                 if (!filePath) return;
                 await writeTextFile(filePath, JSON.stringify(exportData, null, 2));
-                toast.success("Exported successfully", { description: filePath });
+                toast.success(i18nToast("toast.style.exported"), { description: filePath });
             } catch (err) {
-                toast.error("Error exporting file", {
+                toast.error(i18nToast("toast.style.exportError"), {
                     description: err instanceof Error ? err.message : String(err),
                 })
             }

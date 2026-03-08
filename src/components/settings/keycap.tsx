@@ -1,6 +1,8 @@
 import { AlignmentSelector } from "@/components/ui/alignment-selector";
 import { Button } from "@/components/ui/button";
 import { ColorInput } from "@/components/ui/color-picker";
+import { useI18n } from "@/hooks/use-i18n";
+import type { TranslationKey } from "@/i18n";
 import { Item, ItemActions, ItemContent, ItemDescription, ItemGrid, ItemGroup, ItemTitle } from "@/components/ui/item";
 import { Label } from "@/components/ui/label";
 import { NumberInput } from "@/components/ui/number-input";
@@ -109,6 +111,8 @@ export const colorSchemes: KeycapTheme[] = [
 ];
 
 export const KeycapSettings = () => {
+    const { t } = useI18n();
+
     const appearance = useKeyStyle(state => state.appearance);
     const setAppearance = useKeyStyle(state => state.setAppearance);
 
@@ -132,6 +136,23 @@ export const KeycapSettings = () => {
 
     const importStyle = useKeyStyle(state => state.import);
     const exportStyle = useKeyStyle(state => state.export);
+
+    const colorSchemeNameKey: Record<string, TranslationKey> = {
+        Silver: "settings.keycap.scheme.silver",
+        Stone: "settings.keycap.scheme.stone",
+        Lime: "settings.keycap.scheme.lime",
+        Cyber: "settings.keycap.scheme.cyber",
+        Turquoise: "settings.keycap.scheme.turquoise",
+        Blue: "settings.keycap.scheme.blue",
+        Yellow: "settings.keycap.scheme.yellow",
+        Green: "settings.keycap.scheme.green",
+        Pink: "settings.keycap.scheme.pink",
+        Red: "settings.keycap.scheme.red",
+        Pansy: "settings.keycap.scheme.pansy",
+        Eclipse: "settings.keycap.scheme.eclipse",
+        Bumblebee: "settings.keycap.scheme.bumblebee",
+        Charcoal: "settings.keycap.scheme.charcoal",
+    };
 
     const onStyleChange = (value: string) => {
         if (value === "minimal") {
@@ -169,9 +190,9 @@ export const KeycapSettings = () => {
     }
 
     return <div className="flex flex-col p-6 gap-y-4">
-        <h1 className="text-xl font-semibold">Keycap</h1>
+        <h1 className="text-xl font-semibold">{t("settings.keycap.title")}</h1>
 
-        <h2 className="text-sm text-muted-foreground font-medium">Preset</h2>
+        <h2 className="text-sm text-muted-foreground font-medium">{t("settings.keycap.section.preset")}</h2>
         <Item variant="muted">
             <ItemActions className="w-full">
                 <Select value={appearance.style} onValueChange={onStyleChange}>
@@ -180,10 +201,10 @@ export const KeycapSettings = () => {
                     </SelectTrigger>
                     <SelectContent>
                         <SelectGroup>
-                            <SelectItem value="minimal">Minimal</SelectItem>
-                            <SelectItem value="laptop">Laptop</SelectItem>
-                            <SelectItem value="lowprofile">Lowprofile</SelectItem>
-                            <SelectItem value="pbt" >PBT</SelectItem>
+                            <SelectItem value="minimal">{t("settings.keycap.preset.minimal")}</SelectItem>
+                            <SelectItem value="laptop">{t("settings.keycap.preset.laptop")}</SelectItem>
+                            <SelectItem value="lowprofile">{t("settings.keycap.preset.lowprofile")}</SelectItem>
+                            <SelectItem value="pbt" >{t("settings.keycap.preset.pbt")}</SelectItem>
                         </SelectGroup>
                     </SelectContent>
                 </Select>
@@ -208,7 +229,7 @@ export const KeycapSettings = () => {
                                             style={{ backgroundColor: scheme.primary, color: scheme.text }}
                                         >
                                             A</div>
-                                        {scheme.name}
+                                        {t(colorSchemeNameKey[scheme.name])}
                                     </DropdownMenuItem>
                                 ))
                             }
@@ -220,17 +241,17 @@ export const KeycapSettings = () => {
                 </Button>
 
                 <Button variant="outline" size="sm" className="ml-auto" onClick={importStyle}>
-                    <HugeiconsIcon icon={Download01Icon} className="mr-2" /> Import
+                    <HugeiconsIcon icon={Download01Icon} className="mr-2" /> {t("settings.keycap.button.import")}
                 </Button>
                 <Button variant="outline" size="sm" onClick={exportStyle}>
-                    <HugeiconsIcon icon={Upload01Icon} className="mr-2" /> Export
+                    <HugeiconsIcon icon={Upload01Icon} className="mr-2" /> {t("settings.keycap.button.export")}
                 </Button>
             </ItemActions>
         </Item>
 
         <Collapsible defaultOpen={true}>
             <CollapsibleTrigger>
-                <h2 className="text-sm text-muted-foreground font-medium">Text</h2>
+                <h2 className="text-sm text-muted-foreground font-medium">{t("settings.keycap.section.text")}</h2>
             </CollapsibleTrigger>
             <CollapsibleContent className="flex flex-col gap-y-4 pt-4">
                 <ItemGrid className="md:grid-cols-[240px_1fr]">
@@ -242,7 +263,7 @@ export const KeycapSettings = () => {
                     <ItemGroup>
                         <Item variant="muted" className="flex-2">
                             <ItemContent>
-                                <ItemTitle>Size</ItemTitle>
+                                <ItemTitle>{t("settings.keycap.text.size")}</ItemTitle>
                             </ItemContent>
                             <ItemActions>
                                 <NumberInput
@@ -254,7 +275,7 @@ export const KeycapSettings = () => {
                         </Item>
                         <Item variant="muted" className="flex-2">
                             <ItemContent>
-                                <ItemTitle>Variant</ItemTitle>
+                                <ItemTitle>{t("settings.keycap.text.variant")}</ItemTitle>
                             </ItemContent>
                             <ItemActions>
                                 <Select value={text.variant} onValueChange={(value) => {
@@ -264,12 +285,12 @@ export const KeycapSettings = () => {
                                     }
                                 }}>
                                     <SelectTrigger className="w-28">
-                                        <SelectValue placeholder="text variant" />
+                                        <SelectValue placeholder={t("settings.keycap.text.variant.placeholder")} />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="text">Full Text</SelectItem>
-                                        <SelectItem value="text-short">Short Text</SelectItem>
-                                        <SelectItem value="icon">Icon Only</SelectItem>
+                                        <SelectItem value="text">{t("settings.keycap.text.variant.full")}</SelectItem>
+                                        <SelectItem value="text-short">{t("settings.keycap.text.variant.short")}</SelectItem>
+                                        <SelectItem value="icon">{t("settings.keycap.text.variant.icon")}</SelectItem>
                                     </SelectContent>
                                 </Select>
 
@@ -277,7 +298,7 @@ export const KeycapSettings = () => {
                         </Item>
                         <Item variant="muted" className="flex-2">
                             <ItemContent>
-                                <ItemTitle>Text Cap</ItemTitle>
+                                <ItemTitle>{t("settings.keycap.text.cap")}</ItemTitle>
                             </ItemContent>
                             <ItemActions>
                                 <ToggleGroup
@@ -297,7 +318,7 @@ export const KeycapSettings = () => {
                 <ItemGrid>
                     <Item variant="muted" className={modifier.highlight ? "" : "col-span-2"}>
                         <ItemContent>
-                            <ItemTitle>Text Color</ItemTitle>
+                            <ItemTitle>{t("settings.keycap.text.color")}</ItemTitle>
                         </ItemContent>
                         <ItemActions>
                             <ColorInput value={text.color} onChange={(color) => setTextStyle({ color })} />
@@ -307,7 +328,7 @@ export const KeycapSettings = () => {
                         modifier.highlight &&
                         <Item variant="muted">
                             <ItemContent>
-                                <ItemTitle>Modifier Color</ItemTitle>
+                                <ItemTitle>{t("settings.keycap.text.modifierColor")}</ItemTitle>
                             </ItemContent>
                             <ItemActions>
                                 <ColorInput value={modifier.textColor} onChange={(textColor) => setModifierStyle({ textColor })} />
@@ -320,13 +341,13 @@ export const KeycapSettings = () => {
 
         <Collapsible>
             <CollapsibleTrigger>
-                <h2 className="text-sm text-muted-foreground font-medium">Layout</h2>
+                <h2 className="text-sm text-muted-foreground font-medium">{t("settings.keycap.section.layout")}</h2>
             </CollapsibleTrigger>
             <CollapsibleContent className="flex flex-col gap-y-4 pt-4">
                 <ItemGrid>
                     <Item variant="muted">
                         <ItemContent>
-                            <ItemTitle>Icon</ItemTitle>
+                            <ItemTitle>{t("settings.keycap.layout.icon")}</ItemTitle>
                         </ItemContent>
                         <ItemActions>
                             <Switch
@@ -338,7 +359,7 @@ export const KeycapSettings = () => {
                     </Item>
                     <Item variant="muted">
                         <ItemContent>
-                            <ItemTitle>Alignment</ItemTitle>
+                            <ItemTitle>{t("settings.keycap.layout.alignment")}</ItemTitle>
                         </ItemContent>
                         <ItemActions>
                             <ToggleGroup
@@ -364,8 +385,8 @@ export const KeycapSettings = () => {
                 </ItemGrid>
                 <Item variant="muted">
                     <ItemContent>
-                        <ItemTitle>Symbol</ItemTitle>
-                        <ItemDescription>Display symbol characters like !, @, #, etc.</ItemDescription>
+                        <ItemTitle>{t("settings.keycap.layout.symbol")}</ItemTitle>
+                        <ItemDescription>{t("settings.keycap.layout.symbol.description")}</ItemDescription>
                     </ItemContent>
                     <ItemActions>
                         <Switch
@@ -378,8 +399,8 @@ export const KeycapSettings = () => {
                     appearance.style !== "minimal" &&
                     <Item variant="muted">
                         <ItemContent>
-                            <ItemTitle>Press Count</ItemTitle>
-                            <ItemDescription>Display the number of times a key has been pressed.</ItemDescription>
+                            <ItemTitle>{t("settings.keycap.layout.pressCount")}</ItemTitle>
+                            <ItemDescription>{t("settings.keycap.layout.pressCount.description")}</ItemDescription>
                         </ItemContent>
                         <ItemActions>
                             <Switch
@@ -396,13 +417,13 @@ export const KeycapSettings = () => {
             appearance.style !== "minimal" &&
             <Collapsible>
                 <CollapsibleTrigger>
-                    <h2 className="text-sm text-muted-foreground font-medium">Color</h2>
+                    <h2 className="text-sm text-muted-foreground font-medium">{t("settings.keycap.section.color")}</h2>
                 </CollapsibleTrigger>
                 <CollapsibleContent className="flex flex-col gap-y-4 pt-4">
                     <Item variant="muted">
                         <ItemContent>
-                            <ItemTitle>Highlight Modifier</ItemTitle>
-                            <ItemDescription>Use different color for modifier keys</ItemDescription>
+                            <ItemTitle>{t("settings.keycap.color.highlightModifier")}</ItemTitle>
+                            <ItemDescription>{t("settings.keycap.color.highlightModifier.description")}</ItemDescription>
                         </ItemContent>
                         <ItemActions>
                             <Switch checked={modifier.highlight} onCheckedChange={(highlight) => setModifierStyle({ highlight })} />
@@ -412,7 +433,7 @@ export const KeycapSettings = () => {
                         appearance.style !== "lowprofile" &&
                         <Item variant="muted">
                             <ItemContent>
-                                <ItemTitle>Gradient</ItemTitle>
+                                <ItemTitle>{t("settings.keycap.color.gradient")}</ItemTitle>
                             </ItemContent>
                             <ItemActions>
                                 <Switch
@@ -427,7 +448,7 @@ export const KeycapSettings = () => {
                             <ItemGrid>
                                 <Item variant="muted" className={modifier.highlight ? "" : "col-span-2"}>
                                     <ItemContent>
-                                        <ItemTitle>Normal</ItemTitle>
+                                        <ItemTitle>{t("settings.keycap.color.normal")}</ItemTitle>
                                     </ItemContent>
                                     <ItemActions>
                                         <ColorInput value={color.color} onChange={(color) => setColorStyle({ color })} />
@@ -437,7 +458,7 @@ export const KeycapSettings = () => {
                                     modifier.highlight &&
                                     <Item variant="muted">
                                         <ItemContent>
-                                            <ItemTitle>Modifier</ItemTitle>
+                                            <ItemTitle>{t("settings.keycap.color.modifier")}</ItemTitle>
                                         </ItemContent>
                                         <ItemActions>
                                             <ColorInput value={modifier.color} onChange={(color) => setModifierStyle({ color })} />
@@ -446,11 +467,11 @@ export const KeycapSettings = () => {
                                 }
                             </ItemGrid> :
                             <>
-                                {modifier.highlight && <h1>Normal Color</h1>}
+                                {modifier.highlight && <h1>{t("settings.keycap.color.normalHeading")}</h1>}
                                 <ItemGrid>
                                     <Item variant="muted">
                                         <ItemContent>
-                                            <ItemTitle>Primary</ItemTitle>
+                                            <ItemTitle>{t("settings.keycap.color.primary")}</ItemTitle>
                                         </ItemContent>
                                         <ItemActions>
                                             <ColorInput
@@ -461,7 +482,7 @@ export const KeycapSettings = () => {
                                     </Item>
                                     <Item variant="muted">
                                         <ItemContent>
-                                            <ItemTitle>Secondary</ItemTitle>
+                                            <ItemTitle>{t("settings.keycap.color.secondary")}</ItemTitle>
                                         </ItemContent>
                                         <ItemActions>
                                             <ColorInput
@@ -473,11 +494,11 @@ export const KeycapSettings = () => {
                                 </ItemGrid>
                                 {
                                     modifier.highlight && <>
-                                        <h1>Modifier Color</h1>
+                                        <h1>{t("settings.keycap.color.modifierHeading")}</h1>
                                         <ItemGrid>
                                             <Item variant="muted">
                                                 <ItemContent>
-                                                    <ItemTitle>Primary</ItemTitle>
+                                                    <ItemTitle>{t("settings.keycap.color.primary")}</ItemTitle>
                                                 </ItemContent>
                                                 <ItemActions>
                                                     <ColorInput
@@ -488,7 +509,7 @@ export const KeycapSettings = () => {
                                             </Item>
                                             <Item variant="muted">
                                                 <ItemContent>
-                                                    <ItemTitle>Secondary</ItemTitle>
+                                                    <ItemTitle>{t("settings.keycap.color.secondary")}</ItemTitle>
                                                 </ItemContent>
                                                 <ItemActions>
                                                     <ColorInput
@@ -508,13 +529,13 @@ export const KeycapSettings = () => {
 
         <Collapsible>
             <CollapsibleTrigger>
-                <h2 className="text-sm text-muted-foreground font-medium">Border</h2>
+                <h2 className="text-sm text-muted-foreground font-medium">{t("settings.keycap.section.border")}</h2>
             </CollapsibleTrigger>
             <CollapsibleContent className="flex flex-col gap-y-4 pt-4">
                 <ItemGrid>
                     <Item variant="muted">
                         <ItemContent className="min-h-6 h-full justify-center">
-                            <ItemTitle>Enable</ItemTitle>
+                            <ItemTitle>{t("settings.keycap.border.enable")}</ItemTitle>
                         </ItemContent>
                         <ItemActions>
                             <Switch id="borderEnabled" checked={border.enabled} onCheckedChange={(enabled) => setBorderStyle({ enabled })} />
@@ -522,7 +543,7 @@ export const KeycapSettings = () => {
                     </Item>
                     <Item variant="muted">
                         <ItemContent>
-                            <ItemTitle>Width</ItemTitle>
+                            <ItemTitle>{t("settings.keycap.border.width")}</ItemTitle>
                         </ItemContent>
                         <ItemActions>
                             <NumberInput
@@ -537,7 +558,7 @@ export const KeycapSettings = () => {
                     </Item>
                     <Item variant="muted" className={modifier.highlight ? "" : "col-span-2"}>
                         <ItemContent>
-                            <ItemTitle>Color</ItemTitle>
+                            <ItemTitle>{t("settings.keycap.border.color")}</ItemTitle>
                         </ItemContent>
                         <ItemActions>
                             <ColorInput
@@ -550,7 +571,7 @@ export const KeycapSettings = () => {
                     {
                         modifier.highlight && <Item variant="muted">
                             <ItemContent>
-                                <ItemTitle>Modifier Color</ItemTitle>
+                                <ItemTitle>{t("settings.keycap.border.modifierColor")}</ItemTitle>
                             </ItemContent>
                             <ItemActions>
                                 <ColorInput
@@ -564,7 +585,7 @@ export const KeycapSettings = () => {
                 </ItemGrid>
                 <Item variant="muted">
                     <ItemContent>
-                        <ItemTitle>Radius</ItemTitle>
+                        <ItemTitle>{t("settings.keycap.border.radius")}</ItemTitle>
                     </ItemContent>
                     <ItemActions>
                         <div className="w-4 h-4 border-l-2 border-t-2 border-primary/50" style={{ borderTopLeftRadius: `${border.radius * 100}%` }} />
@@ -584,13 +605,13 @@ export const KeycapSettings = () => {
 
         <Collapsible>
             <CollapsibleTrigger>
-                <h2 className="text-sm text-muted-foreground font-medium">Background</h2>
+                <h2 className="text-sm text-muted-foreground font-medium">{t("settings.keycap.section.background")}</h2>
             </CollapsibleTrigger>
             <CollapsibleContent className="flex flex-col gap-y-4 pt-4">
                 <ItemGrid>
                     <Item variant="muted">
                         <ItemContent className="min-h-6 h-full justify-center">
-                            <ItemTitle>Enable</ItemTitle>
+                            <ItemTitle>{t("settings.keycap.background.enable")}</ItemTitle>
                         </ItemContent>
                         <ItemActions>
                             <Switch checked={background.enabled} onCheckedChange={(enabled) => setBackgroundStyle({ enabled })} />
@@ -598,7 +619,7 @@ export const KeycapSettings = () => {
                     </Item>
                     <Item variant="muted">
                         <ItemContent>
-                            <ItemTitle>Color</ItemTitle>
+                            <ItemTitle>{t("settings.keycap.background.color")}</ItemTitle>
                         </ItemContent>
                         <ItemActions>
                             <ColorInput value={background.color} onChange={(color) => setBackgroundStyle({ color })} disabled={!background.enabled} />

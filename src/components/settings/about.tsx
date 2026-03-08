@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button"
+import { useI18n } from "@/hooks/use-i18n"
 import { Item, ItemActions, ItemContent, ItemDescription, ItemTitle } from "@/components/ui/item"
 import { DiscordIcon, GithubIcon, LinkSquare02Icon, SparklesIcon, StarsIcon } from "@hugeicons/core-free-icons"
 import { HugeiconsIcon } from "@hugeicons/react"
@@ -10,6 +11,8 @@ import { toast } from "sonner"
 export const VERSION = "2.1.0"
 
 export const AboutPage = () => {
+    const { t } = useI18n();
+
     const [checking, setChecking] = useState(false);
     const [updateAvailable, setUpdateAvailable] = useState(false);
     const [hovered, setHovered] = useState(false);
@@ -27,16 +30,16 @@ export const AboutPage = () => {
             if (latestVersion !== VERSION) {
                 setUpdateAvailable(true);
                 toast.success(
-                    `New version available: v${latestVersion}`,
+                    t("settings.about.update.toast.available", { version: latestVersion }),
                     {
-                        action: { label: 'View', onClick: visitReleasePage }
+                        action: { label: t("settings.about.update.toast.view"), onClick: visitReleasePage }
                     }
                 );
             } else {
-                toast.info("You are using the latest version.");
+                toast.info(t("settings.about.update.toast.latest"));
             }
         } catch (error) {
-            toast.error("Failed to check for updates.");
+            toast.error(t("settings.about.update.toast.failed"));
         }
         setChecking(false);
     }
@@ -74,7 +77,7 @@ export const AboutPage = () => {
                 />
             </div>
             <h1 className="mt-4 mb-2 text-xl font-semibold">{
-                hovered ? "Keyviz Pro" : "Keyviz"
+                hovered ? t("settings.about.app.pro") : "Keyviz"
             }</h1>
             <p className="text-center text-sm text-muted-foreground">
                 v{VERSION}-beta <br />
@@ -105,10 +108,10 @@ export const AboutPage = () => {
                 >
                     <ItemContent>
                         <ItemTitle>
-                            <HugeiconsIcon icon={SparklesIcon} size="1em" /> Upgrade to Pro
+                            <HugeiconsIcon icon={SparklesIcon} size="1em" /> {t("settings.about.upgrade.title")}
                         </ItemTitle>
                         <ItemDescription>
-                            Love Keyviz? Support its growth and unlock more with Pro.
+                            {t("settings.about.upgrade.description")}
                         </ItemDescription>
                     </ItemContent>
                     <ItemActions>
@@ -116,7 +119,7 @@ export const AboutPage = () => {
                             variant={hovered ? "default" : "outline"}
                             onClick={() => openUrl('https://keyviz.org/pro')}
                         >
-                            Go Pro
+                            {t("settings.about.upgrade.button")}
                         </Button>
                     </ItemActions>
                 </Item>
@@ -125,14 +128,14 @@ export const AboutPage = () => {
             <Item variant="muted" className="transition-all peer-hover:blur-xs">
                 <ItemContent>
                     <ItemTitle>
-                        <HugeiconsIcon icon={StarsIcon} size="1em" /> Check for updates
+                        <HugeiconsIcon icon={StarsIcon} size="1em" /> {t("settings.about.update.title")}
                     </ItemTitle>
                 </ItemContent>
                 <ItemActions>
                     {
                         updateAvailable
-                            ? <Button className="cursor-pointer" onClick={visitReleasePage}>Update Available</Button>
-                            : <Button variant="outline" onClick={checkForUpdates} disabled={checking}>Check</Button>
+                            ? <Button className="cursor-pointer" onClick={visitReleasePage}>{t("settings.about.update.button.available")}</Button>
+                            : <Button variant="outline" onClick={checkForUpdates} disabled={checking}>{t("settings.about.update.button.check")}</Button>
                     }
                 </ItemActions>
             </Item>
@@ -140,10 +143,10 @@ export const AboutPage = () => {
             <Item variant="muted" className="transition-all peer-hover:blur-xs">
                 <ItemContent>
                     <ItemTitle>
-                        <HugeiconsIcon icon={GithubIcon} size="1em" /> Open Source
+                        <HugeiconsIcon icon={GithubIcon} size="1em" /> {t("settings.about.openSource.title")}
                     </ItemTitle>
                     <ItemDescription className="max-w-100">
-                        Review the source code on GitHub, sponsor, star the project, or contribute to its development.
+                        {t("settings.about.openSource.description")}
                     </ItemDescription>
                 </ItemContent>
                 <ItemActions>
@@ -156,10 +159,10 @@ export const AboutPage = () => {
             <Item variant="muted" className="transition-all peer-hover:blur-xs">
                 <ItemContent>
                     <ItemTitle>
-                        <HugeiconsIcon icon={DiscordIcon} size="1em" /> Discord
+                        <HugeiconsIcon icon={DiscordIcon} size="1em" /> {t("settings.about.discord.title")}
                     </ItemTitle>
                     <ItemDescription className="max-w-100">
-                        Join our Discord community.
+                        {t("settings.about.discord.description")}
                     </ItemDescription>
                 </ItemContent>
                 <ItemActions>
