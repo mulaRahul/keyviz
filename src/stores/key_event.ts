@@ -320,15 +320,29 @@ const createKeyEventStore = createSyncedStore<KeyEventStore>(
         onMouseWheel(event: MouseWheelEvent) {
             // bug: history mode, ctrl + scroll, scroll
             const state = get();
+            const wheel = Math.sign(event.delta_y);
+
+            if (wheel === 0) return;
+
+            const raw_key = wheel > 0 ? RawKey.ScrollUp : RawKey.ScrollDown;
+            const previous_raw_key = state.mouse.wheel > 0 ? RawKey.ScrollUp : RawKey.ScrollDown;
+
+            if (
+                state.mouse.wheel !== 0 &&
+                state.mouse.wheel !== wheel &&
+                state.pressedKeys.includes(previous_raw_key)
+            ) {
+                state.onKeyRelease({ type: "KeyEvent", name: previous_raw_key, pressed: false });
+            }
+
             // update mouse wheel state
             const mouse = {
                 ...state.mouse,
-                wheel: Math.sign(event.delta_y), // -1 for up, 1 for down
+                wheel, // -1 for down, 1 for up
                 lastScrollAt: Date.now()
             };
-            const raw_key = event.delta_y > 0 ? RawKey.ScrollUp : RawKey.ScrollDown;
             // simulate mouse wheel as key press
-            if (!state.pressedKeys.includes(raw_key)) {
+            if (!get().pressedKeys.includes(raw_key)) {
                 state.onKeyPress({ type: "KeyEvent", name: raw_key, pressed: true });
             }
 
@@ -344,8 +358,12 @@ const createKeyEventStore = createSyncedStore<KeyEventStore>(
 
             // handle scroll linger
             if (state.mouse.lastScrollAt && now - state.mouse.lastScrollAt > SCROLL_LINGER_MS) {
-                // simulate scroll key release
-                state.onKeyRelease({ type: "KeyEvent", name: state.mouse.wheel > 0 ? RawKey.ScrollUp : RawKey.ScrollDown, pressed: false });
+                if (state.pressedKeys.includes(RawKey.ScrollUp)) {
+                    state.onKeyRelease({ type: "KeyEvent", name: RawKey.ScrollUp, pressed: false });
+                }
+                if (state.pressedKeys.includes(RawKey.ScrollDown)) {
+                    state.onKeyRelease({ type: "KeyEvent", name: RawKey.ScrollDown, pressed: false });
+                }
                 set({ mouse: { ...state.mouse, wheel: 0, lastScrollAt: undefined } });
             }
 
