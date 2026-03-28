@@ -8,6 +8,7 @@
   ],
   "permissions": [
     "core:default",
+    "core:window:allow-set-position",
     "opener:default",
     "os:default",
     "store:default",

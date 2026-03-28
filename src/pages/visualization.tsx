@@ -6,7 +6,6 @@ import { listenForUpdates } from '@/stores/sync';
 import { EventPayload } from "@/types/event";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
-import { primaryMonitor } from "@tauri-apps/api/window";
 import { useEffect, useState, } from "react";
 
 export function Visualization() {
@@ -41,13 +40,12 @@ export function Visualization() {
 
   useEffect(() => {
     const set_monitor = async () => {
-      let monitorName = monitor;
-      if (!monitorName) {
-        const primary = await primaryMonitor();
-        monitorName = primary?.name ?? "";
+      if (!monitor) return;
+      try {
+        await invoke("set_main_window_monitor", { monitorName: monitor });
+      } catch (error) {
+        console.error("Failed to set monitor:", error);
       }
-      if (!monitorName) return;
-      await invoke("set_main_window_monitor", { monitorName });
     }
     set_monitor();
   }, [monitor]);

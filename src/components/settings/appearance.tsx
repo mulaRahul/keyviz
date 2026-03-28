@@ -10,7 +10,7 @@ import { useKeyEvent } from "@/stores/key_event";
 import { useKeyStyle } from "@/stores/key_style";
 import { ComputerIcon, KeyframesDoubleIcon, KeyframesDoubleRemoveIcon, Link02Icon, ParagraphSpacingIcon, TextAlignLeftIcon, Time03Icon, Unlink02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { availableMonitors, getAllWindows, Monitor } from "@tauri-apps/api/window";
+import { availableMonitors, Monitor } from "@tauri-apps/api/window";
 
 
 export const AppearanceSettings = () => {
@@ -52,13 +52,6 @@ export const AppearanceSettings = () => {
                     <Select
                         value={appearance.monitor ?? ""}
                         onValueChange={(value) => {
-                            getAllWindows().then(windows => {
-                                const window = windows.find(w => w.label === "main");
-                                const monitor = monitors.find(m => m.name === value);
-                                if (monitor && window) {
-                                    window.setPosition(monitor.position);
-                                }
-                            });
                             setAppearance({ monitor: value });
                         }}
                     >
