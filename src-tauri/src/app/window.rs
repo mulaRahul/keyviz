@@ -3,8 +3,6 @@ pub fn config_window(window: &tauri::WebviewWindow) {
         .set_ignore_cursor_events(true)
         .expect("Failed to set ignore cursor events");
 
-    // bug: monitor isn't changed on load
-
     #[cfg(target_os = "windows")]
     {
         use windows::Win32::Foundation::HWND;

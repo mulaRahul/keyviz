@@ -7,7 +7,7 @@ import { motion } from "motion/react"
 import { useState } from "react"
 import { toast } from "sonner"
 
-export const VERSION = "2.1.0"
+export const VERSION = "2.1.1"
 
 export const AboutPage = () => {
     const [checking, setChecking] = useState(false);
