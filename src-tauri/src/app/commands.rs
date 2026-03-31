@@ -17,6 +17,13 @@ pub fn set_toggle_shortcut(app: tauri::AppHandle, shortcut: Vec<String>) {
 }
 
 #[tauri::command]
+pub fn set_app_language(app: tauri::AppHandle, language: String) {
+    let state = app.state::<Mutex<AppState>>();
+    let mut app_state = state.lock().unwrap();
+    app_state.set_language(language);
+}
+
+#[tauri::command]
 pub fn set_main_window_monitor(app: tauri::AppHandle, monitor_name: String) {
     let state = app.state::<Mutex<AppState>>();
     let mut app_state = state.lock().unwrap();

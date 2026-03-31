@@ -2,6 +2,7 @@ import { useState } from "react";
 
 import { AboutPage, AppearanceSettings, GeneralSettings, KeycapSettings, MouseSettings } from "@/components/settings";
 import { VERSION } from "@/components/settings/about";
+import { useI18n } from "@/hooks/use-i18n";
 import { ThemeModeToggle } from "@/components/theme-mode-toggle";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
@@ -9,14 +10,15 @@ import { SidebarItem } from "@/components/ui/sidebar-item";
 import { ComputerIcon, InformationSquareIcon, KeyboardIcon, Mouse09Icon, Settings03Icon } from "@hugeicons/core-free-icons";
 
 const sideBar = [
-    { title: "General", icon: Settings03Icon },
-    { title: "Appearance", icon: ComputerIcon },
-    { title: "Keycap", icon: KeyboardIcon },
-    { title: "Mouse", icon: Mouse09Icon },
-]
+    { id: "general", titleKey: "settings.sidebar.general" as const, icon: Settings03Icon },
+    { id: "appearance", titleKey: "settings.sidebar.appearance" as const, icon: ComputerIcon },
+    { id: "keycap", titleKey: "settings.sidebar.keycap" as const, icon: KeyboardIcon },
+    { id: "mouse", titleKey: "settings.sidebar.mouse" as const, icon: Mouse09Icon },
+];
 
 const Settings = () => {
-    const [activeTab, setActiveTab] = useState(sideBar[0].title);
+    const { t } = useI18n();
+    const [activeTab, setActiveTab] = useState(sideBar[0].id);
 
     return (
         <div className="flex w-screen h-screen overflow-hidden border-t bg-background">
@@ -30,25 +32,31 @@ const Settings = () => {
                 </div>
                 {
                     sideBar.map((item) => (
-                        <a key={item.title} onClick={() => setActiveTab(item.title)} className="cursor-pointer">
-                            <SidebarItem item={item} isActive={activeTab === item.title} />
+                        <a key={item.id} onClick={() => setActiveTab(item.id)} className="cursor-pointer">
+                            <SidebarItem
+                                item={{ title: t(item.titleKey), icon: item.icon }}
+                                isActive={activeTab === item.id}
+                            />
                         </a>
                     ))
                 }
                 <div className="mt-auto flex gap-2 items-center">
-                    <a key="about" onClick={() => setActiveTab("About")} className="flex-1 cursor-pointer">
-                        <SidebarItem item={{ title: "About", icon: InformationSquareIcon }} isActive={activeTab === "About"} />
+                    <a key="about" onClick={() => setActiveTab("about")} className="flex-1 cursor-pointer">
+                        <SidebarItem
+                            item={{ title: t("settings.sidebar.about"), icon: InformationSquareIcon }}
+                            isActive={activeTab === "about"}
+                        />
                     </a>
                     <ThemeModeToggle />
                 </div>
             </div>
             <Separator orientation="vertical" />
             <ScrollArea className="flex-1 relative">
-                {activeTab === "General" && <GeneralSettings />}
-                {activeTab === "Appearance" && <AppearanceSettings />}
-                {activeTab === "Keycap" && <KeycapSettings />}
-                {activeTab === "Mouse" && <MouseSettings />}
-                {activeTab === "About" && <AboutPage />}
+                {activeTab === "general" && <GeneralSettings />}
+                {activeTab === "appearance" && <AppearanceSettings />}
+                {activeTab === "keycap" && <KeycapSettings />}
+                {activeTab === "mouse" && <MouseSettings />}
+                {activeTab === "about" && <AboutPage />}
             </ScrollArea>
         </div>
     );

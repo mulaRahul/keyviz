@@ -1,5 +1,7 @@
 # [Keyviz](https://keyviz.org)
 
+**English** | [简体中文](./README.zh-CN.md)
+
 <div>
    <img src="https://img.shields.io/github/v/release/mulaRahul/keyviz?style=flat-square" alt="Releases">
    <img src="https://img.shields.io/github/downloads/mulaRahul/keyviz/total?style=flat-square" alt="Downloads">

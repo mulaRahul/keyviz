@@ -2,6 +2,11 @@ import { KeyOverlay } from "@/components/key-overlay";
 import { MouseOverlay } from "@/components/mouse-overlay";
 import { KEY_EVENT_STORE, KeyEventStore, useKeyEvent } from "@/stores/key_event";
 import { KEY_STYLE_STORE, KeyStyleStore, useKeyStyle } from '@/stores/key_style';
+import {
+  PREFERENCES_STORE,
+  PreferencesStore,
+  usePreferences,
+} from "@/stores/preferences";
 import { listenForUpdates } from '@/stores/sync';
 import { EventPayload } from "@/types/event";
 import { invoke } from "@tauri-apps/api/core";
@@ -23,6 +28,7 @@ export function Visualization() {
       // ───────────── store sync ─────────────
       listenForUpdates<KeyEventStore>(KEY_EVENT_STORE, useKeyEvent.setState),
       listenForUpdates<KeyStyleStore>(KEY_STYLE_STORE, useKeyStyle.setState),
+      listenForUpdates<PreferencesStore>(PREFERENCES_STORE, usePreferences.setState),
       // ───────────── settings window open/close ─────────────
       listen<boolean>("settings-window", (event) => {
         useKeyEvent.setState({ settingsOpen: event.payload });

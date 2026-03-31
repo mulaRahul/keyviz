@@ -1,4 +1,5 @@
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { useI18n } from "@/hooks/use-i18n";
 import { keymaps } from "@/lib/keymaps";
 import { cn } from "@/lib/utils";
 import { useKeyEvent } from "@/stores/key_event";
@@ -103,6 +104,8 @@ const ButtonKey: React.FC<{
 };
 
 export const CustomFilter = () => {
+  const { t } = useI18n();
+
   const [activeTab, setActiveTab] = useState<'Keyboard' | 'Mouse' | 'Numpad'>('Keyboard');
   const [isCtrlHeld, setIsCtrlHeld] = useState(false);
   const [hoveredKey, setHoveredKey] = useState<string | undefined>(undefined);
@@ -310,9 +313,9 @@ export const CustomFilter = () => {
           value={activeTab}
           onValueChange={(value) => setActiveTab(value as 'Keyboard' | 'Mouse' | 'Numpad')}
         >
-          <ToggleGroupItem value="Keyboard">Keyboard</ToggleGroupItem>
-          <ToggleGroupItem value="Mouse">Mouse</ToggleGroupItem>
-          <ToggleGroupItem value="Numpad">Numpad</ToggleGroupItem>
+          <ToggleGroupItem value="Keyboard">{t("settings.customFilter.tab.keyboard")}</ToggleGroupItem>
+          <ToggleGroupItem value="Mouse">{t("settings.customFilter.tab.mouse")}</ToggleGroupItem>
+          <ToggleGroupItem value="Numpad">{t("settings.customFilter.tab.numpad")}</ToggleGroupItem>
         </ToggleGroup>
       </div>
     </KeyboardContext.Provider>

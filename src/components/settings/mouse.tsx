@@ -1,10 +1,11 @@
 import { ColorInput } from "@/components/ui/color-picker";
+import { useI18n } from "@/hooks/use-i18n";
 import { Item, ItemActions, ItemContent, ItemDescription, ItemGrid, ItemTitle } from "@/components/ui/item";
 import { NumberInput } from "@/components/ui/number-input";
 import { Switch } from "@/components/ui/switch";
 import { useKeyEvent } from "@/stores/key_event";
 import { useKeyStyle } from '@/stores/key_style';
-import { ArrowExpand02Icon, Cursor01Icon, CursorCircleSelection01Icon, CursorEdit01Icon, CursorMagicSelection03FreeIcons, Drag03Icon, KeyboardIcon, Link02Icon, MouseLeftClick05Icon, PaintBoardIcon, Unlink02Icon } from "@hugeicons/core-free-icons";
+import { ArrowExpand02Icon, Cursor01Icon, CursorCircleSelection01Icon, CursorEdit01Icon, CursorMagicSelection03FreeIcons, Drag03Icon, Link02Icon, MouseLeftClick05Icon, PaintBoardIcon, Unlink02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { NumberScrubber } from "../ui/number-input-scrub";
 import { useState } from "react";
@@ -12,6 +13,8 @@ import { Toggle } from "../ui/toggle";
 
 
 export const MouseSettings = () => {
+    const { t } = useI18n();
+
     const mouse = useKeyStyle(state => state.mouse);
     const setMouseStyle = useKeyStyle(state => state.setMouse);
 
@@ -21,16 +24,16 @@ export const MouseSettings = () => {
     const [offsetLinked, setOffsetLinked] = useState(true);
 
     return <div className="flex flex-col gap-y-4 p-6">
-        <h1 className="text-xl font-semibold">Mouse</h1>
+        <h1 className="text-xl font-semibold">{t("settings.mouse.title")}</h1>
 
-        <h2 className="text-sm text-muted-foreground font-medium">Cursor Highlight</h2>
+        <h2 className="text-sm text-muted-foreground font-medium">{t("settings.mouse.section.cursorHighlight")}</h2>
         <Item variant="muted">
             <ItemContent>
                 <ItemTitle>
-                    <HugeiconsIcon icon={CursorMagicSelection03FreeIcons} size="1em" /> Show Clicks
+                    <HugeiconsIcon icon={CursorMagicSelection03FreeIcons} size="1em" /> {t("settings.mouse.cursor.showClicks.title")}
                 </ItemTitle>
                 <ItemDescription>
-                    Animate a ring upon mouse press
+                    {t("settings.mouse.cursor.showClicks.description")}
                 </ItemDescription>
             </ItemContent>
             <ItemActions>
@@ -45,7 +48,7 @@ export const MouseSettings = () => {
             <Item variant="muted">
                 <ItemContent>
                     <ItemTitle>
-                        <HugeiconsIcon icon={CursorCircleSelection01Icon} size="1em" /> Size
+                        <HugeiconsIcon icon={CursorCircleSelection01Icon} size="1em" /> {t("settings.mouse.cursor.size")}
                     </ItemTitle>
                 </ItemContent>
                 <ItemActions>
@@ -61,7 +64,7 @@ export const MouseSettings = () => {
             <Item variant="muted">
                 <ItemContent>
                     <ItemTitle>
-                        <HugeiconsIcon icon={PaintBoardIcon} size="1em" /> Color
+                        <HugeiconsIcon icon={PaintBoardIcon} size="1em" /> {t("settings.mouse.cursor.color")}
                     </ItemTitle>
                 </ItemContent>
                 <ItemActions>
@@ -78,10 +81,10 @@ export const MouseSettings = () => {
         <Item variant="muted">
             <ItemContent>
                 <ItemTitle>
-                    <HugeiconsIcon icon={Cursor01Icon} size="1em" /> Always Highlight
+                    <HugeiconsIcon icon={Cursor01Icon} size="1em" /> {t("settings.mouse.cursor.alwaysHighlight.title")}
                 </ItemTitle>
                 <ItemDescription>
-                    Permanently show the ring around the cursor
+                    {t("settings.mouse.cursor.alwaysHighlight.description")}
                 </ItemDescription>
             </ItemContent>
             <ItemActions>
@@ -93,14 +96,14 @@ export const MouseSettings = () => {
             </ItemActions>
         </Item>
 
-        <h2 className="text-sm text-muted-foreground font-medium mt-2">Button Indicator</h2>
+        <h2 className="text-sm text-muted-foreground font-medium mt-2">{t("settings.mouse.section.buttonIndicator")}</h2>
         <Item variant="muted">
             <ItemContent>
                 <ItemTitle>
-                    <HugeiconsIcon icon={MouseLeftClick05Icon} size="1em" /> Show Indicator
+                    <HugeiconsIcon icon={MouseLeftClick05Icon} size="1em" /> {t("settings.mouse.indicator.show.title")}
                 </ItemTitle>
                 <ItemDescription>
-                    Display button and scroll icons next to the cursor
+                    {t("settings.mouse.indicator.show.description")}
                 </ItemDescription>
             </ItemContent>
             <ItemActions>
@@ -114,10 +117,10 @@ export const MouseSettings = () => {
         <Item variant="muted">
             <ItemContent>
                 <ItemTitle>
-                    <HugeiconsIcon icon={Cursor01Icon} size="1em" /> Keep Indicator
+                    <HugeiconsIcon icon={Cursor01Icon} size="1em" /> {t("settings.mouse.indicator.keep.title")}
                 </ItemTitle>
                 <ItemDescription>
-                    Permanently show the icon beside the cursor
+                    {t("settings.mouse.indicator.keep.description")}
                 </ItemDescription>
             </ItemContent>
             <ItemActions>
@@ -132,7 +135,7 @@ export const MouseSettings = () => {
         <Item variant="muted">
             <ItemContent>
                 <ItemTitle>
-                    <HugeiconsIcon icon={CursorEdit01Icon} size="1em" /> Size
+                    <HugeiconsIcon icon={CursorEdit01Icon} size="1em" /> {t("settings.mouse.indicator.size")}
                 </ItemTitle>
             </ItemContent>
             <ItemActions>
@@ -147,10 +150,10 @@ export const MouseSettings = () => {
         <Item variant="muted">
             <ItemContent>
                 <ItemTitle>
-                    <HugeiconsIcon icon={ArrowExpand02Icon} size="1em" /> Offset
+                    <HugeiconsIcon icon={ArrowExpand02Icon} size="1em" /> {t("settings.mouse.indicator.offset.title")}
                 </ItemTitle>
                 <ItemDescription>
-                    Space from the cursor to the indicator
+                    {t("settings.mouse.indicator.offset.description")}
                 </ItemDescription>
             </ItemContent>
             <ItemActions>
@@ -170,7 +173,7 @@ export const MouseSettings = () => {
                             setMouseStyle({ indicatorOffsetY: mouse.indicatorOffsetX });
                         }
                     }}
-                    aria-label="Offset linked"
+                    aria-label={t("settings.mouse.indicator.offset.ariaLinked")}
                 >
                     <HugeiconsIcon icon={offsetLinked ? Link02Icon : Unlink02Icon} size="1em" />
                 </Toggle>
@@ -185,14 +188,14 @@ export const MouseSettings = () => {
             </ItemActions>
         </Item>
 
-        <h2 className="text-sm text-muted-foreground font-medium mt-2">Event</h2>
+        <h2 className="text-sm text-muted-foreground font-medium mt-2">{t("settings.mouse.section.event")}</h2>
         <Item variant="muted">
             <ItemContent>
                 <ItemTitle>
-                    <HugeiconsIcon icon={Drag03Icon} size="1em" /> Drag Threshold
+                    <HugeiconsIcon icon={Drag03Icon} size="1em" /> {t("settings.mouse.event.dragThreshold.title")}
                 </ItemTitle>
                 <ItemDescription>
-                    Minimum distance in pixels to show Drag event
+                    {t("settings.mouse.event.dragThreshold.description")}
                 </ItemDescription>
             </ItemContent>
             <ItemActions>
