@@ -15,6 +15,8 @@ export const KeycapBase = ({ event }: { event: KeyEvent }) => {
     lineHeight: 1.2,
     fontSize: text.size,
     textTransform: text.caps,
+    fontVariantLigatures: "none",
+    fontFeatureSettings: "\"liga\" 0, \"calt\" 0",
   };
 
   const label = text.variant === "text-short"

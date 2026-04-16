@@ -1,10 +1,11 @@
 import { ColorInput } from "@/components/ui/color-picker";
+import { useI18n } from "@/i18n";
 import { Item, ItemActions, ItemContent, ItemDescription, ItemGrid, ItemTitle } from "@/components/ui/item";
 import { NumberInput } from "@/components/ui/number-input";
 import { Switch } from "@/components/ui/switch";
 import { useKeyEvent } from "@/stores/key_event";
 import { useKeyStyle } from '@/stores/key_style';
-import { ArrowExpand02Icon, Cursor01Icon, CursorCircleSelection01Icon, CursorEdit01Icon, CursorMagicSelection03FreeIcons, Drag03Icon, KeyboardIcon, Link02Icon, MouseLeftClick05Icon, PaintBoardIcon, Unlink02Icon } from "@hugeicons/core-free-icons";
+import { ArrowExpand02Icon, Cursor01Icon, CursorCircleSelection01Icon, CursorEdit01Icon, CursorMagicSelection03FreeIcons, Drag03Icon, Link02Icon, MouseLeftClick05Icon, PaintBoardIcon, Unlink02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { NumberScrubber } from "../ui/number-input-scrub";
 import { useState } from "react";
@@ -12,6 +13,7 @@ import { Toggle } from "../ui/toggle";
 
 
 export const MouseSettings = () => {
+    const { t } = useI18n();
     const mouse = useKeyStyle(state => state.mouse);
     const setMouseStyle = useKeyStyle(state => state.setMouse);
 
@@ -21,16 +23,16 @@ export const MouseSettings = () => {
     const [offsetLinked, setOffsetLinked] = useState(true);
 
     return <div className="flex flex-col gap-y-4 p-6">
-        <h1 className="text-xl font-semibold">Mouse</h1>
+        <h1 className="text-xl font-semibold">{t("Mouse", "鼠标")}</h1>
 
-        <h2 className="text-sm text-muted-foreground font-medium">Cursor Highlight</h2>
+        <h2 className="text-sm text-muted-foreground font-medium">{t("Cursor Highlight", "光标高亮")}</h2>
         <Item variant="muted">
             <ItemContent>
                 <ItemTitle>
-                    <HugeiconsIcon icon={CursorMagicSelection03FreeIcons} size="1em" /> Show Clicks
+                    <HugeiconsIcon icon={CursorMagicSelection03FreeIcons} size="1em" /> {t("Show Clicks", "显示点击")}
                 </ItemTitle>
                 <ItemDescription>
-                    Animate a ring upon mouse press
+                    {t("Animate a ring upon mouse press", "鼠标按下时显示动画圆环")}
                 </ItemDescription>
             </ItemContent>
             <ItemActions>
@@ -45,7 +47,7 @@ export const MouseSettings = () => {
             <Item variant="muted">
                 <ItemContent>
                     <ItemTitle>
-                        <HugeiconsIcon icon={CursorCircleSelection01Icon} size="1em" /> Size
+                        <HugeiconsIcon icon={CursorCircleSelection01Icon} size="1em" /> {t("Size", "尺寸")}
                     </ItemTitle>
                 </ItemContent>
                 <ItemActions>
@@ -61,7 +63,7 @@ export const MouseSettings = () => {
             <Item variant="muted">
                 <ItemContent>
                     <ItemTitle>
-                        <HugeiconsIcon icon={PaintBoardIcon} size="1em" /> Color
+                        <HugeiconsIcon icon={PaintBoardIcon} size="1em" /> {t("Color", "颜色")}
                     </ItemTitle>
                 </ItemContent>
                 <ItemActions>
@@ -78,10 +80,10 @@ export const MouseSettings = () => {
         <Item variant="muted">
             <ItemContent>
                 <ItemTitle>
-                    <HugeiconsIcon icon={Cursor01Icon} size="1em" /> Always Highlight
+                    <HugeiconsIcon icon={Cursor01Icon} size="1em" /> {t("Always Highlight", "始终高亮")}
                 </ItemTitle>
                 <ItemDescription>
-                    Permanently show the ring around the cursor
+                    {t("Permanently show the ring around the cursor", "始终显示光标周围的高亮圆环")}
                 </ItemDescription>
             </ItemContent>
             <ItemActions>
@@ -93,14 +95,14 @@ export const MouseSettings = () => {
             </ItemActions>
         </Item>
 
-        <h2 className="text-sm text-muted-foreground font-medium mt-2">Button Indicator</h2>
+        <h2 className="text-sm text-muted-foreground font-medium mt-2">{t("Button Indicator", "按键指示器")}</h2>
         <Item variant="muted">
             <ItemContent>
                 <ItemTitle>
-                    <HugeiconsIcon icon={MouseLeftClick05Icon} size="1em" /> Show Indicator
+                    <HugeiconsIcon icon={MouseLeftClick05Icon} size="1em" /> {t("Show Indicator", "显示指示器")}
                 </ItemTitle>
                 <ItemDescription>
-                    Display button and scroll icons next to the cursor
+                    {t("Display button and scroll icons next to the cursor", "在光标旁显示按键和滚轮图标")}
                 </ItemDescription>
             </ItemContent>
             <ItemActions>
@@ -114,10 +116,10 @@ export const MouseSettings = () => {
         <Item variant="muted">
             <ItemContent>
                 <ItemTitle>
-                    <HugeiconsIcon icon={Cursor01Icon} size="1em" /> Keep Indicator
+                    <HugeiconsIcon icon={Cursor01Icon} size="1em" /> {t("Keep Indicator", "常驻指示器")}
                 </ItemTitle>
                 <ItemDescription>
-                    Permanently show the icon beside the cursor
+                    {t("Permanently show the icon beside the cursor", "始终在光标旁显示图标")}
                 </ItemDescription>
             </ItemContent>
             <ItemActions>
@@ -132,7 +134,7 @@ export const MouseSettings = () => {
         <Item variant="muted">
             <ItemContent>
                 <ItemTitle>
-                    <HugeiconsIcon icon={CursorEdit01Icon} size="1em" /> Size
+                    <HugeiconsIcon icon={CursorEdit01Icon} size="1em" /> {t("Size", "尺寸")}
                 </ItemTitle>
             </ItemContent>
             <ItemActions>
@@ -147,10 +149,10 @@ export const MouseSettings = () => {
         <Item variant="muted">
             <ItemContent>
                 <ItemTitle>
-                    <HugeiconsIcon icon={ArrowExpand02Icon} size="1em" /> Offset
+                    <HugeiconsIcon icon={ArrowExpand02Icon} size="1em" /> {t("Offset", "偏移")}
                 </ItemTitle>
                 <ItemDescription>
-                    Space from the cursor to the indicator
+                    {t("Space from the cursor to the indicator", "指示器与光标之间的距离")}
                 </ItemDescription>
             </ItemContent>
             <ItemActions>
@@ -185,14 +187,14 @@ export const MouseSettings = () => {
             </ItemActions>
         </Item>
 
-        <h2 className="text-sm text-muted-foreground font-medium mt-2">Event</h2>
+        <h2 className="text-sm text-muted-foreground font-medium mt-2">{t("Event", "事件")}</h2>
         <Item variant="muted">
             <ItemContent>
                 <ItemTitle>
-                    <HugeiconsIcon icon={Drag03Icon} size="1em" /> Drag Threshold
+                    <HugeiconsIcon icon={Drag03Icon} size="1em" /> {t("Drag Threshold", "拖拽阈值")}
                 </ItemTitle>
                 <ItemDescription>
-                    Minimum distance in pixels to show Drag event
+                    {t("Minimum distance in pixels to show Drag event", "显示 Drag 事件所需的最小像素距离")}
                 </ItemDescription>
             </ItemContent>
             <ItemActions>

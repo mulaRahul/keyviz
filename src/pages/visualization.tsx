@@ -6,10 +6,12 @@ import { listenForUpdates } from '@/stores/sync';
 import { EventPayload } from "@/types/event";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
+import { getCurrentWindow } from "@tauri-apps/api/window";
 import { useEffect, useState, } from "react";
 
 export function Visualization() {
   const monitor = useKeyStyle((state) => state.appearance.monitor);
+  const alwaysOnTop = useKeyStyle((state) => state.appearance.alwaysOnTop);
   const onEvent = useKeyEvent((state) => state.onEvent);
   const tick = useKeyEvent((state) => state.tick);
 
@@ -49,6 +51,12 @@ export function Visualization() {
     }
     set_monitor();
   }, [monitor]);
+
+  useEffect(() => {
+    getCurrentWindow().setAlwaysOnTop(alwaysOnTop).catch((error) => {
+      console.error("Failed to update always-on-top state:", error);
+    });
+  }, [alwaysOnTop]);
 
   if (!isListening) return null;
 

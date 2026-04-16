@@ -8,6 +8,7 @@ import { open, save } from "@tauri-apps/plugin-dialog";
 import { toast } from "sonner";
 
 export const KEY_STYLE_STORE = "key_style_store";
+export type LanguagePreference = "system" | "en" | "zh-CN";
 
 export interface AppearanceSettings {
     monitor: string | null;
@@ -18,6 +19,8 @@ export interface AppearanceSettings {
     animation: "none" | "fade" | "zoom" | "float" | "slide";
     animationDuration: number;
     style: "minimal" | "laptop" | "lowprofile" | "pbt";
+    language: LanguagePreference;
+    alwaysOnTop: boolean;
 }
 
 export interface LayoutSettings {
@@ -111,6 +114,8 @@ const createKeyStyleStore = createSyncedStore<KeyStyleStore>(
             animation: "fade",
             animationDuration: 0.25,
             style: "lowprofile",
+            language: "system",
+            alwaysOnTop: true,
         },
         layout: {
             showIcon: true,
@@ -237,6 +242,21 @@ const createKeyStyleStore = createSyncedStore<KeyStyleStore>(
     (config) => persist(config, {
         name: KEY_STYLE_STORE,
         storage: createJSONStorage(() => tauriStorage),
+        merge: (persistedState, currentState) => {
+            const persisted = persistedState as Partial<KeyStyleState> | undefined;
+            return {
+                ...currentState,
+                ...persisted,
+                appearance: { ...currentState.appearance, ...persisted?.appearance },
+                layout: { ...currentState.layout, ...persisted?.layout },
+                color: { ...currentState.color, ...persisted?.color },
+                modifier: { ...currentState.modifier, ...persisted?.modifier },
+                text: { ...currentState.text, ...persisted?.text },
+                border: { ...currentState.border, ...persisted?.border },
+                background: { ...currentState.background, ...persisted?.background },
+                mouse: { ...currentState.mouse, ...persisted?.mouse },
+            };
+        },
     }),
 );
 

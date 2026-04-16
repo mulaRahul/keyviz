@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button"
+import { useI18n } from "@/i18n"
 import { Item, ItemActions, ItemContent, ItemDescription, ItemTitle } from "@/components/ui/item"
 import { DiscordIcon, GithubIcon, LinkSquare02Icon, SparklesIcon, StarsIcon } from "@hugeicons/core-free-icons"
 import { HugeiconsIcon } from "@hugeicons/react"
@@ -10,6 +11,7 @@ import { toast } from "sonner"
 export const VERSION = "2.1.1"
 
 export const AboutPage = () => {
+    const { t } = useI18n();
     const [checking, setChecking] = useState(false);
     const [updateAvailable, setUpdateAvailable] = useState(false);
     const [hovered, setHovered] = useState(false);
@@ -27,16 +29,16 @@ export const AboutPage = () => {
             if (latestVersion !== VERSION) {
                 setUpdateAvailable(true);
                 toast.success(
-                    `New version available: v${latestVersion}`,
+                    t(`New version available: v${latestVersion}`, `发现新版本：v${latestVersion}`),
                     {
-                        action: { label: 'View', onClick: visitReleasePage }
+                        action: { label: t('View', '查看'), onClick: visitReleasePage }
                     }
                 );
             } else {
-                toast.info("You are using the latest version.");
+                toast.info(t("You are using the latest version.", "当前已是最新版本。"));
             }
         } catch (error) {
-            toast.error("Failed to check for updates.");
+            toast.error(t("Failed to check for updates.", "检查更新失败。"));
         }
         setChecking(false);
     }
@@ -105,10 +107,10 @@ export const AboutPage = () => {
                 >
                     <ItemContent>
                         <ItemTitle>
-                            <HugeiconsIcon icon={SparklesIcon} size="1em" /> Upgrade to Pro
+                            <HugeiconsIcon icon={SparklesIcon} size="1em" /> {t("Upgrade to Pro", "升级到 Pro")}
                         </ItemTitle>
                         <ItemDescription>
-                            Love Keyviz? Support its growth and unlock more with Pro.
+                            {t("Love Keyviz? Support its growth and unlock more with Pro.", "如果你喜欢 Keyviz，可以支持它继续发展，并通过 Pro 解锁更多功能。")}
                         </ItemDescription>
                     </ItemContent>
                     <ItemActions>
@@ -116,7 +118,7 @@ export const AboutPage = () => {
                             variant={hovered ? "default" : "outline"}
                             onClick={() => openUrl('https://keyviz.org/pro')}
                         >
-                            Go Pro
+                            {t("Go Pro", "前往升级")}
                         </Button>
                     </ItemActions>
                 </Item>
@@ -125,14 +127,14 @@ export const AboutPage = () => {
             <Item variant="muted" className="transition-all peer-hover:blur-xs">
                 <ItemContent>
                     <ItemTitle>
-                        <HugeiconsIcon icon={StarsIcon} size="1em" /> Check for updates
+                        <HugeiconsIcon icon={StarsIcon} size="1em" /> {t("Check for updates", "检查更新")}
                     </ItemTitle>
                 </ItemContent>
                 <ItemActions>
                     {
                         updateAvailable
-                            ? <Button className="cursor-pointer" onClick={visitReleasePage}>Update Available</Button>
-                            : <Button variant="outline" onClick={checkForUpdates} disabled={checking}>Check</Button>
+                            ? <Button className="cursor-pointer" onClick={visitReleasePage}>{t("Update Available", "有可用更新")}</Button>
+                            : <Button variant="outline" onClick={checkForUpdates} disabled={checking}>{t("Check", "检查")}</Button>
                     }
                 </ItemActions>
             </Item>
@@ -140,10 +142,10 @@ export const AboutPage = () => {
             <Item variant="muted" className="transition-all peer-hover:blur-xs">
                 <ItemContent>
                     <ItemTitle>
-                        <HugeiconsIcon icon={GithubIcon} size="1em" /> Open Source
+                        <HugeiconsIcon icon={GithubIcon} size="1em" /> {t("Open Source", "开源")}
                     </ItemTitle>
                     <ItemDescription className="max-w-100">
-                        Review the source code on GitHub, sponsor, star the project, or contribute to its development.
+                        {t("Review the source code on GitHub, sponsor, star the project, or contribute to its development.", "可以在 GitHub 查看源码、赞助项目、点 Star，或参与贡献。")}
                     </ItemDescription>
                 </ItemContent>
                 <ItemActions>
@@ -159,7 +161,7 @@ export const AboutPage = () => {
                         <HugeiconsIcon icon={DiscordIcon} size="1em" /> Discord
                     </ItemTitle>
                     <ItemDescription className="max-w-100">
-                        Join our Discord community.
+                        {t("Join our Discord community.", "加入我们的 Discord 社区。")}
                     </ItemDescription>
                 </ItemContent>
                 <ItemActions>
