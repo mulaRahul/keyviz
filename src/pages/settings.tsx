@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import { AboutPage, AppearanceSettings, GeneralSettings, KeycapSettings, MouseSettings } from "@/components/settings";
+import { useI18n } from "@/i18n";
 import { VERSION } from "@/components/settings/about";
 import { ThemeModeToggle } from "@/components/theme-mode-toggle";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -16,7 +17,25 @@ const sideBar = [
 ]
 
 const Settings = () => {
+    const { t } = useI18n();
     const [activeTab, setActiveTab] = useState(sideBar[0].title);
+
+    const localizedTitle = (title: string) => {
+        switch (title) {
+            case "General":
+                return t("General", "通用");
+            case "Appearance":
+                return t("Appearance", "外观");
+            case "Keycap":
+                return t("Keycap", "键帽");
+            case "Mouse":
+                return t("Mouse", "鼠标");
+            case "About":
+                return t("About", "关于");
+            default:
+                return title;
+        }
+    };
 
     return (
         <div className="flex w-screen h-screen overflow-hidden border-t bg-background">
@@ -31,13 +50,13 @@ const Settings = () => {
                 {
                     sideBar.map((item) => (
                         <a key={item.title} onClick={() => setActiveTab(item.title)} className="cursor-pointer">
-                            <SidebarItem item={item} isActive={activeTab === item.title} />
+                            <SidebarItem item={{ ...item, title: localizedTitle(item.title) }} isActive={activeTab === item.title} />
                         </a>
                     ))
                 }
                 <div className="mt-auto flex gap-2 items-center">
                     <a key="about" onClick={() => setActiveTab("About")} className="flex-1 cursor-pointer">
-                        <SidebarItem item={{ title: "About", icon: InformationSquareIcon }} isActive={activeTab === "About"} />
+                        <SidebarItem item={{ title: localizedTitle("About"), icon: InformationSquareIcon }} isActive={activeTab === "About"} />
                     </a>
                     <ThemeModeToggle />
                 </div>

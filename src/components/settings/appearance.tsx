@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 
+import { useI18n } from "@/i18n";
 import { AlignmentSelector } from "@/components/ui/alignment-selector";
 import { Item, ItemActions, ItemContent, ItemDescription, ItemTitle } from "@/components/ui/item";
 import { NumberInput } from "@/components/ui/number-input";
@@ -14,6 +15,7 @@ import { availableMonitors, Monitor } from "@tauri-apps/api/window";
 
 
 export const AppearanceSettings = () => {
+    const { t } = useI18n();
     const appearance = useKeyStyle(state => state.appearance);
     const setAppearance = useKeyStyle(state => state.setAppearance);
 
@@ -33,19 +35,19 @@ export const AppearanceSettings = () => {
     }, []);
 
     return <div className="flex flex-col gap-y-4 p-6">
-        <h1 className="text-xl font-semibold">Appearance</h1>
+        <h1 className="text-xl font-semibold">{t("Appearance", "外观")}</h1>
 
-        <h2 className="text-sm text-muted-foreground font-medium">Position</h2>
+        <h2 className="text-sm text-muted-foreground font-medium">{t("Position", "位置")}</h2>
         {
             monitors.length > 1 &&
             <Item variant="muted">
                 <ItemContent>
                     <ItemTitle>
                         <HugeiconsIcon icon={ComputerIcon} size="1em" />
-                        Display
+                        {t("Display", "显示器")}
                     </ItemTitle>
                     <ItemDescription>
-                        Change monitor/display for the visualisation.
+                        {t("Change monitor/display for the visualisation.", "切换按键显示所使用的显示器。")}
                     </ItemDescription>
                 </ItemContent>
                 <ItemActions>
@@ -56,7 +58,7 @@ export const AppearanceSettings = () => {
                         }}
                     >
                         <SelectTrigger className="w-32">
-                            <SelectValue placeholder="Select Display" />
+                            <SelectValue placeholder={t("Select Display", "选择显示器")} />
                         </SelectTrigger>
                         <SelectContent>
                             <SelectGroup>
@@ -77,10 +79,10 @@ export const AppearanceSettings = () => {
         <Item variant="muted">
             <ItemContent className="self-start">
                 <ItemTitle>
-                    <HugeiconsIcon icon={TextAlignLeftIcon} size="1em" /> Alignment
+                    <HugeiconsIcon icon={TextAlignLeftIcon} size="1em" /> {t("Alignment", "对齐")}
                 </ItemTitle>
                 <ItemDescription>
-                    Position of the key visualization on the screen
+                    {t("Position of the key visualization on the screen", "按键显示在屏幕上的位置")}
                 </ItemDescription>
             </ItemContent>
             <ItemActions>
@@ -96,10 +98,10 @@ export const AppearanceSettings = () => {
         <Item variant="muted">
             <ItemContent>
                 <ItemTitle>
-                    <HugeiconsIcon icon={ParagraphSpacingIcon} size="1em" /> Margin
+                    <HugeiconsIcon icon={ParagraphSpacingIcon} size="1em" /> {t("Margin", "边距")}
                 </ItemTitle>
                 <ItemDescription>
-                    Space from the edge of the screen
+                    {t("Space from the edge of the screen", "距离屏幕边缘的间距")}
                 </ItemDescription>
             </ItemContent>
             <ItemActions>
@@ -138,14 +140,14 @@ export const AppearanceSettings = () => {
             </ItemActions>
         </Item>
 
-        <h2 className="text-sm text-muted-foreground font-medium">Animation</h2>
+        <h2 className="text-sm text-muted-foreground font-medium">{t("Animation", "动画")}</h2>
         <Item variant="muted">
             <ItemContent>
                 <ItemTitle>
-                    <HugeiconsIcon icon={Time03Icon} size="1em" /> Duration
+                    <HugeiconsIcon icon={Time03Icon} size="1em" /> {t("Duration", "停留时长")}
                 </ItemTitle>
                 <ItemDescription className="max-w-84">
-                    The duration keys stay on screen (in seconds)
+                    {t("How long released keys stay on screen (in seconds)", "按键释放后在屏幕上保留的时间（秒）")}
                 </ItemDescription>
             </ItemContent>
             <ItemActions>
@@ -162,7 +164,7 @@ export const AppearanceSettings = () => {
         <Item variant="muted">
             <ItemContent>
                 <ItemTitle>
-                    <HugeiconsIcon icon={KeyframesDoubleIcon} size="1em" /> Animation
+                    <HugeiconsIcon icon={KeyframesDoubleIcon} size="1em" /> {t("Animation", "动画类型")}
                 </ItemTitle>
             </ItemContent>
             <ItemActions>
@@ -172,11 +174,11 @@ export const AppearanceSettings = () => {
                     </SelectTrigger>
                     <SelectContent>
                         <SelectGroup>
-                            <SelectItem value="none">None</SelectItem>
-                            <SelectItem value="fade">Fade</SelectItem>
-                            <SelectItem value="zoom">Zoom</SelectItem>
-                            <SelectItem value="float">Float</SelectItem>
-                            <SelectItem value="slide">Slide</SelectItem>
+                            <SelectItem value="none">{t("None", "无")}</SelectItem>
+                            <SelectItem value="fade">{t("Fade", "淡入淡出")}</SelectItem>
+                            <SelectItem value="zoom">{t("Zoom", "缩放")}</SelectItem>
+                            <SelectItem value="float">{t("Float", "上浮")}</SelectItem>
+                            <SelectItem value="slide">{t("Slide", "滑动")}</SelectItem>
                         </SelectGroup>
                     </SelectContent>
                 </Select>
@@ -186,10 +188,10 @@ export const AppearanceSettings = () => {
         <Item variant="muted">
             <ItemContent>
                 <ItemTitle>
-                    <HugeiconsIcon icon={KeyframesDoubleRemoveIcon} size="1em" /> Animation Speed
+                    <HugeiconsIcon icon={KeyframesDoubleRemoveIcon} size="1em" /> {t("Animation Speed", "动画速度")}
                 </ItemTitle>
                 <ItemDescription>
-                    Higher the value, slower the animation
+                    {t("Higher values make the animation slower", "数值越大，动画越慢")}
                 </ItemDescription>
             </ItemContent>
             <ItemActions>

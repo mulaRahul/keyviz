@@ -62,6 +62,20 @@ interface KeyEventActions {
 
 export type KeyEventStore = KeyEventState & KeyEventActions;
 
+const COMBINATION_KEYS = new Set<string>([
+    ...MODIFIERS,
+    RawKey.Left,
+    RawKey.Middle,
+    RawKey.Right,
+    RawKey.Drag,
+    RawKey.ScrollUp,
+    RawKey.ScrollDown,
+]);
+
+function shouldGroupKeyPress(pressedKeys: string[], keyName: string): boolean {
+    return pressedKeys.some((pressedKey) => COMBINATION_KEYS.has(pressedKey)) || COMBINATION_KEYS.has(keyName);
+}
+
 const createKeyEventStore = createSyncedStore<KeyEventStore>(
     KEY_EVENT_STORE,
     (set, get) => ({
@@ -192,7 +206,15 @@ const createKeyEventStore = createSyncedStore<KeyEventStore>(
                 }
                 // key combination
                 else {
-                    if (state.showEventHistory && groups[last].keys.some(gKey => !gKey.in(pressedKeys))) {
+                    const shouldGroup = shouldGroupKeyPress(pressedKeys, key.name);
+
+                    if (!shouldGroup) {
+                        if (state.showEventHistory) {
+                            groups.push({ keys: [key], createdAt });
+                        } else {
+                            groups = [{ keys: [key], createdAt }];
+                        }
+                    } else if (state.showEventHistory && groups[last].keys.some(gKey => !gKey.in(pressedKeys))) {
                         // history mode, partial combination, add new group
                         const groupKeys = groups[last].keys.filter(gKey => gKey.in(pressedKeys));
                         groupKeys.push(key);
@@ -226,15 +248,18 @@ const createKeyEventStore = createSyncedStore<KeyEventStore>(
 
             // update last pressed time
             const groups = [...state.groups];
-            const last = groups.length - 1;
+            let updated = false;
 
-            const kIndex = last >= 0 ? groups[last].keys.findIndex(key => key.name === event.name) : undefined;
-            if (kIndex && kIndex >= 0) {
-                groups[last].keys[kIndex].lastPressedAt = Date.now();
-                set({ pressedKeys, groups });
-            } else {
-                set({ pressedKeys });
+            for (let index = groups.length - 1; index >= 0; index--) {
+                const keyIndex = groups[index].keys.findIndex(key => key.name === event.name);
+                if (keyIndex >= 0) {
+                    groups[index].keys[keyIndex].lastPressedAt = Date.now();
+                    updated = true;
+                    break;
+                }
             }
+
+            set(updated ? { pressedKeys, groups } : { pressedKeys });
         },
         onMouseMove(event: MouseMoveEvent) {
             const state = get();
