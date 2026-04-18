@@ -62,6 +62,7 @@ export interface BackgroundSettings {
 }
 
 export interface MouseSettings {
+    showMouseActions: boolean;
     showClicks: boolean;
     size: number;
     color: string;
@@ -148,6 +149,7 @@ const createKeyStyleStore = createSyncedStore<KeyStyleStore>(
             color: "#ffffff99",
         },
         mouse: {
+            showMouseActions: true,
             showClicks: false,
             size: 150,
             color: "#009dff",

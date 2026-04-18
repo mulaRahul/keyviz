@@ -189,6 +189,23 @@ export const MouseSettings = () => {
         <Item variant="muted">
             <ItemContent>
                 <ItemTitle>
+                    <HugeiconsIcon icon={MouseLeftClick05Icon} size="1em" /> Show Mouse Actions
+                </ItemTitle>
+                <ItemDescription>
+                    Show clicks, drags, and scrolls in the key overlay
+                </ItemDescription>
+            </ItemContent>
+            <ItemActions>
+                <Switch
+                    checked={mouse.showMouseActions}
+                    onCheckedChange={(showMouseActions) => setMouseStyle({ showMouseActions })}
+                />
+            </ItemActions>
+        </Item>
+
+        <Item variant="muted">
+            <ItemContent>
+                <ItemTitle>
                     <HugeiconsIcon icon={Drag03Icon} size="1em" /> Drag Threshold
                 </ItemTitle>
                 <ItemDescription>
