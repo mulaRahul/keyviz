@@ -40,7 +40,7 @@ unsafe fn raw_callback(
                 usb_hid: 0,
                 extra_data: f_get_extra_data(lpdata),
             };
-            if let Some(callback) = &mut GLOBAL_CALLBACK {
+            if let Some(callback) = &mut *std::ptr::addr_of_mut!(GLOBAL_CALLBACK) {
                 callback(event);
             }
         }
