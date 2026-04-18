@@ -3,6 +3,7 @@ import { getCurrentWindow } from "@tauri-apps/api/window";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { tauriStorage } from "./storage";
 import { createSyncedStore } from "./sync";
+import { useKeyStyle } from "./key_style";
 
 
 export const KEY_EVENT_STORE = "key_event_store";
@@ -271,8 +272,7 @@ const createKeyEventStore = createSyncedStore<KeyEventStore>(
                         state.allowedKeys.includes("Drag")
                     );
 
-                    if (hasGroupKeys || dragAllowed) {
-                        // simulate drag as key press
+                    if ((hasGroupKeys || dragAllowed) && useKeyStyle.getState().mouse.showMouseActions) {
                         state.onKeyPress({ type: "KeyEvent", name: "Drag", pressed: true });
                     }
                     return;
@@ -282,14 +282,14 @@ const createKeyEventStore = createSyncedStore<KeyEventStore>(
         },
         onMouseButtonPress(event: MouseButtonEvent) {
             const state = get();
-            // set drag start position
             const mouse = {
                 ...state.mouse,
                 dragStart: { x: state.mouse.x, y: state.mouse.y },
             };
 
-            // simulate mouse button press as key
-            state.onKeyPress({ type: "KeyEvent", name: event.button.toString(), pressed: true });
+            if (useKeyStyle.getState().mouse.showMouseActions) {
+                state.onKeyPress({ type: "KeyEvent", name: event.button.toString(), pressed: true });
+            }
 
             set({
                 pressedMouseButton: event.button,
@@ -298,19 +298,17 @@ const createKeyEventStore = createSyncedStore<KeyEventStore>(
         },
         onMouseButtonRelease(event: MouseButtonEvent) {
             const state = get();
-            // reset drag state
             const mouse = {
                 ...state.mouse,
                 dragging: false,
                 dragStart: undefined
             };
-            // check if was dragging
-            if (state.mouse.dragging) {
-                // simulate drag release as key
-                state.onKeyRelease({ type: "KeyEvent", name: "Drag", pressed: false });
-            } else {
-                // simulate mouse button release as key
-                state.onKeyRelease({ type: "KeyEvent", name: event.button.toString(), pressed: false });
+            if (useKeyStyle.getState().mouse.showMouseActions) {
+                if (state.mouse.dragging) {
+                    state.onKeyRelease({ type: "KeyEvent", name: "Drag", pressed: false });
+                } else {
+                    state.onKeyRelease({ type: "KeyEvent", name: event.button.toString(), pressed: false });
+                }
             }
             set({
                 pressedMouseButton: null,
@@ -341,8 +339,7 @@ const createKeyEventStore = createSyncedStore<KeyEventStore>(
                 wheel, // -1 for down, 1 for up
                 lastScrollAt: Date.now()
             };
-            // simulate mouse wheel as key press
-            if (!get().pressedKeys.includes(raw_key)) {
+            if (!get().pressedKeys.includes(raw_key) && useKeyStyle.getState().mouse.showMouseActions) {
                 state.onKeyPress({ type: "KeyEvent", name: raw_key, pressed: true });
             }
 
