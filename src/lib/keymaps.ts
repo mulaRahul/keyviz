@@ -315,8 +315,8 @@ export const keymaps: Record<string, DisplayData> = {
         category: "punctuation",
     },
     Slash: {
-        label: "?",
-        symbol: "/",
+        label: "/",
+        symbol: "?",
         category: "punctuation",
     },
     // ───────────── Numpad ─────────────
