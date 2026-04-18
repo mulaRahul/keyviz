@@ -4,7 +4,6 @@ import { Suspense, lazy } from "react";
 import { HashRouter, Route, Routes } from "react-router-dom";
 import { ThemeProvider } from "./components/theme-provider";
 import { Toaster } from "./components/ui/sonner";
-import { MouseOverlayPage } from "./pages/mouse-overlay-page";
 import { Visualization } from "./pages/visualization";
 
 const Settings = lazy(() => import("./pages/settings"));
@@ -15,7 +14,6 @@ function App() {
       <Suspense fallback={<div>Loading...</div>}>
         <Routes>
           <Route path="/" element={<Visualization />} />
-          <Route path="/mouse-overlay" element={<MouseOverlayPage />} />
           <Route path="/settings" element={
             <ThemeProvider>
               <Settings />

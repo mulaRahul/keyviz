@@ -34,26 +34,6 @@ pub fn resize_overlay_window(app: tauri::AppHandle, x: f64, y: f64, width: f64, 
 }
 
 #[tauri::command]
-pub fn set_mouse_overlay_size(app: tauri::AppHandle, size: u32) {
-    let state = app.state::<Mutex<AppState>>();
-    let scale = {
-        let mut app_state = state.lock().unwrap();
-        app_state.mouse_overlay_size = size;
-        app_state.monitor_scale
-    };
-
-    if let Some(mouse_window) = app.get_webview_window("mouse-overlay") {
-        let phys = ((size as f64 * scale) as u32).max(1);
-        mouse_window
-            .set_size(PhysicalSize {
-                width: phys,
-                height: phys,
-            })
-            .unwrap_or(());
-    }
-}
-
-#[tauri::command]
 pub fn log(message: String) {
     println!("[LOG] {}", message);
 }

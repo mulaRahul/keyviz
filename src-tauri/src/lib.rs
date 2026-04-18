@@ -9,10 +9,7 @@ use tauri::{
 };
 
 mod app;
-use app::commands::{
-    log, resize_overlay_window, set_main_window_monitor, set_mouse_overlay_size,
-    set_toggle_shortcut,
-};
+use app::commands::{log, resize_overlay_window, set_main_window_monitor, set_toggle_shortcut};
 use app::event::start_listener;
 use app::state::AppState;
 use app::window::config_window;
@@ -31,21 +28,6 @@ pub fn run() {
             // prepare main (key overlay) window
             if let Some(window) = app.get_webview_window("main") {
                 config_window(&window);
-            }
-
-            // create and configure the fullscreen mouse overlay window
-            let mouse_url = tauri::WebviewUrl::App("index.html#/mouse-overlay".into());
-            if let Ok(mouse_window) = WebviewWindowBuilder::new(app, "mouse-overlay", mouse_url)
-                .transparent(true)
-                .decorations(false)
-                .shadow(false)
-                .always_on_top(true)
-                .skip_taskbar(true)
-                .focused(false)
-                .visible(false)
-                .build()
-            {
-                config_window(&mouse_window);
             }
 
             let app_handle = app.handle();
@@ -129,8 +111,7 @@ pub fn run() {
             log,
             set_toggle_shortcut,
             set_main_window_monitor,
-            resize_overlay_window,
-            set_mouse_overlay_size
+            resize_overlay_window
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
