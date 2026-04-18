@@ -4,7 +4,7 @@ import { NumberInput } from "@/components/ui/number-input";
 import { Switch } from "@/components/ui/switch";
 import { useKeyEvent } from "@/stores/key_event";
 import { useKeyStyle } from '@/stores/key_style';
-import { ArrowExpand02Icon, Cursor01Icon, CursorCircleSelection01Icon, CursorEdit01Icon, CursorMagicSelection03FreeIcons, Drag03Icon, KeyboardIcon, Link02Icon, MouseLeftClick05Icon, PaintBoardIcon, Unlink02Icon } from "@hugeicons/core-free-icons";
+import { ArrowExpand02Icon, Cursor01Icon, CursorCircleSelection01Icon, CursorEdit01Icon, CursorMagicSelection03FreeIcons, Drag03Icon, Link02Icon, MouseLeftClick05Icon, PaintBoardIcon, Unlink02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { NumberScrubber } from "../ui/number-input-scrub";
 import { useState } from "react";
@@ -186,6 +186,23 @@ export const MouseSettings = () => {
         </Item>
 
         <h2 className="text-sm text-muted-foreground font-medium mt-2">Event</h2>
+        <Item variant="muted">
+            <ItemContent>
+                <ItemTitle>
+                    <HugeiconsIcon icon={MouseLeftClick05Icon} size="1em" /> Show Mouse Actions
+                </ItemTitle>
+                <ItemDescription>
+                    Show clicks, drags, and scrolls in the key overlay
+                </ItemDescription>
+            </ItemContent>
+            <ItemActions>
+                <Switch
+                    checked={mouse.showMouseActions}
+                    onCheckedChange={(showMouseActions) => setMouseStyle({ showMouseActions })}
+                />
+            </ItemActions>
+        </Item>
+
         <Item variant="muted">
             <ItemContent>
                 <ItemTitle>
