@@ -7,9 +7,11 @@ pub fn config_window(window: &tauri::WebviewWindow) {
 
     #[cfg(target_os = "windows")]
     {
-        use windows::Win32::Foundation::HWND;
+        use windows::Win32::Foundation::{BOOL, HWND, LPARAM};
         use windows::Win32::UI::WindowsAndMessaging::{
-            SetWindowPos, HWND_TOPMOST, SWP_NOMOVE, SWP_NOSIZE,
+            EnumChildWindows, GetWindowLongPtrW, SetWindowLongPtrW, SetWindowPos,
+            GWL_EXSTYLE, HWND_TOPMOST, SWP_NOMOVE, SWP_NOSIZE,
+            WS_EX_LAYERED, WS_EX_NOACTIVATE, WS_EX_TRANSPARENT,
         };
 
         let hwnd = HWND(window.hwnd().unwrap().0 as isize);
@@ -18,8 +20,35 @@ pub fn config_window(window: &tauri::WebviewWindow) {
         }
 
         if is_mouse_overlay {
-            // Start the mouse-overlay off-screen at its content size.
-            // The event loop moves it to the cursor on every mouse-move event.
+            // WebView2 embeds child windows that don't inherit WS_EX_TRANSPARENT from the
+            // parent. Window-picker tools (e.g. Cap) hit-test against those children and
+            // report "KeyViz" instead of the window underneath. Apply TRANSPARENT +
+            // NOACTIVATE to the parent and every child so hit-testing skips us entirely
+            // while screen-capture APIs (which use a different path) still see our pixels.
+            unsafe extern "system" fn make_child_transparent(child: HWND, _: LPARAM) -> BOOL {
+                let style = GetWindowLongPtrW(child, GWL_EXSTYLE);
+                SetWindowLongPtrW(
+                    child,
+                    GWL_EXSTYLE,
+                    style | WS_EX_TRANSPARENT.0 as isize | WS_EX_NOACTIVATE.0 as isize,
+                );
+                BOOL(1)
+            }
+
+            unsafe {
+                let style = GetWindowLongPtrW(hwnd, GWL_EXSTYLE);
+                SetWindowLongPtrW(
+                    hwnd,
+                    GWL_EXSTYLE,
+                    style
+                        | WS_EX_TRANSPARENT.0 as isize
+                        | WS_EX_LAYERED.0 as isize
+                        | WS_EX_NOACTIVATE.0 as isize,
+                );
+                EnumChildWindows(hwnd, Some(make_child_transparent), LPARAM(0));
+            }
+
+            // Start off-screen; event loop moves it to cursor on every mouse-move.
             window
                 .set_position(tauri::PhysicalPosition { x: -10000i32, y: -10000i32 })
                 .unwrap_or(());
