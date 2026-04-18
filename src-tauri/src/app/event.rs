@@ -105,7 +105,7 @@ pub fn start_listener(app_handle: AppHandle, toggle_menu_item: MenuItem<Wry>) {
                     pressed: false,
                 }),
                 EventType::MouseMove { x, y } => {
-                    // Convert Physical -> Logical
+                    // Convert Physical -> Logical (monitor-relative)
                     #[cfg(target_os = "macos")]
                     let (logical_x, logical_y) = (
                         x - app_state.monitor_position.0 as f64,
@@ -117,6 +117,19 @@ pub fn start_listener(app_handle: AppHandle, toggle_menu_item: MenuItem<Wry>) {
                         let (offset_x, offset_y) = app_state.monitor_position;
                         (x - offset_x as f64, y - offset_y as f64)
                     };
+
+                    // Move the mouse-overlay window to sit centered on the cursor.
+                    // x/y from rdev are physical screen coordinates; PhysicalPosition
+                    // matches that unit so no DPI conversion needed here.
+                    let half = (app_state.mouse_overlay_size as f64
+                        * app_state.monitor_scale
+                        / 2.0) as i32;
+                    if let Some(mouse_window) = app_handle.get_webview_window("mouse-overlay") {
+                        let _ = mouse_window.set_position(tauri::PhysicalPosition {
+                            x: x as i32 - half,
+                            y: y as i32 - half,
+                        });
+                    }
 
                     Some(InputEvent::MouseMoveEvent {
                         x: logical_x,

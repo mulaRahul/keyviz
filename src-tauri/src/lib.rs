@@ -9,7 +9,10 @@ use tauri::{
 };
 
 mod app;
-use app::commands::{log, set_main_window_monitor, set_toggle_shortcut};
+use app::commands::{
+    log, resize_overlay_window, set_main_window_monitor, set_mouse_overlay_size,
+    set_toggle_shortcut,
+};
 use app::event::start_listener;
 use app::state::AppState;
 use app::window::config_window;
@@ -25,14 +28,44 @@ pub fn run() {
         .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_opener::init())
         .setup(|app| {
-            // prepare window
+            // prepare main (key overlay) window
             if let Some(window) = app.get_webview_window("main") {
                 config_window(&window);
             }
 
+            // create and configure the fullscreen mouse overlay window
+            let mouse_url = tauri::WebviewUrl::App("index.html#/mouse-overlay".into());
+            if let Ok(mouse_window) = WebviewWindowBuilder::new(app, "mouse-overlay", mouse_url)
+                .transparent(true)
+                .decorations(false)
+                .shadow(false)
+                .always_on_top(true)
+                .skip_taskbar(true)
+                .focused(false)
+                .visible(false)
+                .build()
+            {
+                config_window(&mouse_window);
+            }
+
             let app_handle = app.handle();
+
             // manage app state
             app.manage(Mutex::new(AppState::new(&app_handle)));
+
+            // seed monitor scale from primary monitor so resize_overlay_window
+            // works correctly on HiDPI screens before a monitor is explicitly set
+            if let Some(window) = app.get_webview_window("main") {
+                if let Ok(Some(monitor)) = window.primary_monitor() {
+                    let state = app_handle.state::<Mutex<AppState>>();
+                    let mut app_state = state.lock().unwrap();
+                    if app_state.monitor_name.is_none() {
+                        app_state.monitor_scale = monitor.scale_factor();
+                        app_state.monitor_position =
+                            (monitor.position().x, monitor.position().y);
+                    }
+                }
+            }
 
             // tray actions
             let toggle_item = MenuItem::with_id(app, "toggle", "Stop", true, None::<&str>)?;
@@ -95,7 +128,9 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             log,
             set_toggle_shortcut,
-            set_main_window_monitor
+            set_main_window_monitor,
+            resize_overlay_window,
+            set_mouse_overlay_size
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
