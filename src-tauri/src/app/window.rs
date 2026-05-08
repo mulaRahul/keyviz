@@ -1,5 +1,9 @@
 pub fn config_window(window: &tauri::WebviewWindow) {
     window
+        .set_always_on_top(true)
+        .expect("Failed to set always on top");
+
+    window
         .set_ignore_cursor_events(true)
         .expect("Failed to set ignore cursor events");
 
