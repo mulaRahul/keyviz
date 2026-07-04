@@ -45,6 +45,11 @@ You can download the latest version of Keyviz from the **[GitHub Releases](https
     **Note:** Keyviz requires **Input Monitoring** and **Accessibility** permissions. Enable them here:
     `Settings > Privacy & Security > Input Monitoring & Accessibility`
 
+    **"keyviz.app is damaged and can't be opened" ([#420](https://github.com/mulaRahul/keyviz/issues/420)):** This is a Gatekeeper warning, not an actual corrupted download — it appears because the release isn't notarized by Apple. Move Keyviz into `/Applications` first, then clear the quarantine attribute in Terminal:
+    ```bash
+    xattr -cr /Applications/keyviz.app
+    ```
+
 ### Linux (x11)
 Keyviz is compatible with Linux using the X11 protocol. Currently, you can try it out by following the build instructions below.
 
