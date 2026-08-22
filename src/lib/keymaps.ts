@@ -319,6 +319,11 @@ export const keymaps: Record<string, DisplayData> = {
         symbol: "/",
         category: "punctuation",
     },
+    IntlBackslash: {
+        label: "<",
+        symbol: ">",
+        category: "punctuation",
+    },
     // ───────────── Numpad ─────────────
     KpDivide: { label: "/", category: "punctuation" },
     KpMultiply: { label: "*", category: "punctuation" },
