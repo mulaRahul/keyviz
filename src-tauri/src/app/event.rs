@@ -1,6 +1,6 @@
-use std::{sync::Mutex, thread};
+use std::{sync::Mutex, thread, time::Instant};
 
-use rdev::{listen, Button, EventType};
+use rdev::{listen, Button, EventType, Key};
 use serde::Serialize;
 use tauri::{menu::MenuItem, AppHandle, Emitter, Manager, Wry};
 
@@ -36,10 +36,79 @@ pub fn start_listener(app_handle: AppHandle, toggle_menu_item: MenuItem<Wry>) {
     thread::spawn(move || {
         println!("Starting global input listener...");
 
+        // AltGr detection state
+        // Windows sends AltGr as Ctrl+Alt at the low-level hook.
+        // We merge them back into a single AltGr key.
+        let mut last_ctrl_press: Option<Instant> = None;
+        let mut altgr_active = false;
+        let mut skip_next_alt_release = false;
+        const ALTGR_WINDOW_MS: u128 = 50;
+
         if let Err(err) = listen(move |event| {
             // get app state
             let state = app_handle.state::<Mutex<AppState>>();
             let mut app_state = state.lock().unwrap();
+
+            // ─── AltGr merge: press side ───
+            // When Alt is pressed right after ControlLeft, it's actually AltGr.
+            if let EventType::KeyPress(key) = event.event_type {
+                if key == Key::Alt {
+                    if let Some(instant) = last_ctrl_press {
+                        if instant.elapsed().as_millis() < ALTGR_WINDOW_MS {
+                            // This is AltGr, not separate Ctrl+Alt
+                            // Undo the ControlLeft that was already processed
+                            app_state.pressed_keys.retain(|k| k != "ControlLeft");
+                            let _ = app_handle.emit("input-event", InputEvent::KeyEvent {
+                                pressed: false,
+                                name: "ControlLeft".to_string(),
+                            });
+                            // Track AltGr instead
+                            altgr_active = true;
+                            last_ctrl_press = None;
+                            let altgr_name = "AltGr".to_string();
+                            if !app_state.pressed_keys.contains(&altgr_name) {
+                                app_state.pressed_keys.push(altgr_name.clone());
+                            }
+                            // Emit AltGr press if listening
+                            if app_state.listening {
+                                let _ = app_handle.emit("input-event", InputEvent::KeyEvent {
+                                    pressed: true,
+                                    name: altgr_name,
+                                });
+                            }
+                            return;
+                        }
+                    }
+                }
+                // Track ControlLeft press time for AltGr detection
+                if key == Key::ControlLeft {
+                    last_ctrl_press = Some(Instant::now());
+                } else if key != Key::Alt {
+                    last_ctrl_press = None;
+                }
+            }
+
+            // ─── AltGr merge: release side ───
+            if let EventType::KeyRelease(key) = event.event_type {
+                // ControlLeft release while AltGr is active → emit AltGr release
+                if altgr_active && key == Key::ControlLeft {
+                    app_state.pressed_keys.retain(|k| k != "AltGr");
+                    altgr_active = false;
+                    skip_next_alt_release = true;
+                    if app_state.listening {
+                        let _ = app_handle.emit("input-event", InputEvent::KeyEvent {
+                            pressed: false,
+                            name: "AltGr".to_string(),
+                        });
+                    }
+                    return;
+                }
+                // Skip the Alt release that follows AltGr release
+                if skip_next_alt_release && key == Key::Alt {
+                    skip_next_alt_release = false;
+                    return;
+                }
+            }
 
             // track pressed keys
             if let EventType::KeyPress(key) = event.event_type {

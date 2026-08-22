@@ -36,6 +36,7 @@ export interface KeyEventState {
     maxHistory: number;
     lingerDurationMs: number;
     toggleShortcut: string[];
+    keyboardLayout: string;
 }
 
 interface KeyEventActions {
@@ -48,6 +49,7 @@ interface KeyEventActions {
     // setShowMouseEvents(value: KeyEventState["showMouseEvents"]): void;
     setLingerDurationMs(value: KeyEventState["lingerDurationMs"]): void;
     setToggleShortcut(value: KeyEventState["toggleShortcut"]): void;
+    setKeyboardLayout(value: string): void;
     // ───────────── event actions ─────────────
     onEvent(event: EventPayload): void;
     onKeyPress(event: RawKeyEvent): void;
@@ -82,6 +84,7 @@ const createKeyEventStore = createSyncedStore<KeyEventStore>(
         maxHistory: 5,
         lingerDurationMs: 5_000,
         toggleShortcut: [RawKey.ShiftLeft, RawKey.F10],
+        keyboardLayout: "us",
 
         setDragThreshold(value: number) {
             set({ dragThreshold: value });
@@ -103,6 +106,9 @@ const createKeyEventStore = createSyncedStore<KeyEventStore>(
         },
         setToggleShortcut(value: string[]) {
             set({ toggleShortcut: value });
+        },
+        setKeyboardLayout(value: string) {
+            set({ keyboardLayout: value });
         },
         onEvent(event: EventPayload) {
             const state = get();
@@ -139,13 +145,30 @@ const createKeyEventStore = createSyncedStore<KeyEventStore>(
             const pressedKeys = [...state.pressedKeys];
             pressedKeys.push(event.name);
 
+            // AltGr merge: Windows sends AltGr as Ctrl+Alt. The Rust backend
+            // detects this and sends AltGr, but ControlLeft was already shown.
+            // Remove ControlLeft from pressed keys and the last group only.
+            let groups = [...state.groups];
+            if (event.name === RawKey.AltGr) {
+                const ctrlIdx = pressedKeys.indexOf(RawKey.ControlLeft);
+                if (ctrlIdx >= 0) {
+                    pressedKeys.splice(ctrlIdx, 1);
+                }
+                const lastIdx = groups.length - 1;
+                if (lastIdx >= 0) {
+                    groups[lastIdx] = {
+                        ...groups[lastIdx],
+                        keys: groups[lastIdx].keys.filter(k => k.name !== RawKey.ControlLeft),
+                    };
+                }
+            }
+
             // 1. filter event
             if (state.filter !== "none" && state.ignoreEvent(pressedKeys)) {
                 set({ pressedKeys });
                 return;
             }
 
-            let groups = [...state.groups];
             const last = groups.length - 1;
             const key = new KeyEvent(event.name);
 

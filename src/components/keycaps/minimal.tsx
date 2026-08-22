@@ -1,5 +1,6 @@
-import { keymaps } from "@/lib/keymaps";
+import { getKeyDisplay } from "@/lib/keymaps";
 import { easeInOutExpo } from "@/lib/utils";
+import { useKeyEvent } from "@/stores/key_event";
 import { useKeyStyle } from "@/stores/key_style";
 import { motion } from "motion/react";
 import type { KeycapProps } from ".";
@@ -8,8 +9,9 @@ export const MinimalKeycap = ({ event, isPressed }: KeycapProps) => {
     const text = useKeyStyle((state) => state.text);
     const modifier = useKeyStyle((state) => state.modifier);
     const layout = useKeyStyle((state) => state.layout);
+    const keyboardLayout = useKeyEvent((state) => state.keyboardLayout);
 
-    const display = keymaps[event.name];
+    const display = getKeyDisplay(event.name, keyboardLayout);
     const color = event.isModifier() && modifier.highlight ? modifier.textColor : text.color;
     const textStyle: React.CSSProperties = {
         color,

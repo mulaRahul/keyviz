@@ -319,6 +319,11 @@ export const keymaps: Record<string, DisplayData> = {
         symbol: "/",
         category: "punctuation",
     },
+    IntlBackslash: {
+        label: "<",
+        symbol: ">",
+        category: "punctuation",
+    },
     // ───────────── Numpad ─────────────
     KpDivide: { label: "/", category: "punctuation" },
     KpMultiply: { label: "*", category: "punctuation" },
@@ -440,6 +445,24 @@ export const keymaps: Record<string, DisplayData> = {
     },
 };
 
+// ───────────── Layout-specific overrides ─────────────
+export type { KeyboardLayout } from "@/lib/layouts";
+
+import { layoutMap } from "@/lib/layouts";
+
+export function getKeyDisplay(name: string, layout: string): DisplayData {
+    const base = keymaps[name];
+    if (!base) return { label: name };
+
+    const layoutDef = layoutMap[layout];
+    if (!layoutDef) return base;
+
+    const override = layoutDef.overrides[name];
+    if (!override) return base;
+
+    return { ...base, ...override };
+}
+
 // ───────────── Apply Mappings for Modifiers ─────────────
 
 // Control
@@ -490,6 +513,17 @@ export const keymaps: Record<string, DisplayData> = {
             macos: "opt",
         }),
         glyph: "⌥",
+        icon: OptionIcon,
+        category: "modifier",
+    };
+});
+
+// AltGr
+['AltGr'].forEach((key) => {
+    keymaps[key] = {
+        label: "alt gr",
+        shortLabel: "alt gr",
+        glyph: "⌥⌃",
         icon: OptionIcon,
         category: "modifier",
     };
