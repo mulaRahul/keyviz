@@ -16,7 +16,7 @@ use app::window::config_window;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    tauri::Builder::default()
+    let app = tauri::Builder::default()
         .plugin(tauri_plugin_single_instance::init(|_, __, ___| {}))
         .plugin(tauri_plugin_prevent_default::init())
         .plugin(tauri_plugin_fs::init())
@@ -97,6 +97,14 @@ pub fn run() {
             set_toggle_shortcut,
             set_main_window_monitor
         ])
-        .run(tauri::generate_context!())
-        .expect("error while running tauri application");
+        .build(tauri::generate_context!())
+        .expect("error while building tauri application");
+    #[cfg(target_os = "macos")]
+    let app = {
+        let mut app = app;
+        app.set_activation_policy(tauri::ActivationPolicy::Accessory);
+        app
+    };
+
+    app.run(|_, _| {});
 }
