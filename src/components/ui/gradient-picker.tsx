@@ -40,6 +40,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
+import { useTranslation } from 'react-i18next';
 
 // Enable CSS color names
 extend([namesPlugin]);
@@ -346,12 +347,13 @@ export const ColorPickerEyeDropper = ({ className, ...props }: ComponentProps<ty
 // --- Formats ---
 
 export const ColorPickerOutput = ({ className, ...props }: ComponentProps<typeof SelectTrigger>) => {
+  const { t } = useTranslation();
   const { mode, setMode } = useColorPicker();
   const formats = ['hex', 'rgb', 'hsl', 'css'];
   return (
     <Select value={mode} onValueChange={setMode}>
       <SelectTrigger className={cn('h-8 w-18 px-2 text-xs', className)} {...props}>
-        <SelectValue placeholder="Mode" />
+        <SelectValue placeholder={t("Mode")} />
       </SelectTrigger>
       <SelectContent>
         {formats.map((f) => (
@@ -379,6 +381,7 @@ const ChannelInput = ({ value, onChange, max = 255, label, className }: { value:
 };
 
 export const ColorPickerFormat = ({ className, ...props }: HTMLAttributes<HTMLDivElement>) => {
+  const { t } = useTranslation();
   const { hue, saturation, lightness, alpha, mode, setHue, setSaturation, setLightness, setAlpha } = useColorPicker();
   const color = colord({ h: hue, s: saturation, l: lightness, a: alpha / 100 });
 
@@ -397,7 +400,7 @@ export const ColorPickerFormat = ({ className, ...props }: HTMLAttributes<HTMLDi
       <div className={cn('flex gap-2', className)} {...props}>
         <div className="relative flex-1">
           <Input defaultValue={color.toHex()} onBlur={handleHexChange} key={color.toHex()} className="h-8 px-2 text-xs" />
-          <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground pointer-events-none">HEX</span>
+          <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground pointer-events-none">{t("HEX")}</span>
         </div>
         <ChannelInput value={Math.round(alpha)} onChange={setAlpha} max={100} label="%" className="w-14" />
       </div>
@@ -494,6 +497,7 @@ export const ColorPicker = ({
   className,
   ...props
 }: ColorPickerProps) => {
+  const { t } = useTranslation();
   const [internalValue, setInternalValue] = useState(value || defaultValue);
   const isInternalChange = useRef(false);
 
@@ -558,8 +562,8 @@ export const ColorPicker = ({
         // If switching to gradient, use current solid as start?
       }} className="w-full">
         <TabsList className="mb-2 w-full grid grid-cols-2">
-          <TabsTrigger value="solid">Solid</TabsTrigger>
-          <TabsTrigger value="gradient">Gradient</TabsTrigger>
+          <TabsTrigger value="solid">{t("Solid")}</TabsTrigger>
+          <TabsTrigger value="gradient">{t("Gradient")}</TabsTrigger>
         </TabsList>
 
         <ColorLogicProvider color={activeColor} onChange={handleSolidChange}>

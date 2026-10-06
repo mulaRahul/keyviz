@@ -1,6 +1,7 @@
-import { keymaps } from '@/lib/keymaps';
 import { RawKey } from '@/types/event';
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { translateKeyLabel } from '@/i18n/key-label';
 
 
 // --- Types ---
@@ -48,8 +49,9 @@ const formatKey = (key: string) => {
 const ShortcutRecorder: React.FC<ShortcutInputProps> = ({
   value,
   onChange,
-  placeholder = "Click to set shortcut"
+  placeholder
 }) => {
+  const { t } = useTranslation();
   const [isRecording, setIsRecording] = useState(false);
   const inputRef = useRef<HTMLDivElement>(null);
 
@@ -135,14 +137,14 @@ const ShortcutRecorder: React.FC<ShortcutInputProps> = ({
       >
         {isRecording ? (
           <span className="text-primary font-medium ml-2">
-            Press your combination. Esc to cancel.
+            {t("Press your combination. Esc to cancel.")}
           </span>
         ) : (
           <div className="flex gap-2">
             {value.length > 0 ? (
-              value.map(k => <KeyCap key={k} label={keymaps[k]?.label ?? k} />)
+              value.map(k => <KeyCap key={k} label={translateKeyLabel(k, t)} />)
             ) : (
-              <span className="text-gray-400 select-none">{placeholder}</span>
+              <span className="text-gray-400 select-none">{placeholder ?? t("Click to set shortcut")}</span>
             )}
           </div>
         )}

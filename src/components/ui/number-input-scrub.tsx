@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 
 interface NumberScrubberProps
   extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "onChange"> {
@@ -27,6 +28,7 @@ export function NumberScrubber({
   className,
   ...props
 }: NumberScrubberProps) {
+  const { t } = useTranslation();
   const [isDragging, setIsDragging] = useState(false);
   const startX = useRef<number>(0);
   const startValue = useRef<number>(0);
@@ -100,7 +102,7 @@ export function NumberScrubber({
             props.disabled && "pointer-events-none"
           )}
           onMouseDown={handleMouseDown}
-          title="Click and drag to scrub"
+          title={t("Click and drag to scrub")}
         >
           {icon}
         </div>

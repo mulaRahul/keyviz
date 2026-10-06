@@ -1,6 +1,7 @@
+import type { ComponentType } from "react";
 import { platform } from "@tauri-apps/plugin-os";
 import { MouseLeftClickIcon, MouseMiddleClickIcon, MouseRightClickIcon, MouseRightDragIcon, MouseScrollDownIcon, MouseScrollUpIcon, ReturnIcon } from "@/components/ui/icons";
-import { ArrowBigUpDashIcon, ArrowBigUpIcon, ArrowDownIcon, ArrowDownToLineIcon, ArrowLeftIcon, ArrowLeftRightIcon, ArrowRightIcon, ArrowRightToLineIcon, ArrowUpIcon, ArrowUpToLineIcon, ChevronUpIcon, CircleArrowOutUpLeftIcon, CommandIcon, DeleteIcon, Grid2X2Icon, ImageIcon, LockIcon, LucideIcon, MouseIcon, MoveDownRightIcon, MoveUpLeftIcon, OptionIcon, PauseIcon, SpaceIcon, SparkleIcon, Volume2Icon, VolumeXIcon } from "lucide-react";
+import { ArrowBigUpDashIcon, ArrowBigUpIcon, ArrowDownIcon, ArrowDownToLineIcon, ArrowLeftIcon, ArrowLeftRightIcon, ArrowRightIcon, ArrowRightToLineIcon, ArrowUpIcon, ArrowUpToLineIcon, ChevronUpIcon, CircleArrowOutUpLeftIcon, CommandIcon, DeleteIcon, Grid2X2Icon, ImageIcon, LockIcon, MouseIcon, MoveDownRightIcon, MoveUpLeftIcon, OptionIcon, PauseIcon, SpaceIcon, SparkleIcon, Volume2Icon, VolumeXIcon } from "lucide-react";
 
 // ───────────── Platform Logic ─────────────
 const currentPlatform = platform();
@@ -21,6 +22,9 @@ function switchPlatform<T>(config: SwitchPlatformConfig<T>): T {
 }
 
 // ───────────── Key mapping ─────────────
+// lucide icons, custom icons and keyboard-file drawings share this shape
+export type KeyIcon = ComponentType<{ color?: string; size?: number | string }>;
+
 export interface DisplayData {
     // textual representation
     label: string;
@@ -31,7 +35,7 @@ export interface DisplayData {
     // secondary symbol if any like @ for digit 2
     symbol?: string;
     // icon path if can be represented with iconography
-    icon?: LucideIcon;
+    icon?: KeyIcon;
     // category
     category?: "modifier" | "letter" | "digit" | "punctuation" | "function" | "arrow" | "navigation" | "special" | "numpad" | "mouse";
 }
@@ -494,6 +498,21 @@ export const keymaps: Record<string, DisplayData> = {
         category: "modifier",
     };
 });
+
+// AltGr (right alt on ISO layouts)
+keymaps['AltGr'] = {
+    label: switchPlatform({
+        windows: "alt gr",
+        macos: "right option",
+    }),
+    shortLabel: switchPlatform({
+        windows: "altgr",
+        macos: "r opt",
+    }),
+    glyph: "⌥",
+    icon: OptionIcon,
+    category: "modifier",
+};
 
 // Shift
 ['ShiftLeft', 'ShiftRight'].forEach((key) => {

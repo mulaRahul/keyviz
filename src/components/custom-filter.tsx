@@ -4,6 +4,8 @@ import { cn } from "@/lib/utils";
 import { useKeyEvent } from "@/stores/key_event";
 import { RawKey } from "@/types/event";
 import { createContext, useContext, useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { translateKeyLabel } from "@/i18n/key-label";
 
 // Context for shared state
 interface KeyboardContextType {
@@ -22,6 +24,7 @@ const ButtonKey: React.FC<{
   className?: string;
   flexGrow?: boolean;
 }> = ({ rawKey, className = "", flexGrow = false }) => {
+  const { t } = useTranslation();
   const allowedKeys = useKeyEvent(state => state.allowedKeys);
   const setAllowedKeys = useKeyEvent(state => state.setAllowedKeys);
   const context = useContext(KeyboardContext);
@@ -33,7 +36,7 @@ const ButtonKey: React.FC<{
   const { isCtrlHeld, hoveredCategory, setHoveredKey } = context;
 
   const keyData = keymaps[rawKey];
-  const displayLabel = keyData?.shortLabel || keyData?.label || rawKey;
+  const displayLabel = translateKeyLabel(rawKey, t, true);
   const symbol = keyData?.symbol;
   const category = keyData?.category;
   const enabled = allowedKeys.includes(rawKey);
@@ -103,6 +106,7 @@ const ButtonKey: React.FC<{
 };
 
 export const CustomFilter = () => {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<'Keyboard' | 'Mouse' | 'Numpad'>('Keyboard');
   const [isCtrlHeld, setIsCtrlHeld] = useState(false);
   const [hoveredKey, setHoveredKey] = useState<string | undefined>(undefined);
@@ -245,6 +249,7 @@ export const CustomFilter = () => {
               <ButtonKey rawKey={RawKey.Alt} className="flex-1" />
               <ButtonKey rawKey={RawKey.MetaLeft} className="flex-1" />
               <ButtonKey rawKey={RawKey.Space} className="flex-4" flexGrow />
+              <ButtonKey rawKey={RawKey.AltGr} className="flex-1" />
               <ButtonKey rawKey={RawKey.ControlRight} className="flex-1" />
               <ButtonKey rawKey={RawKey.LeftArrow} />
               <ButtonKey rawKey={RawKey.DownArrow} />
@@ -310,9 +315,9 @@ export const CustomFilter = () => {
           value={activeTab}
           onValueChange={(value) => setActiveTab(value as 'Keyboard' | 'Mouse' | 'Numpad')}
         >
-          <ToggleGroupItem value="Keyboard">Keyboard</ToggleGroupItem>
-          <ToggleGroupItem value="Mouse">Mouse</ToggleGroupItem>
-          <ToggleGroupItem value="Numpad">Numpad</ToggleGroupItem>
+          <ToggleGroupItem value="Keyboard">{t("Keyboard")}</ToggleGroupItem>
+          <ToggleGroupItem value="Mouse">{t("Mouse")}</ToggleGroupItem>
+          <ToggleGroupItem value="Numpad">{t("Numpad")}</ToggleGroupItem>
         </ToggleGroup>
       </div>
     </KeyboardContext.Provider>

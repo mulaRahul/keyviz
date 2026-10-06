@@ -37,6 +37,16 @@ pub fn start_listener(app_handle: AppHandle, toggle_menu_item: MenuItem<Wry>) {
         println!("Starting global input listener...");
 
         if let Err(err) = listen(move |event| {
+            // Windows sends a fake left Ctrl (scan code 0x21D) with every AltGr press/release
+            #[cfg(target_os = "windows")]
+            if let EventType::KeyPress(rdev::Key::ControlLeft) | EventType::KeyRelease(rdev::Key::ControlLeft) =
+                event.event_type
+            {
+                if event.position_code == 0x21D {
+                    return;
+                }
+            }
+
             // get app state
             let state = app_handle.state::<Mutex<AppState>>();
             let mut app_state = state.lock().unwrap();

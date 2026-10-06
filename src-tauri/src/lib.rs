@@ -9,7 +9,7 @@ use tauri::{
 };
 
 mod app;
-use app::commands::{log, set_main_window_monitor, set_toggle_shortcut};
+use app::commands::{log, set_language, set_main_window_monitor, set_toggle_shortcut};
 use app::event::start_listener;
 use app::state::AppState;
 use app::window::config_window;
@@ -39,6 +39,16 @@ pub fn run() {
             let settings_item = MenuItem::with_id(app, "settings", "Settings", true, None::<&str>)?;
             let quit_item = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
 
+            {
+                let state = app.state::<Mutex<AppState>>();
+                let mut app_state = state.lock().unwrap();
+                app_state.toggle_menu_item = Some(toggle_item.clone());
+                app_state.settings_menu_item = Some(settings_item.clone());
+                app_state.quit_menu_item = Some(quit_item.clone());
+                let language = app_state.language.clone();
+                app_state.set_language(app.handle(), language);
+            }
+
             // start global input listener
             start_listener(app_handle.clone(), toggle_item.clone());
 
@@ -59,9 +69,20 @@ pub fn run() {
                             let _ = window.set_focus();
                             return;
                         }
+                        let language = app
+                            .state::<Mutex<AppState>>()
+                            .lock()
+                            .unwrap()
+                            .language
+                            .clone();
+                        let settings_title = if language == "fr" {
+                            "Keyviz - Paramètres"
+                        } else {
+                            "Keyviz - Settings"
+                        };
                         let webview_url = tauri::WebviewUrl::App("index.html#/settings".into());
                         WebviewWindowBuilder::new(app, "settings", webview_url.clone())
-                            .title("Keyviz")
+                            .title(settings_title)
                             .inner_size(800.0, 640.0)
                             .min_inner_size(640.0, 480.0)
                             .max_inner_size(1000.0, 800.0)
@@ -94,6 +115,7 @@ pub fn run() {
         })
         .invoke_handler(tauri::generate_handler![
             log,
+            set_language,
             set_toggle_shortcut,
             set_main_window_monitor
         ])

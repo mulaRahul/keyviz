@@ -6,6 +6,7 @@ import { getCurrentWindow } from "@tauri-apps/api/window";
 import { readTextFile, writeTextFile } from "@tauri-apps/plugin-fs";
 import { open, save } from "@tauri-apps/plugin-dialog";
 import { toast } from "sonner";
+import i18next from "i18next";
 
 export const KEY_STYLE_STORE = "key_style_store";
 
@@ -47,6 +48,15 @@ export interface TextSettings {
     caps: "uppercase" | "capitalize" | "lowercase";
     variant: "icon" | "text" | "text-short";
     alignment: Alignment;
+    // letters follow shift: "a" alone, "A" with shift (undefined = on)
+    matchCase?: boolean;
+}
+
+export interface KeyboardSettings {
+    // "" = built-in icons, "builtin:<id>" or a user file name
+    name: string;
+    // svg source of the keyboard, parsed by the overlay window
+    svg: string;
 }
 
 export interface BorderSettings {
@@ -82,9 +92,11 @@ export interface KeyStyleState {
     border: BorderSettings;
     background: BackgroundSettings;
     mouse: MouseSettings;
+    keyboard: KeyboardSettings;
 }
 
 interface KeyStyleActions {
+    setKeyboard: (keyboard: KeyboardSettings) => void;
     setAppearance: (appearance: Partial<AppearanceSettings>) => void;
     setLayout: (layout: Partial<LayoutSettings>) => void;
     setColor: (color: Partial<ColorSettings>) => void;
@@ -158,7 +170,9 @@ const createKeyStyleStore = createSyncedStore<KeyStyleStore>(
             indicatorOffsetX: 50,
             indicatorOffsetY: 50,
         },
+        keyboard: { name: "", svg: "" },
 
+        setKeyboard: (keyboard) => set({ keyboard }),
         setAppearance: (appearance) => set((state) => ({ appearance: { ...state.appearance, ...appearance } })),
         setLayout: (layout) => set((state) => ({ layout: { ...state.layout, ...layout } })),
         setColor: (color) => set((state) => ({ color: { ...state.color, ...color } })),
@@ -173,7 +187,7 @@ const createKeyStyleStore = createSyncedStore<KeyStyleStore>(
                 const filePath = await open({
                     multiple: false,
                     filters: [{
-                        name: 'JSON Files',
+                        name: i18next.t("JSON Files"),
                         extensions: ['json']
                     }]
                 });
@@ -187,7 +201,7 @@ const createKeyStyleStore = createSyncedStore<KeyStyleStore>(
                     !parsedData.modifier || !parsedData.text || !parsedData.border ||
                     !parsedData.background || !parsedData.mouse
                 ) {
-                    toast.warning("Invalid file format", { description: filePath });
+                    toast.warning(i18next.t("Invalid file format"), { description: filePath });
                     return;
                 }
                 set(() => ({
@@ -199,10 +213,12 @@ const createKeyStyleStore = createSyncedStore<KeyStyleStore>(
                     border: parsedData.border,
                     background: parsedData.background,
                     mouse: parsedData.mouse,
+                    // older exports have no keyboard: keep the current one
+                    ...(parsedData.keyboard && { keyboard: parsedData.keyboard }),
                 }));
-                toast.success("Imported successfully", { description: filePath });
+                toast.success(i18next.t("Imported successfully"), { description: filePath });
             } catch (err) {
-                toast.error("Error importing file", {
+                toast.error(i18next.t("Error importing file"), {
                     description: err instanceof Error ? err.message : String(err),
                 })
             }
@@ -218,6 +234,7 @@ const createKeyStyleStore = createSyncedStore<KeyStyleStore>(
                 border: state.border,
                 background: state.background,
                 mouse: state.mouse,
+                keyboard: state.keyboard,
             };
             try {
                 const filePath = await save({
@@ -226,9 +243,9 @@ const createKeyStyleStore = createSyncedStore<KeyStyleStore>(
                 });
                 if (!filePath) return;
                 await writeTextFile(filePath, JSON.stringify(exportData, null, 2));
-                toast.success("Exported successfully", { description: filePath });
+                toast.success(i18next.t("Exported successfully"), { description: filePath });
             } catch (err) {
-                toast.error("Error exporting file", {
+                toast.error(i18next.t("Error exporting file"), {
                     description: err instanceof Error ? err.message : String(err),
                 })
             }

@@ -16,6 +16,16 @@
     "dialog:allow-save",
     "fs:allow-read-text-file",
     "fs:allow-write-text-file",
+    "fs:allow-appdata-read-recursive",
+    "fs:allow-appdata-write-recursive",
+    {
+      "identifier": "opener:allow-open-path",
+      "allow": [
+        {
+          "path": "$APPDATA/keyboards"
+        }
+      ]
+    },
     {
       "identifier": "opener:allow-open-url",
       "allow": [

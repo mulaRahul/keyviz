@@ -3,8 +3,10 @@ import { Button } from "./button";
 import { ButtonGroup } from "./button-group";
 import { Input } from "./input";
 import { MinusSignIcon, PlusSignIcon } from "@hugeicons/core-free-icons";
+import { useTranslation } from "react-i18next";
 
 export const NumberInput = ({ value, onChange, min, max, step }: { value: number; onChange: (value: number) => void; min?: number; max?: number; step?: number }) => {
+    const { t } = useTranslation();
     return (
         <ButtonGroup>
             <Input
@@ -26,7 +28,7 @@ export const NumberInput = ({ value, onChange, min, max, step }: { value: number
                 variant="outline"
                 size="icon"
                 type="button"
-                aria-label="Decrement"
+                aria-label={t("Decrement")}
                 onClick={() => onChange(value - (step ?? 1))}
                 disabled={value <= (min ?? -Infinity)}
             >
@@ -36,7 +38,7 @@ export const NumberInput = ({ value, onChange, min, max, step }: { value: number
                 variant="outline"
                 size="icon"
                 type="button"
-                aria-label="Increment"
+                aria-label={t("Increment")}
                 onClick={() => onChange(value + (step ?? 1))}
                 disabled={value >= (max ?? Infinity)}
             >

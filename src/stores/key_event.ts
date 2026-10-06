@@ -32,6 +32,8 @@ export interface KeyEventState {
     dragThreshold: number;
     filter: "none" | "modifiers" | "custom";
     allowedKeys: string[];
+    // mouse buttons, drag and wheel also shown as keycaps
+    showMouseKeys: boolean;
     showEventHistory: boolean;
     maxHistory: number;
     lingerDurationMs: number;
@@ -44,6 +46,7 @@ interface KeyEventActions {
     setFilter(value: KeyEventState["filter"]): void;
     setAllowedKeys(keys: KeyEventState["allowedKeys"]): void;
     setShowEventHistory(value: KeyEventState["showEventHistory"]): void;
+    setShowMouseKeys(value: KeyEventState["showMouseKeys"]): void;
     setMaxHistory(value: KeyEventState["maxHistory"]): void;
     // setShowMouseEvents(value: KeyEventState["showMouseEvents"]): void;
     setLingerDurationMs(value: KeyEventState["lingerDurationMs"]): void;
@@ -78,6 +81,7 @@ const createKeyEventStore = createSyncedStore<KeyEventStore>(
             RawKey.MetaLeft,
             RawKey.Alt
         ],
+        showMouseKeys: true,
         showEventHistory: false,
         maxHistory: 5,
         lingerDurationMs: 5_000,
@@ -94,6 +98,9 @@ const createKeyEventStore = createSyncedStore<KeyEventStore>(
         },
         setShowEventHistory(value: boolean) {
             set({ showEventHistory: value });
+        },
+        setShowMouseKeys(value: boolean) {
+            set({ showMouseKeys: value });
         },
         setMaxHistory(value: number) {
             set({ maxHistory: value });
@@ -147,7 +154,8 @@ const createKeyEventStore = createSyncedStore<KeyEventStore>(
 
             let groups = [...state.groups];
             const last = groups.length - 1;
-            const key = new KeyEvent(event.name);
+            const shifted = pressedKeys.includes(RawKey.ShiftLeft) || pressedKeys.includes(RawKey.ShiftRight);
+            const key = new KeyEvent(event.name, shifted);
 
             // 2. check if pressed again
             const existingKey = last >= 0 ? groups[last].keys.find(gKey => gKey.name === key.name) : undefined;
@@ -157,7 +165,7 @@ const createKeyEventStore = createSyncedStore<KeyEventStore>(
                     const groupKeys: KeyEvent[] = [];
                     groups[last].keys.forEach(gKey => {
                         if (gKey.in(pressedKeys)) {
-                            groupKeys.push(new KeyEvent(gKey.name));
+                            groupKeys.push(new KeyEvent(gKey.name, gKey.name === key.name ? shifted : gKey.shifted));
                         }
                     });
                     groups.push({ keys: groupKeys, createdAt: state.showEventHistory ? Date.now() : 0 });
@@ -171,6 +179,7 @@ const createKeyEventStore = createSyncedStore<KeyEventStore>(
                         if (gKey.name === key.name) {
                             // update existing key's pressed count and time
                             existingKey.press();
+                            existingKey.shifted = shifted;
                             groupKeys.push(existingKey);
                         } else if (gKey.in(pressedKeys)) {
                             groupKeys.push(gKey);
@@ -271,7 +280,7 @@ const createKeyEventStore = createSyncedStore<KeyEventStore>(
                         state.allowedKeys.includes("Drag")
                     );
 
-                    if (hasGroupKeys || dragAllowed) {
+                    if (state.showMouseKeys && (hasGroupKeys || dragAllowed)) {
                         // simulate drag as key press
                         state.onKeyPress({ type: "KeyEvent", name: "Drag", pressed: true });
                     }
@@ -289,7 +298,9 @@ const createKeyEventStore = createSyncedStore<KeyEventStore>(
             };
 
             // simulate mouse button press as key
-            state.onKeyPress({ type: "KeyEvent", name: event.button.toString(), pressed: true });
+            if (state.showMouseKeys) {
+                state.onKeyPress({ type: "KeyEvent", name: event.button.toString(), pressed: true });
+            }
 
             set({
                 pressedMouseButton: event.button,
@@ -342,7 +353,7 @@ const createKeyEventStore = createSyncedStore<KeyEventStore>(
                 lastScrollAt: Date.now()
             };
             // simulate mouse wheel as key press
-            if (!get().pressedKeys.includes(raw_key)) {
+            if (state.showMouseKeys && !get().pressedKeys.includes(raw_key)) {
                 state.onKeyPress({ type: "KeyEvent", name: raw_key, pressed: true });
             }
 
