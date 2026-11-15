@@ -40,6 +40,9 @@ pub fn set_main_window_monitor(app: tauri::AppHandle, monitor_name: String) {
             app_state.monitor_position = (position.x, position.y);
 
             // Update window
+            // a fullscreen window can't leave its monitor
+            #[cfg(target_os = "windows")]
+            window.set_fullscreen(false).unwrap_or(());
             window
                 .set_position(PhysicalPosition {
                     x: position.x,
@@ -52,6 +55,8 @@ pub fn set_main_window_monitor(app: tauri::AppHandle, monitor_name: String) {
                     height: size.height,
                 })
                 .unwrap_or(());
+            #[cfg(target_os = "windows")]
+            window.set_fullscreen(true).unwrap_or(());
         }
     }
 }
