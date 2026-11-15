@@ -265,6 +265,9 @@ export const CustomFilter = () => {
               <ButtonKey rawKey={RawKey.Drag} />
             </div>
             <ButtonKey rawKey={RawKey.Right} className="mt-7" />
+            <ButtonKey rawKey={RawKey.Back} />
+            <div />
+            <ButtonKey rawKey={RawKey.Forward} />
           </div>
         }
         {

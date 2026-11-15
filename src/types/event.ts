@@ -32,6 +32,8 @@ export type MouseButton =
   | "Left"
   | "Right"
   | "Middle"
+  | "Back"
+  | "Forward"
   | "Other";
 
 export const RawKey = {
@@ -177,6 +179,8 @@ export const RawKey = {
   Left: "Left",
   Middle: "Middle",
   Right: "Right",
+  Back: "Back",
+  Forward: "Forward",
   Drag: "Drag",
   ScrollUp: "ScrollUp",
   ScrollDown: "ScrollDown",
