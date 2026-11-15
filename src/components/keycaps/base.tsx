@@ -1,4 +1,5 @@
-import { keymaps } from "@/lib/keymaps";
+import { getKeyDisplay } from "@/lib/keymaps";
+import { useKeyEvent } from "@/stores/key_event";
 import { useKeyStyle } from "@/stores/key_style";
 import { KeyEvent } from "@/types/event";
 import { alignmentForRow } from "@/types/style";
@@ -7,7 +8,8 @@ export const KeycapBase = ({ event }: { event: KeyEvent }) => {
   const text = useKeyStyle((state) => state.text);
   const layout = useKeyStyle((state) => state.layout);
   const modifier = useKeyStyle((state) => state.modifier);
-  const display = keymaps[event.name];
+  const keyboardLayout = useKeyEvent((state) => state.keyboardLayout);
+  const display = getKeyDisplay(event.name, keyboardLayout);
 
   const textColor = event.isModifier() && modifier.highlight ? modifier.textColor : text.color;
   const textStyle: React.CSSProperties = {

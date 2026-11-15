@@ -1,4 +1,5 @@
-import { keymaps } from '@/lib/keymaps';
+import { getKeyDisplay } from '@/lib/keymaps';
+import { useKeyEvent } from '@/stores/key_event';
 import { RawKey } from '@/types/event';
 import { useEffect, useRef, useState } from 'react';
 
@@ -52,6 +53,7 @@ const ShortcutRecorder: React.FC<ShortcutInputProps> = ({
 }) => {
   const [isRecording, setIsRecording] = useState(false);
   const inputRef = useRef<HTMLDivElement>(null);
+  const keyboardLayout = useKeyEvent((state) => state.keyboardLayout);
 
   // --- Logic: Handle Key Down ---
   useEffect(() => {
@@ -140,7 +142,7 @@ const ShortcutRecorder: React.FC<ShortcutInputProps> = ({
         ) : (
           <div className="flex gap-2">
             {value.length > 0 ? (
-              value.map(k => <KeyCap key={k} label={keymaps[k]?.label ?? k} />)
+              value.map(k => <KeyCap key={k} label={getKeyDisplay(k, keyboardLayout).label ?? k} />)
             ) : (
               <span className="text-gray-400 select-none">{placeholder}</span>
             )}

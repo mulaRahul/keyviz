@@ -1,6 +1,6 @@
 use crate::rdev::{Button, EventType, Key};
 use crate::windows::keyboard::Keyboard;
-use crate::keycodes::windows::key_from_code;
+use crate::keycodes::windows::get_win_key;
 use lazy_static::lazy_static;
 use std::convert::TryInto;
 use std::os::raw::{c_int, c_short};
@@ -83,12 +83,14 @@ pub unsafe fn convert(param: WPARAM, lpdata: LPARAM) -> (Option<EventType>, u16)
         match param.try_into() {
             Ok(WM_KEYDOWN) | Ok(WM_SYSKEYDOWN) => {
                 code = get_code(lpdata) as u16;
-                let key = key_from_code(code.into());
+                let scancode = get_scan_code(lpdata) as u32;
+                let key = get_win_key(code.into(), scancode);
                 Some(EventType::KeyPress(key))
             }
             Ok(WM_KEYUP) | Ok(WM_SYSKEYUP) => {
                 code = get_code(lpdata) as u16;
-                let key = key_from_code(code.into());
+                let scancode = get_scan_code(lpdata) as u32;
+                let key = get_win_key(code.into(), scancode);
                 Some(EventType::KeyRelease(key))
             }
             Ok(WM_LBUTTONDOWN) => Some(EventType::ButtonPress(Button::Left)),

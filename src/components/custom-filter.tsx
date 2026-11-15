@@ -1,5 +1,5 @@
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { keymaps } from "@/lib/keymaps";
+import { getKeyDisplay, keymaps } from "@/lib/keymaps";
 import { cn } from "@/lib/utils";
 import { useKeyEvent } from "@/stores/key_event";
 import { RawKey } from "@/types/event";
@@ -24,6 +24,7 @@ const ButtonKey: React.FC<{
 }> = ({ rawKey, className = "", flexGrow = false }) => {
   const allowedKeys = useKeyEvent(state => state.allowedKeys);
   const setAllowedKeys = useKeyEvent(state => state.setAllowedKeys);
+  const keyboardLayout = useKeyEvent(state => state.keyboardLayout);
   const context = useContext(KeyboardContext);
 
   if (!context) {
@@ -32,18 +33,18 @@ const ButtonKey: React.FC<{
 
   const { isCtrlHeld, hoveredCategory, setHoveredKey } = context;
 
-  const keyData = keymaps[rawKey];
+  const keyData = getKeyDisplay(rawKey, keyboardLayout);
   const displayLabel = keyData?.shortLabel || keyData?.label || rawKey;
   const symbol = keyData?.symbol;
-  const category = keyData?.category;
+  const category = keymaps[rawKey]?.category;
   const enabled = allowedKeys.includes(rawKey);
   const isHighlighted = isCtrlHeld && hoveredCategory && category === hoveredCategory;
 
   let content = <>{displayLabel}</>;
   if (symbol) {
     content = <>{symbol}<br />{displayLabel}</>;
-  } else if (keyData?.category === 'arrow') {
-    content = <>{keyData.glyph}</>;
+  } else if (keymaps[rawKey]?.category === 'arrow') {
+    content = <>{keymaps[rawKey]?.glyph}</>;
   }
 
   const handleClick = () => {
