@@ -229,7 +229,7 @@ const createKeyEventStore = createSyncedStore<KeyEventStore>(
             const last = groups.length - 1;
 
             const kIndex = last >= 0 ? groups[last].keys.findIndex(key => key.name === event.name) : undefined;
-            if (kIndex && kIndex >= 0) {
+            if (kIndex !== undefined && kIndex >= 0) {
                 groups[last].keys[kIndex].lastPressedAt = Date.now();
                 set({ pressedKeys, groups });
             } else {
