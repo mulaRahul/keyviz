@@ -34,6 +34,7 @@ export interface KeyEventState {
     allowedKeys: string[];
     showEventHistory: boolean;
     maxHistory: number;
+    showMouseEvents: boolean;
     lingerDurationMs: number;
     toggleShortcut: string[];
 }
@@ -45,7 +46,7 @@ interface KeyEventActions {
     setAllowedKeys(keys: KeyEventState["allowedKeys"]): void;
     setShowEventHistory(value: KeyEventState["showEventHistory"]): void;
     setMaxHistory(value: KeyEventState["maxHistory"]): void;
-    // setShowMouseEvents(value: KeyEventState["showMouseEvents"]): void;
+    setShowMouseEvents(value: KeyEventState["showMouseEvents"]): void;
     setLingerDurationMs(value: KeyEventState["lingerDurationMs"]): void;
     setToggleShortcut(value: KeyEventState["toggleShortcut"]): void;
     // ───────────── event actions ─────────────
@@ -80,6 +81,7 @@ const createKeyEventStore = createSyncedStore<KeyEventStore>(
         ],
         showEventHistory: false,
         maxHistory: 5,
+        showMouseEvents: true,
         lingerDurationMs: 5_000,
         toggleShortcut: [RawKey.ShiftLeft, RawKey.F10],
 
@@ -94,6 +96,9 @@ const createKeyEventStore = createSyncedStore<KeyEventStore>(
         },
         setShowEventHistory(value: boolean) {
             set({ showEventHistory: value });
+        },
+        setShowMouseEvents(value: boolean) {
+            set({ showMouseEvents: value });
         },
         setMaxHistory(value: number) {
             set({ maxHistory: value });
@@ -121,6 +126,7 @@ const createKeyEventStore = createSyncedStore<KeyEventStore>(
                     break;
 
                 case "MouseButtonEvent":
+                    if (!state.showMouseEvents) return;
                     if (event.pressed) {
                         state.onMouseButtonPress(event);
                     } else {
@@ -129,6 +135,7 @@ const createKeyEventStore = createSyncedStore<KeyEventStore>(
                     break;
 
                 case "MouseWheelEvent":
+                    if (!state.showMouseEvents) return;
                     state.onMouseWheel(event);
                     break;
             }

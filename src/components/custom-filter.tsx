@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import { useKeyEvent } from "@/stores/key_event";
 import { RawKey } from "@/types/event";
 import { createContext, useContext, useEffect, useRef, useState } from "react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 // Context for shared state
 interface KeyboardContextType {
@@ -104,6 +105,7 @@ const ButtonKey: React.FC<{
 
 export const CustomFilter = () => {
   const [activeTab, setActiveTab] = useState<'Keyboard' | 'Mouse' | 'Numpad'>('Keyboard');
+  const showMouseEvents = useKeyEvent(state => state.showMouseEvents);
   const [isCtrlHeld, setIsCtrlHeld] = useState(false);
   const [hoveredKey, setHoveredKey] = useState<string | undefined>(undefined);
   const [hoveredCategory, setHoveredCategory] = useState<string | undefined>(undefined);
@@ -291,9 +293,9 @@ export const CustomFilter = () => {
             {/* <div /> */}
 
             {/* Row 4 */}
-            <ButtonKey rawKey={RawKey.Kp3} />
-            <ButtonKey rawKey={RawKey.Kp2} />
             <ButtonKey rawKey={RawKey.Kp1} />
+            <ButtonKey rawKey={RawKey.Kp2} />
+            <ButtonKey rawKey={RawKey.Kp3} />
             <ButtonKey rawKey={RawKey.KpReturn} className="row-span-2" flexGrow />
 
             {/* Row 5 */}
@@ -311,7 +313,20 @@ export const CustomFilter = () => {
           onValueChange={(value) => setActiveTab(value as 'Keyboard' | 'Mouse' | 'Numpad')}
         >
           <ToggleGroupItem value="Keyboard">Keyboard</ToggleGroupItem>
-          <ToggleGroupItem value="Mouse">Mouse</ToggleGroupItem>
+          {
+            showMouseEvents ? (
+              <ToggleGroupItem value="Mouse">Mouse</ToggleGroupItem>
+            ) : (
+              <Tooltip>
+                <TooltipTrigger>
+                  <ToggleGroupItem value="Mouse" disabled>Mouse</ToggleGroupItem>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Mouse events are currently disabled</p>
+                </TooltipContent>
+              </Tooltip>
+            )
+          }
           <ToggleGroupItem value="Numpad">Numpad</ToggleGroupItem>
         </ToggleGroup>
       </div>
