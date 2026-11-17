@@ -289,6 +289,7 @@ const createKeyEventStore = createSyncedStore<KeyEventStore>(
         },
         onMouseButtonPress(event: MouseButtonEvent) {
             const state = get();
+            if (event.button === "Other") return;
             // set drag start position
             const mouse = {
                 ...state.mouse,
@@ -305,6 +306,7 @@ const createKeyEventStore = createSyncedStore<KeyEventStore>(
         },
         onMouseButtonRelease(event: MouseButtonEvent) {
             const state = get();
+            if (event.button === "Other") return;
             // reset drag state
             const mouse = {
                 ...state.mouse,

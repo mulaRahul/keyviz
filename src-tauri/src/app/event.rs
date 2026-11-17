@@ -20,6 +20,8 @@ pub enum MouseButton {
     Left,
     Right,
     Middle,
+    Back,
+    Forward,
     Other,
 }
 
@@ -28,6 +30,9 @@ pub fn map_mouse_button(button: Button) -> MouseButton {
         Button::Left => MouseButton::Left,
         Button::Right => MouseButton::Right,
         Button::Middle => MouseButton::Middle,
+        // Common side-button codes across Windows, macOS, and Linux/X11.
+        Button::Unknown(code) if matches!(code, 1 | 3 | 8) => MouseButton::Back,
+        Button::Unknown(code) if matches!(code, 2 | 4 | 9) => MouseButton::Forward,
         _ => MouseButton::Other,
     }
 }

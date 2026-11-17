@@ -421,6 +421,18 @@ export const keymaps: Record<string, DisplayData> = {
         icon: MouseRightClickIcon,
         category: "mouse",
     },
+    Back: {
+        label: "mouse back",
+        shortLabel: "back",
+        icon: ArrowLeftIcon,
+        category: "mouse",
+    },
+    Forward: {
+        label: "mouse forward",
+        shortLabel: "forward",
+        icon: ArrowRightIcon,
+        category: "mouse",
+    },
     Drag: {
         label: "drag",
         icon: MouseRightDragIcon,
