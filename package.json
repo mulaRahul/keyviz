@@ -40,7 +40,7 @@
     "react-resizable-panels": "^4.0.15",
     "react-router-dom": "^7.11.0",
     "recharts": "^3.6.0",
-    "shadcn": "^3.6.2",
+    "shadcn": "^1.0.0",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.4.0",
     "tailwindcss": "^4.1.18",
