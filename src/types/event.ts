@@ -43,6 +43,7 @@ export const RawKey = {
   ControlLeft: "ControlLeft",
   ControlRight: "ControlRight",
   Alt: "Alt",
+  AltGr: "AltGr",
   MetaLeft: "MetaLeft",
   MetaRight: "MetaRight",
   CapsLock: "CapsLock",
@@ -195,6 +196,7 @@ export const MODIFIERS = new Set<string>([
   RawKey.ControlLeft,
   RawKey.ControlRight,
   RawKey.Alt,
+  RawKey.AltGr,
   RawKey.MetaLeft,
   RawKey.MetaRight,
   RawKey.Function,
@@ -204,11 +206,14 @@ export class KeyEvent {
   name: string;
   pressedCount: number;
   lastPressedAt: number;
+  // shift was held when the key went down (drives letter case)
+  shifted: boolean;
 
-  constructor(name: string) {
+  constructor(name: string, shifted = false) {
     this.name = name;
     this.pressedCount = 1;
     this.lastPressedAt = Date.now();
+    this.shifted = shifted;
   }
 
   press() {

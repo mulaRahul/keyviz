@@ -27,6 +27,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
+import { useTranslation } from 'react-i18next';
 import { Popover, PopoverContent, PopoverTrigger } from './popover';
 
 // Enable CSS color names (e.g., "red")
@@ -333,13 +334,14 @@ export const ColorPickerEyeDropper = ({ className, ...props }: ComponentProps<ty
 // --- Inputs Area ---
 
 export const ColorPickerOutput = ({ className, ...props }: ComponentProps<typeof SelectTrigger>) => {
+  const { t } = useTranslation();
   const { mode, setMode } = useColorPicker();
   const formats = ['hex', 'rgb', 'hsl', 'css'];
 
   return (
     <Select value={mode} onValueChange={setMode}>
       <SelectTrigger className={cn('h-8 w-18 px-2 text-xs', className)} {...props}>
-        <SelectValue placeholder="Mode" />
+        <SelectValue placeholder={t("Mode")} />
       </SelectTrigger>
       <SelectContent>
         {formats.map((f) => (
@@ -384,6 +386,7 @@ const ChannelInput = ({
 };
 
 export const ColorPickerFormat = ({ className, ...props }: HTMLAttributes<HTMLDivElement>) => {
+  const { t } = useTranslation();
   const { hue, saturation, lightness, alpha, mode, setHue, setSaturation, setLightness, setAlpha } = useColorPicker();
 
   const color = colord({ h: hue, s: saturation, l: lightness, a: alpha / 100 });
@@ -415,7 +418,7 @@ export const ColorPickerFormat = ({ className, ...props }: HTMLAttributes<HTMLDi
             key={color.toHex()}         // Force re-render if external state changes
             className="h-8 px-2 text-xs"
           />
-          <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground pointer-events-none">HEX</span>
+          <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground pointer-events-none">{t("HEX")}</span>
         </div>
         <ChannelInput
           value={Math.round(alpha)}

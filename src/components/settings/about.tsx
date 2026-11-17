@@ -6,10 +6,12 @@ import { openUrl } from "@tauri-apps/plugin-opener"
 import { motion } from "motion/react"
 import { useState } from "react"
 import { toast } from "sonner"
+import { useTranslation } from "react-i18next"
 
 export const VERSION = "2.1.1"
 
 export const AboutPage = () => {
+    const { t } = useTranslation();
     const [checking, setChecking] = useState(false);
     const [updateAvailable, setUpdateAvailable] = useState(false);
     const [hovered, setHovered] = useState(false);
@@ -27,16 +29,16 @@ export const AboutPage = () => {
             if (latestVersion !== VERSION) {
                 setUpdateAvailable(true);
                 toast.success(
-                    `New version available: v${latestVersion}`,
+                    t("New version available: v{{version}}", { version: latestVersion }),
                     {
-                        action: { label: 'View', onClick: visitReleasePage }
+                        action: { label: t("View"), onClick: visitReleasePage }
                     }
                 );
             } else {
-                toast.info("You are using the latest version.");
+                toast.info(t("You are using the latest version."));
             }
         } catch (error) {
-            toast.error("Failed to check for updates.");
+            toast.error(t("Failed to check for updates."));
         }
         setChecking(false);
     }
@@ -51,7 +53,7 @@ export const AboutPage = () => {
                     }}
                     className="absolute top-0 left-0 w-full h-full"
                     src="./logo.svg"
-                    alt="logo"
+                    alt=""
                 />
                 <motion.img
                     initial={{ scale: 1.2, opacity: 0 }}
@@ -70,7 +72,7 @@ export const AboutPage = () => {
                     }}
                     className="absolute top-0 left-0 w-full h-full"
                     src="./logo-pro.svg"
-                    alt="logo-pro"
+                    alt=""
                 />
             </div>
             <h1 className="mt-4 mb-2 text-xl font-semibold">{
@@ -105,10 +107,10 @@ export const AboutPage = () => {
                 >
                     <ItemContent>
                         <ItemTitle>
-                            <HugeiconsIcon icon={SparklesIcon} size="1em" /> Upgrade to Pro
+                            <HugeiconsIcon icon={SparklesIcon} size="1em" /> {t("Upgrade to Pro")}
                         </ItemTitle>
                         <ItemDescription>
-                            Love Keyviz? Support its growth and unlock more with Pro.
+                            {t("Love Keyviz? Support its growth and unlock more with Pro.")}
                         </ItemDescription>
                     </ItemContent>
                     <ItemActions>
@@ -116,7 +118,7 @@ export const AboutPage = () => {
                             variant={hovered ? "default" : "outline"}
                             onClick={() => openUrl('https://keyviz.org/pro')}
                         >
-                            Go Pro
+                            {t("Go Pro")}
                         </Button>
                     </ItemActions>
                 </Item>
@@ -125,14 +127,14 @@ export const AboutPage = () => {
             <Item variant="muted" className="transition-all peer-hover:blur-xs">
                 <ItemContent>
                     <ItemTitle>
-                        <HugeiconsIcon icon={StarsIcon} size="1em" /> Check for updates
+                        <HugeiconsIcon icon={StarsIcon} size="1em" /> {t("Check for updates")}
                     </ItemTitle>
                 </ItemContent>
                 <ItemActions>
                     {
                         updateAvailable
-                            ? <Button className="cursor-pointer" onClick={visitReleasePage}>Update Available</Button>
-                            : <Button variant="outline" onClick={checkForUpdates} disabled={checking}>Check</Button>
+                            ? <Button className="cursor-pointer" onClick={visitReleasePage}>{t("Update Available")}</Button>
+                            : <Button variant="outline" onClick={checkForUpdates} disabled={checking}>{t("Check")}</Button>
                     }
                 </ItemActions>
             </Item>
@@ -140,10 +142,10 @@ export const AboutPage = () => {
             <Item variant="muted" className="transition-all peer-hover:blur-xs">
                 <ItemContent>
                     <ItemTitle>
-                        <HugeiconsIcon icon={GithubIcon} size="1em" /> Open Source
+                        <HugeiconsIcon icon={GithubIcon} size="1em" /> {t("Open Source")}
                     </ItemTitle>
                     <ItemDescription className="max-w-100">
-                        Review the source code on GitHub, sponsor, star the project, or contribute to its development.
+                        {t("Review the source code on GitHub, sponsor, star the project, or contribute to its development.")}
                     </ItemDescription>
                 </ItemContent>
                 <ItemActions>
@@ -159,7 +161,7 @@ export const AboutPage = () => {
                         <HugeiconsIcon icon={DiscordIcon} size="1em" /> Discord
                     </ItemTitle>
                     <ItemDescription className="max-w-100">
-                        Join our Discord community.
+                        {t("Join our Discord community.")}
                     </ItemDescription>
                 </ItemContent>
                 <ItemActions>

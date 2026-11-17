@@ -6,7 +6,7 @@ import { StateStorage } from 'zustand/middleware';
 const isSender = getCurrentWindow().label === "settings";
 
 // initialize the store instance
-const store = await load('store.json', {
+export const store = await load('store.json', {
     autoSave: isSender ? 1000 : false,
     defaults: {},
 });

@@ -9,28 +9,32 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { NumberScrubber } from "../ui/number-input-scrub";
 import { useState } from "react";
 import { Toggle } from "../ui/toggle";
+import { useTranslation } from "react-i18next";
 
 
 export const MouseSettings = () => {
+    const { t } = useTranslation();
     const mouse = useKeyStyle(state => state.mouse);
     const setMouseStyle = useKeyStyle(state => state.setMouse);
 
     const dragThreshold = useKeyEvent(state => state.dragThreshold);
     const setDragThreshold = useKeyEvent(state => state.setDragThreshold);
+    const showMouseKeys = useKeyEvent(state => state.showMouseKeys);
+    const setShowMouseKeys = useKeyEvent(state => state.setShowMouseKeys);
 
     const [offsetLinked, setOffsetLinked] = useState(true);
 
     return <div className="flex flex-col gap-y-4 p-6">
-        <h1 className="text-xl font-semibold">Mouse</h1>
+        <h1 className="text-xl font-semibold">{t("Mouse")}</h1>
 
-        <h2 className="text-sm text-muted-foreground font-medium">Cursor Highlight</h2>
+        <h2 className="text-sm text-muted-foreground font-medium">{t("Cursor Highlight")}</h2>
         <Item variant="muted">
             <ItemContent>
                 <ItemTitle>
-                    <HugeiconsIcon icon={CursorMagicSelection03FreeIcons} size="1em" /> Show Clicks
+                    <HugeiconsIcon icon={CursorMagicSelection03FreeIcons} size="1em" /> {t("Show Clicks")}
                 </ItemTitle>
                 <ItemDescription>
-                    Animate a ring upon mouse press
+                    {t("Animate a ring upon mouse press")}
                 </ItemDescription>
             </ItemContent>
             <ItemActions>
@@ -78,10 +82,10 @@ export const MouseSettings = () => {
         <Item variant="muted">
             <ItemContent>
                 <ItemTitle>
-                    <HugeiconsIcon icon={Cursor01Icon} size="1em" /> Always Highlight
+                    <HugeiconsIcon icon={Cursor01Icon} size="1em" /> {t("Always Highlight")}
                 </ItemTitle>
                 <ItemDescription>
-                    Permanently show the ring around the cursor
+                    {t("Permanently show the ring around the cursor")}
                 </ItemDescription>
             </ItemContent>
             <ItemActions>
@@ -93,14 +97,14 @@ export const MouseSettings = () => {
             </ItemActions>
         </Item>
 
-        <h2 className="text-sm text-muted-foreground font-medium mt-2">Button Indicator</h2>
+        <h2 className="text-sm text-muted-foreground font-medium mt-2">{t("Button Indicator")}</h2>
         <Item variant="muted">
             <ItemContent>
                 <ItemTitle>
-                    <HugeiconsIcon icon={MouseLeftClick05Icon} size="1em" /> Show Indicator
+                    <HugeiconsIcon icon={MouseLeftClick05Icon} size="1em" /> {t("Show Indicator")}
                 </ItemTitle>
                 <ItemDescription>
-                    Display button and scroll icons next to the cursor
+                    {t("Display button and scroll icons next to the cursor")}
                 </ItemDescription>
             </ItemContent>
             <ItemActions>
@@ -114,10 +118,10 @@ export const MouseSettings = () => {
         <Item variant="muted">
             <ItemContent>
                 <ItemTitle>
-                    <HugeiconsIcon icon={Cursor01Icon} size="1em" /> Keep Indicator
+                    <HugeiconsIcon icon={Cursor01Icon} size="1em" /> {t("Keep Indicator")}
                 </ItemTitle>
                 <ItemDescription>
-                    Permanently show the icon beside the cursor
+                    {t("Permanently show the icon beside the cursor")}
                 </ItemDescription>
             </ItemContent>
             <ItemActions>
@@ -147,10 +151,10 @@ export const MouseSettings = () => {
         <Item variant="muted">
             <ItemContent>
                 <ItemTitle>
-                    <HugeiconsIcon icon={ArrowExpand02Icon} size="1em" /> Offset
+                    <HugeiconsIcon icon={ArrowExpand02Icon} size="1em" /> {t("Offset")}
                 </ItemTitle>
                 <ItemDescription>
-                    Space from the cursor to the indicator
+                    {t("Space from the cursor to the indicator")}
                 </ItemDescription>
             </ItemContent>
             <ItemActions>
@@ -170,7 +174,7 @@ export const MouseSettings = () => {
                             setMouseStyle({ indicatorOffsetY: mouse.indicatorOffsetX });
                         }
                     }}
-                    aria-label="Offset linked"
+                    aria-label={t("Offset linked")}
                 >
                     <HugeiconsIcon icon={offsetLinked ? Link02Icon : Unlink02Icon} size="1em" />
                 </Toggle>
@@ -185,14 +189,31 @@ export const MouseSettings = () => {
             </ItemActions>
         </Item>
 
-        <h2 className="text-sm text-muted-foreground font-medium mt-2">Event</h2>
+        <h2 className="text-sm text-muted-foreground font-medium mt-2">{t("Event")}</h2>
         <Item variant="muted">
             <ItemContent>
                 <ItemTitle>
-                    <HugeiconsIcon icon={Drag03Icon} size="1em" /> Drag Threshold
+                    <HugeiconsIcon icon={KeyboardIcon} size="1em" /> {t("Show as Keys")}
                 </ItemTitle>
                 <ItemDescription>
-                    Minimum distance in pixels to show Drag event
+                    {t("Also show clicks, drag and scroll among the keystrokes")}
+                </ItemDescription>
+            </ItemContent>
+            <ItemActions>
+                <Switch
+                    checked={showMouseKeys}
+                    onCheckedChange={setShowMouseKeys}
+                />
+            </ItemActions>
+        </Item>
+
+        <Item variant="muted">
+            <ItemContent>
+                <ItemTitle>
+                    <HugeiconsIcon icon={Drag03Icon} size="1em" /> {t("Drag Threshold")}
+                </ItemTitle>
+                <ItemDescription>
+                    {t("Minimum distance in pixels to show Drag event")}
                 </ItemDescription>
             </ItemContent>
             <ItemActions>
