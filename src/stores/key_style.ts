@@ -6,6 +6,7 @@ import { getCurrentWindow } from "@tauri-apps/api/window";
 import { readTextFile, writeTextFile } from "@tauri-apps/plugin-fs";
 import { open, save } from "@tauri-apps/plugin-dialog";
 import { toast } from "sonner";
+import i18next from 'i18next'
 
 export const KEY_STYLE_STORE = "key_style_store";
 
@@ -173,7 +174,7 @@ const createKeyStyleStore = createSyncedStore<KeyStyleStore>(
                 const filePath = await open({
                     multiple: false,
                     filters: [{
-                        name: 'JSON Files',
+                        name: i18next.t('jsonFiles', 'JSON Files'),
                         extensions: ['json']
                     }]
                 });
@@ -187,7 +188,7 @@ const createKeyStyleStore = createSyncedStore<KeyStyleStore>(
                     !parsedData.modifier || !parsedData.text || !parsedData.border ||
                     !parsedData.background || !parsedData.mouse
                 ) {
-                    toast.warning("Invalid file format", { description: filePath });
+                    toast.warning(i18next.t('invalidFileFormat', 'Invalid file format'), { description: filePath });
                     return;
                 }
                 set(() => ({
@@ -202,7 +203,7 @@ const createKeyStyleStore = createSyncedStore<KeyStyleStore>(
                 }));
                 toast.success("Imported successfully", { description: filePath });
             } catch (err) {
-                toast.error("Error importing file", {
+                toast.error(i18next.t('errorImportingFile', 'Error importing file'), {
                     description: err instanceof Error ? err.message : String(err),
                 })
             }
@@ -222,13 +223,13 @@ const createKeyStyleStore = createSyncedStore<KeyStyleStore>(
             try {
                 const filePath = await save({
                     defaultPath: "key_style.json",
-                    filters: [{ name: "JSON Files", extensions: ["json"] }],
+                    filters: [{ name: i18next.t('jsonFiles', 'JSON Files'), extensions: ["json"] }],
                 });
                 if (!filePath) return;
                 await writeTextFile(filePath, JSON.stringify(exportData, null, 2));
                 toast.success("Exported successfully", { description: filePath });
             } catch (err) {
-                toast.error("Error exporting file", {
+                toast.error(i18next.t('errorExportingFile', 'Error exporting file'), {
                     description: err instanceof Error ? err.message : String(err),
                 })
             }

@@ -5,6 +5,7 @@ import { useKeyEvent } from "@/stores/key_event";
 import { RawKey } from "@/types/event";
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
+import { useTranslation } from 'react-i18next';
 
 // Context for shared state
 interface KeyboardContextType {
@@ -104,6 +105,7 @@ const ButtonKey: React.FC<{
 };
 
 export const CustomFilter = () => {
+  const { t } = useTranslation()
   const [activeTab, setActiveTab] = useState<'Keyboard' | 'Mouse' | 'Numpad'>('Keyboard');
   const showMouseEvents = useKeyEvent(state => state.showMouseEvents);
   const [isCtrlHeld, setIsCtrlHeld] = useState(false);
@@ -315,22 +317,22 @@ export const CustomFilter = () => {
           value={activeTab}
           onValueChange={(value) => setActiveTab(value as 'Keyboard' | 'Mouse' | 'Numpad')}
         >
-          <ToggleGroupItem value="Keyboard">Keyboard</ToggleGroupItem>
+          <ToggleGroupItem value="Keyboard">{t('keyboard', 'Keyboard')}</ToggleGroupItem>
           {
             showMouseEvents ? (
-              <ToggleGroupItem value="Mouse">Mouse</ToggleGroupItem>
+              <ToggleGroupItem value="Mouse">{t('mouse', 'Mouse')}</ToggleGroupItem>
             ) : (
               <Tooltip>
                 <TooltipTrigger>
-                  <ToggleGroupItem value="Mouse" disabled>Mouse</ToggleGroupItem>
+                  <ToggleGroupItem value="Mouse" disabled>{t('mouse', 'Mouse')}</ToggleGroupItem>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>Mouse events are currently disabled</p>
+                  <p>{t('mouseEventsAreCurrentlyDisabled', 'Mouse events are currently disabled')}</p>
                 </TooltipContent>
               </Tooltip>
             )
           }
-          <ToggleGroupItem value="Numpad">Numpad</ToggleGroupItem>
+          <ToggleGroupItem value="Numpad">{t('numpad', 'Numpad')}</ToggleGroupItem>
         </ToggleGroup>
       </div>
     </KeyboardContext.Provider>

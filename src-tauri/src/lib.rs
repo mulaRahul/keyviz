@@ -9,9 +9,9 @@ use tauri::{
 };
 
 mod app;
-use app::commands::{log, set_main_window_monitor, set_toggle_shortcut};
+use app::commands::{log, set_locale, set_main_window_monitor, set_toggle_shortcut};
 use app::event::start_listener;
-use app::state::AppState;
+use app::state::{tray_labels, AppState, TrayMenuItems};
 use app::window::config_window;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -31,13 +31,21 @@ pub fn run() {
             }
 
             let app_handle = app.handle();
-            // manage app state
-            app.manage(Mutex::new(AppState::new(&app_handle)));
+            let mut app_state = AppState::new(&app_handle);
+            let labels = tray_labels(&app_state.locale);
 
             // tray actions
-            let toggle_item = MenuItem::with_id(app, "toggle", "Stop", true, None::<&str>)?;
-            let settings_item = MenuItem::with_id(app, "settings", "Settings", true, None::<&str>)?;
-            let quit_item = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
+            let toggle_item = MenuItem::with_id(app, "toggle", labels.stop, true, None::<&str>)?;
+            let settings_item =
+                MenuItem::with_id(app, "settings", labels.settings, true, None::<&str>)?;
+            let quit_item = MenuItem::with_id(app, "quit", labels.quit, true, None::<&str>)?;
+
+            app_state.tray_menu_items = Some(TrayMenuItems {
+                toggle: toggle_item.clone(),
+                settings: settings_item.clone(),
+                quit: quit_item.clone(),
+            });
+            app.manage(Mutex::new(app_state));
 
             // start global input listener
             start_listener(app_handle.clone(), toggle_item.clone());
@@ -94,6 +102,7 @@ pub fn run() {
         })
         .invoke_handler(tauri::generate_handler![
             log,
+            set_locale,
             set_toggle_shortcut,
             set_main_window_monitor
         ])
