@@ -1,9 +1,24 @@
 import { platform } from "@tauri-apps/plugin-os";
+import { inTauri } from "@/lib/env";
 import { MouseLeftClickIcon, MouseMiddleClickIcon, MouseRightClickIcon, MouseRightDragIcon, MouseScrollDownIcon, MouseScrollUpIcon, ReturnIcon } from "@/components/ui/icons";
 import { ArrowBigUpDashIcon, ArrowBigUpIcon, ArrowDownIcon, ArrowDownToLineIcon, ArrowLeftIcon, ArrowLeftRightIcon, ArrowRightIcon, ArrowRightToLineIcon, ArrowUpIcon, ArrowUpToLineIcon, ChevronUpIcon, CircleArrowOutUpLeftIcon, CommandIcon, DeleteIcon, Grid2X2Icon, ImageIcon, LockIcon, LucideIcon, MouseIcon, MoveDownRightIcon, MoveUpLeftIcon, OptionIcon, PauseIcon, SpaceIcon, SparkleIcon, Volume2Icon, VolumeXIcon } from "lucide-react";
 
 // ───────────── Platform Logic ─────────────
-const currentPlatform = platform();
+// `platform()` reaches into the Tauri IPC bridge, which does not exist in the
+// browser page the OBS source opens, so fall back to the user agent there.
+const currentPlatform = inTauri ? platform() : browserPlatform();
+
+function browserPlatform(): ReturnType<typeof platform> {
+    const agent = navigator.userAgent;
+
+    if (agent.includes("Windows")) return "windows";
+    if (agent.includes("Android")) return "android";
+    if (agent.includes("iPhone") || agent.includes("iPad")) return "ios";
+    if (agent.includes("Mac")) return "macos";
+    if (agent.includes("Linux")) return "linux";
+
+    return "windows";
+}
 
 interface SwitchPlatformConfig<T> {
     windows: T;
