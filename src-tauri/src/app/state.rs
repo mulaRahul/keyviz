@@ -1,6 +1,8 @@
 use serde::Deserialize;
-use tauri::{image::Image, include_image, menu::MenuItem, Emitter, Wry};
+use tauri::{image::Image, include_image, menu::MenuItem, AppHandle, Emitter, Wry};
 use tauri_plugin_store::StoreExt;
+
+use crate::app::monitors::MonitorRect;
 
 pub const SUPPORTED_LOCALES: [&str; 4] = ["en-US", "zh-CN", "fr-FR", "es-ES"];
 
@@ -10,6 +12,10 @@ pub struct TrayMenuItems {
     pub settings: MenuItem<Wry>,
     pub quit: MenuItem<Wry>,
 }
+
+/// Reserved display name for the OBS browser-source output. The frontend adds
+/// it to the keycap display list; it never maps to a real monitor.
+pub const BROWSER_DISPLAY: &str = "__browser__";
 
 #[derive(Default)]
 pub struct AppState {
@@ -22,6 +28,32 @@ pub struct AppState {
     pub monitor_name: Option<String>,
     pub monitor_scale: f64,
     pub monitor_position: (i32, i32),
+
+    /// Physical rectangle of every monitor, in `available_monitors()` order.
+    /// Kept in state so the input listener can route an event to the right
+    /// overlay window without querying the window system on every mouse move.
+    pub monitors: Vec<MonitorRect>,
+    /// Whether mouse visuals are drawn by one click-through window per monitor
+    /// (as opposed to the single main window).
+    pub mouse_overlays: bool,
+    /// Display names the user wants mouse visuals on. `None` means the setting
+    /// was never touched (default: every display); `Some` empty means none.
+    pub mouse_displays: Option<Vec<String>>,
+    /// Display names the user wants keycaps on. `None` means the setting was
+    /// never touched (default: the main window on the primary display);
+    /// `Some` empty means nothing is drawn.
+    pub key_displays: Option<Vec<String>>,
+    /// Master switch for the keycaps. When false no window draws them, but the
+    /// `key_displays` selection is kept for when it is turned back on.
+    pub key_enabled: bool,
+    /// Master switch for the mouse visuals, same contract as `key_enabled`.
+    pub mouse_enabled: bool,
+    /// Monitor indices that currently have their own keycap window, i.e. every
+    /// selected key display except the one the main window covers.
+    pub key_stages: Vec<usize>,
+    /// Last known cursor position in global physical pixels. Button and wheel
+    /// events carry no coordinates of their own.
+    pub pointer: (f64, f64),
 }
 
 impl AppState {
@@ -65,6 +97,14 @@ impl AppState {
             monitor_name: None,
             monitor_scale: 1.0,
             monitor_position: (0, 0),
+            monitors: vec![],
+            mouse_overlays: false,
+            mouse_displays: None,
+            key_displays: None,
+            key_enabled: true,
+            mouse_enabled: true,
+            key_stages: vec![],
+            pointer: (0.0, 0.0),
         }
     }
 
@@ -103,6 +143,37 @@ impl AppState {
         }
 
         Ok(())
+    }
+
+    /// Re-reads the monitor layout, returning `true` when it changed.
+    ///
+    /// Displays can be plugged in, unplugged, moved or rescaled while the app
+    /// runs; the cached rectangles are what mouse events are routed with, so
+    /// they have to stay in sync with the window system.
+    pub fn refresh_monitors(&mut self, app: &AppHandle) -> bool {
+        let monitors: Vec<MonitorRect> = app
+            .available_monitors()
+            .unwrap_or_default()
+            .iter()
+            .map(|monitor| {
+                let position = monitor.position();
+                let size = monitor.size();
+
+                MonitorRect::new(
+                    position.x,
+                    position.y,
+                    size.width,
+                    size.height,
+                    monitor.scale_factor(),
+                )
+                .with_name(monitor.name().cloned())
+            })
+            .collect();
+
+        let changed = monitors != self.monitors;
+        self.monitors = monitors;
+
+        changed
     }
 
     pub fn toggle_listener(&mut self, app: &tauri::AppHandle, toggle: &tauri::menu::MenuItem<Wry>) {
