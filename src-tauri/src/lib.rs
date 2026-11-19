@@ -70,6 +70,7 @@ pub fn run() {
                         let webview_url = tauri::WebviewUrl::App("index.html#/settings".into());
                         WebviewWindowBuilder::new(app, "settings", webview_url.clone())
                             .title("Keyviz")
+                            .always_on_top(true)
                             .inner_size(800.0, 640.0)
                             .min_inner_size(640.0, 480.0)
                             .max_inner_size(1000.0, 800.0)

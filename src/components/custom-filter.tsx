@@ -2,10 +2,11 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { keymaps } from "@/lib/keymaps";
 import { cn } from "@/lib/utils";
 import { useKeyEvent } from "@/stores/key_event";
-import { RawKey } from "@/types/event";
+import { RawKey, type RawKeyValue } from "@/types/event";
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 import { useTranslation } from 'react-i18next';
+import { useRive } from "@rive-app/react-webgl2";
 
 // Context for shared state
 interface KeyboardContextType {
@@ -145,7 +146,7 @@ export const CustomFilter = () => {
 
   return (
     <KeyboardContext.Provider value={{ isCtrlHeld, hoveredKey, hoveredCategory, setHoveredKey, setHoveredCategory }}>
-      <div className="w-full h-100 flex flex-col gap-4 items-center justify-center">
+      <div className="p-4 w-full h-100 flex flex-col items-center justify-between">
         {activeTab === 'Keyboard' &&
           <div
             className="w-full p-3 max-w-196 flex flex-col gap-2 bg-secondary rounded-2xl"
@@ -258,26 +259,14 @@ export const CustomFilter = () => {
         }
         {
           activeTab === 'Mouse' &&
-          <div
-            className="h-fit w-fit p-5 grid grid-cols-3 gap-4 justify-center bg-secondary rounded-t-[44%] rounded-b-[40%]"
-          >
-            <ButtonKey rawKey={RawKey.Left} className="mt-7" />
-            <div className="flex flex-col gap-4 items-center">
-              <ButtonKey rawKey={RawKey.Middle} />
-              <ButtonKey rawKey={RawKey.ScrollUp} />
-              <ButtonKey rawKey={RawKey.ScrollDown} />
-              <ButtonKey rawKey={RawKey.Drag} />
-            </div>
-            <ButtonKey rawKey={RawKey.Right} className="mt-7" />
-            <ButtonKey rawKey={RawKey.Back} />
-            <div />
-            <ButtonKey rawKey={RawKey.Forward} />
+          <div className="p-2 w-full h-full">
+            <MouseFilter />
           </div>
         }
         {
           activeTab === 'Numpad' &&
           <div
-            className="w-56 p-3 grid grid-cols-4 gap-2 bg-secondary rounded-2xl"
+            className="my-auto w-56 p-3 grid grid-cols-4 gap-2 bg-secondary rounded-2xl"
           >
             {/* Row 1 */}
             <ButtonKey rawKey={RawKey.NumLock} />
@@ -337,4 +326,89 @@ export const CustomFilter = () => {
       </div>
     </KeyboardContext.Provider>
   );
+};
+
+
+const mouseProperties = [
+  ["left", RawKey.Left],
+  ["right", RawKey.Right],
+  ["middle", RawKey.Middle],
+  ["scrollUp", RawKey.ScrollUp],
+  ["scrollDown", RawKey.ScrollDown],
+  ["drag", RawKey.Drag],
+  ["backward", RawKey.Back],
+  ["forward", RawKey.Forward],
+] as const;
+
+const MouseFilter = () => {
+  const { rive, RiveComponent } = useRive({
+    src: "/mouse_filter.riv",
+    stateMachine: "State Machine",
+    autoplay: true,
+    autoBind: true,
+    onRiveReady(rive) {
+      const vmi = rive.viewModelInstance;
+      const allowedKeys = useKeyEvent.getState().allowedKeys;
+      if (vmi != null) {
+        for (const [name, key] of mouseProperties) {
+          const property = vmi.boolean(name);
+          if (property != null) {
+            property.value = allowedKeys.includes(key);
+          }
+        }
+      }
+    },
+  });
+
+  const vmi = rive?.viewModelInstance;
+
+  useEffect(() => {
+    if (!rive) return;
+    if (!vmi) {
+      console.error("Mouse filter Rive view model is not available");
+      return;
+    }
+
+    const cleanups: (() => void)[] = [];
+    const setupListeners = (propertyName: string, rawKey: RawKeyValue) => {
+      const property = vmi.boolean(propertyName);
+      if (!property) {
+        console.error(`Mouse filter Rive view model has no boolean property "${propertyName}"`);
+        return;
+      }
+
+      property.value = useKeyEvent.getState().allowedKeys.includes(rawKey);
+
+      const onPropertyChange = () => {
+        const { allowedKeys, setAllowedKeys } = useKeyEvent.getState();
+        const enabled = allowedKeys.includes(rawKey);
+        if (property.value === enabled) return;
+
+        setAllowedKeys(property.value
+          ? [...allowedKeys, rawKey]
+          : allowedKeys.filter(key => key !== rawKey));
+      };
+
+      property.on(onPropertyChange);
+      const unsubscribe = useKeyEvent.subscribe((state, previousState) => {
+        const enabled = state.allowedKeys.includes(rawKey);
+        if (enabled !== previousState.allowedKeys.includes(rawKey) && property.value !== enabled) {
+          property.value = enabled;
+        }
+      });
+
+      cleanups.push(() => {
+        unsubscribe();
+        property.off(onPropertyChange);
+      });
+    };
+
+    mouseProperties.forEach(([name, key]) => setupListeners(name, key));
+
+    return () => {
+      cleanups.forEach(cleanup => cleanup());
+    };
+  }, [rive, vmi]);
+
+  return <RiveComponent className="w-full h-full" />;
 };
