@@ -2,7 +2,7 @@ import { Alignment } from "@/types/style";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { tauriStorage } from "./storage";
 import { createSyncedStore } from "./sync";
-import { getCurrentWindow } from "@tauri-apps/api/window";
+import { windowLabel } from "@/lib/env";
 import { readTextFile, writeTextFile } from "@tauri-apps/plugin-fs";
 import { open, save } from "@tauri-apps/plugin-dialog";
 import { toast } from "sonner";
@@ -10,8 +10,31 @@ import i18next from 'i18next'
 
 export const KEY_STYLE_STORE = "key_style_store";
 
+/** Pseudo display that serves the keycaps over HTTP for OBS Browser Source. */
+export const BROWSER_DISPLAY = "__browser__";
+
+/** Port the browser source binds to by default (below the Windows dynamic range). */
+export const DEFAULT_BROWSER_PORT = 17650;
+
 export interface AppearanceSettings {
-    monitor: string | null;
+    /**
+     * Displays that render the keycaps, by monitor name. `null` means the user
+     * never changed it (main window on the primary display); an empty array
+     * means the user cleared every display, so nothing is drawn.
+     */
+    monitors: string[] | null;
+    /**
+     * Displays that render mouse clicks and the indicator, by monitor name.
+     * `null` means every display (the default), an empty array means none.
+     */
+    mouseMonitors: string[] | null;
+    /**
+     * Master switch for the keycaps. When off, nothing is drawn anywhere; the
+     * `monitors` selection is kept so turning it back on restores the setup.
+     */
+    keycapsEnabled: boolean;
+    /** Master switch for the mouse visuals, same contract as `keycapsEnabled`. */
+    mouseEnabled: boolean;
     flexDirection: "row" | "column";
     alignment: Alignment;
     marginX: number;
@@ -83,6 +106,8 @@ export interface KeyStyleState {
     border: BorderSettings;
     background: BackgroundSettings;
     mouse: MouseSettings;
+    /** Port the OBS browser-source page listens on when that output is selected. */
+    browserSourcePort: number;
 }
 
 interface KeyStyleActions {
@@ -94,6 +119,7 @@ interface KeyStyleActions {
     setBorder: (border: Partial<BorderSettings>) => void;
     setBackground: (background: Partial<BackgroundSettings>) => void;
     setMouse: (mouse: Partial<MouseSettings>) => void;
+    setBrowserSourcePort: (port: number) => void;
     import: () => Promise<void>;
     export: () => Promise<void>;
 }
@@ -104,7 +130,10 @@ const createKeyStyleStore = createSyncedStore<KeyStyleStore>(
     KEY_STYLE_STORE,
     (set, get) => ({
         appearance: {
-            monitor: null,
+            monitors: null,
+            mouseMonitors: null,
+            keycapsEnabled: true,
+            mouseEnabled: true,
             flexDirection: "column",
             alignment: "bottom-center",
             marginX: 100,
@@ -159,6 +188,7 @@ const createKeyStyleStore = createSyncedStore<KeyStyleStore>(
             indicatorOffsetX: 50,
             indicatorOffsetY: 50,
         },
+        browserSourcePort: DEFAULT_BROWSER_PORT,
 
         setAppearance: (appearance) => set((state) => ({ appearance: { ...state.appearance, ...appearance } })),
         setLayout: (layout) => set((state) => ({ layout: { ...state.layout, ...layout } })),
@@ -168,6 +198,7 @@ const createKeyStyleStore = createSyncedStore<KeyStyleStore>(
         setBorder: (border) => set((state) => ({ border: { ...state.border, ...border } })),
         setBackground: (background) => set((state) => ({ background: { ...state.background, ...background } })),
         setMouse: (mouse) => set((state) => ({ mouse: { ...state.mouse, ...mouse } })),
+        setBrowserSourcePort: (browserSourcePort) => set({ browserSourcePort }),
 
         import: async () => {
             try {
@@ -219,6 +250,7 @@ const createKeyStyleStore = createSyncedStore<KeyStyleStore>(
                 border: state.border,
                 background: state.background,
                 mouse: state.mouse,
+                browserSourcePort: state.browserSourcePort,
             };
             try {
                 const filePath = await save({
@@ -238,7 +270,27 @@ const createKeyStyleStore = createSyncedStore<KeyStyleStore>(
     (config) => persist(config, {
         name: KEY_STYLE_STORE,
         storage: createJSONStorage(() => tauriStorage),
+        version: 2,
+        // v1 stored a single `appearance.monitor` string. Both the keycaps and
+        // the mouse effects followed it, so the same display fills both lists.
+        // When it was never set, both stay `null` (= default behaviour).
+        migrate: (persisted, version) => {
+            const state = persisted as Partial<KeyStyleStore>;
+            const appearance = state?.appearance as (Partial<AppearanceSettings> & { monitor?: string | null }) | undefined;
+
+            if (version < 2 && appearance) {
+                const monitor = appearance.monitor ?? null;
+
+                if (monitor) {
+                    appearance.monitors = appearance.monitors ?? [monitor];
+                    appearance.mouseMonitors = appearance.mouseMonitors ?? [monitor];
+                }
+                delete appearance.monitor;
+            }
+
+            return state as KeyStyleStore;
+        },
     }),
 );
 
-export const useKeyStyle = createKeyStyleStore(getCurrentWindow().label === "settings");
+export const useKeyStyle = createKeyStyleStore(windowLabel() === "settings");
