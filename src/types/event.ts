@@ -14,6 +14,9 @@ export interface MouseButtonEvent {
   type: "MouseButtonEvent";
   pressed: boolean;
   button: MouseButton;
+  /** Click position, local to the window the event was delivered to. */
+  x: number;
+  y: number;
 }
 
 export interface MouseMoveEvent {
@@ -26,6 +29,9 @@ export interface MouseWheelEvent {
   type: "MouseWheelEvent";
   delta_x: number;
   delta_y: number;
+  /** Cursor position, local to the window the event was delivered to. */
+  x: number;
+  y: number;
 }
 
 export type MouseButton =
