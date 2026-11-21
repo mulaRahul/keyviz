@@ -31,7 +31,7 @@ tauri-plugin-fs = "2"
 tauri-plugin-prevent-default = "4"
 
 [target.'cfg(target_os = "windows")'.dependencies]
-windows = { version = "0.48", features = ["Win32_UI_WindowsAndMessaging", "Win32_Foundation"] }
+windows = { version = "0.48", features = ["Win32_UI_Accessibility", "Win32_UI_WindowsAndMessaging", "Win32_Foundation"] }
 
 [target.'cfg(target_os = "macos")'.dependencies]
 cocoa = "0.25"

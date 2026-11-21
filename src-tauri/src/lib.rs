@@ -88,6 +88,11 @@ pub fn run() {
             Ok(())
         })
         .on_window_event(|window, event| {
+            #[cfg(target_os = "windows")]
+            if window.label() == "main" && matches!(event, tauri::WindowEvent::Destroyed) {
+                app::window::stop_keeping_on_top();
+            }
+
             if window.label() != "settings" {
                 return;
             }
