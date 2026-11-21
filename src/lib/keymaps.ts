@@ -77,7 +77,10 @@ export const keymaps: Record<string, DisplayData> = {
     },
     Tab: {
         label: "tab",
-        glyph: "⇆",
+        glyph: switchPlatform({
+            windows: "⇆",
+            macos: "⇥",
+        }),
         icon: ArrowLeftRightIcon,
         category: "special",
     },
