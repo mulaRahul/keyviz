@@ -17,6 +17,7 @@ use app::window::config_window;
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .device_event_filter(tauri::DeviceEventFilter::Always)
         .plugin(tauri_plugin_single_instance::init(|_, __, ___| {}))
         .plugin(tauri_plugin_prevent_default::init())
         .plugin(tauri_plugin_fs::init())
