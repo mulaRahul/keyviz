@@ -13,12 +13,12 @@ export const MouseOverlay = () => {
     const wheel = useKeyEvent(state => state.mouse.wheel);
     const pressedMouseButton = useKeyEvent(state => state.pressedMouseButton);
     const style = useKeyStyle(state => state.mouse);
-    const animationDuration = useKeyStyle(state => state.appearance.animationDuration);
+    const animationDuration = Math.min(useKeyStyle(state => state.appearance.animationDuration), 0.25);
 
     const [show, setShow] = useState(false);
 
     const positionRef = useRef<HTMLDivElement>(null);
-    const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const pressTimestampRef = useRef<number | null>(null);
 
     // Handle minimum display duration for mouse clicks

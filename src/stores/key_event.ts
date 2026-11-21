@@ -126,7 +126,6 @@ const createKeyEventStore = createSyncedStore<KeyEventStore>(
                     break;
 
                 case "MouseButtonEvent":
-                    if (!state.showMouseEvents) return;
                     if (event.button === "Other") return;
                     if (event.pressed) {
                         state.onMouseButtonPress(event);
@@ -297,7 +296,9 @@ const createKeyEventStore = createSyncedStore<KeyEventStore>(
             };
 
             // simulate mouse button press as key
-            state.onKeyPress({ type: "KeyEvent", name: event.button.toString(), pressed: true });
+            if (state.showMouseEvents) {
+                state.onKeyPress({ type: "KeyEvent", name: event.button.toString(), pressed: true });
+            }
 
             set({
                 pressedMouseButton: event.button,
@@ -312,14 +313,18 @@ const createKeyEventStore = createSyncedStore<KeyEventStore>(
                 dragging: false,
                 dragStart: undefined
             };
-            // check if drag was visualized
-            if (state.mouse.dragging && state.pressedKeys.includes("Drag")) {
-                // simulate drag release as key
-                state.onKeyRelease({ type: "KeyEvent", name: "Drag", pressed: false });
-            } else {
-                // simulate mouse button release as key
-                state.onKeyRelease({ type: "KeyEvent", name: event.button.toString(), pressed: false });
+
+            if (state.showMouseEvents) {
+                // check if drag was visualized
+                if (state.mouse.dragging && state.pressedKeys.includes("Drag")) {
+                    // simulate drag release as key
+                    state.onKeyRelease({ type: "KeyEvent", name: "Drag", pressed: false });
+                } else {
+                    // simulate mouse button release as key
+                    state.onKeyRelease({ type: "KeyEvent", name: event.button.toString(), pressed: false });
+                }
             }
+
             set({
                 pressedMouseButton: null,
                 mouse
