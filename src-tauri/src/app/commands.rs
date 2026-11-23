@@ -17,6 +17,15 @@ pub fn set_toggle_shortcut(app: tauri::AppHandle, shortcut: Vec<String>) {
 }
 
 #[tauri::command]
+pub fn set_locale(app: tauri::AppHandle, locale: String) -> Result<(), String> {
+    let state = app.state::<Mutex<AppState>>();
+    let mut app_state = state
+        .lock()
+        .map_err(|error| format!("Failed to access app state: {error}"))?;
+    app_state.set_locale(&app, &locale)
+}
+
+#[tauri::command]
 pub fn set_main_window_monitor(app: tauri::AppHandle, monitor_name: String) {
     let state = app.state::<Mutex<AppState>>();
     let mut app_state = state.lock().unwrap();
@@ -40,6 +49,9 @@ pub fn set_main_window_monitor(app: tauri::AppHandle, monitor_name: String) {
             app_state.monitor_position = (position.x, position.y);
 
             // Update window
+            // a fullscreen window can't leave its monitor
+            #[cfg(target_os = "windows")]
+            window.set_fullscreen(false).unwrap_or(());
             window
                 .set_position(PhysicalPosition {
                     x: position.x,
@@ -52,6 +64,8 @@ pub fn set_main_window_monitor(app: tauri::AppHandle, monitor_name: String) {
                     height: size.height,
                 })
                 .unwrap_or(());
+            #[cfg(target_os = "windows")]
+            window.set_fullscreen(true).unwrap_or(());
         }
     }
 }

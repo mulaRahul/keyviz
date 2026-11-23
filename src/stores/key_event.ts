@@ -34,6 +34,7 @@ export interface KeyEventState {
     allowedKeys: string[];
     showEventHistory: boolean;
     maxHistory: number;
+    showMouseEvents: boolean;
     lingerDurationMs: number;
     toggleShortcut: string[];
 }
@@ -45,7 +46,7 @@ interface KeyEventActions {
     setAllowedKeys(keys: KeyEventState["allowedKeys"]): void;
     setShowEventHistory(value: KeyEventState["showEventHistory"]): void;
     setMaxHistory(value: KeyEventState["maxHistory"]): void;
-    // setShowMouseEvents(value: KeyEventState["showMouseEvents"]): void;
+    setShowMouseEvents(value: KeyEventState["showMouseEvents"]): void;
     setLingerDurationMs(value: KeyEventState["lingerDurationMs"]): void;
     setToggleShortcut(value: KeyEventState["toggleShortcut"]): void;
     // ───────────── event actions ─────────────
@@ -80,6 +81,7 @@ const createKeyEventStore = createSyncedStore<KeyEventStore>(
         ],
         showEventHistory: false,
         maxHistory: 5,
+        showMouseEvents: true,
         lingerDurationMs: 5_000,
         toggleShortcut: [RawKey.ShiftLeft, RawKey.F10],
 
@@ -94,6 +96,9 @@ const createKeyEventStore = createSyncedStore<KeyEventStore>(
         },
         setShowEventHistory(value: boolean) {
             set({ showEventHistory: value });
+        },
+        setShowMouseEvents(value: boolean) {
+            set({ showMouseEvents: value });
         },
         setMaxHistory(value: number) {
             set({ maxHistory: value });
@@ -121,6 +126,7 @@ const createKeyEventStore = createSyncedStore<KeyEventStore>(
                     break;
 
                 case "MouseButtonEvent":
+                    if (event.button === "Other") return;
                     if (event.pressed) {
                         state.onMouseButtonPress(event);
                     } else {
@@ -129,6 +135,7 @@ const createKeyEventStore = createSyncedStore<KeyEventStore>(
                     break;
 
                 case "MouseWheelEvent":
+                    if (!state.showMouseEvents) return;
                     state.onMouseWheel(event);
                     break;
             }
@@ -229,7 +236,7 @@ const createKeyEventStore = createSyncedStore<KeyEventStore>(
             const last = groups.length - 1;
 
             const kIndex = last >= 0 ? groups[last].keys.findIndex(key => key.name === event.name) : undefined;
-            if (kIndex && kIndex >= 0) {
+            if (kIndex !== undefined && kIndex >= 0) {
                 groups[last].keys[kIndex].lastPressedAt = Date.now();
                 set({ pressedKeys, groups });
             } else {
@@ -251,30 +258,30 @@ const createKeyEventStore = createSyncedStore<KeyEventStore>(
                 if (dragDistance > state.dragThreshold) {
                     mouse.dragging = true;
 
-                    // remove mouse button from pressed keys
-                    const pressedKeys = state.pressedKeys.filter(keyName => keyName !== state.pressedMouseButton?.toString());
+                    const buttonName = state.pressedMouseButton?.toString();
+                    const last = state.groups.length - 1;
 
-                    // remove mouse button from last group
+                    // Drag is shown if other keys are in the group (combination) or drag is allowed
+                    const hasOtherGroupKeys = last >= 0 && state.groups[last].keys.some(key => key.name !== buttonName);
+                    const dragAllowed = state.filter !== "custom" || state.allowedKeys.includes("Drag");
+
+                    if (!hasOtherGroupKeys && !dragAllowed) {
+                        // drag isn't visualized, keep the mouse button as a regular hold
+                        set({ mouse });
+                        return;
+                    }
+
+                    // replace mouse button with drag
+                    const pressedKeys = state.pressedKeys.filter(keyName => keyName !== buttonName);
                     const groups = [...state.groups];
-                    const last = groups.length - 1;
                     if (last >= 0) {
-                        groups[last].keys = groups[last].keys.filter(key => key.name !== state.pressedMouseButton?.toString());
+                        groups[last].keys = groups[last].keys.filter(key => key.name !== buttonName);
                     }
 
                     set({ pressedKeys, mouse, groups });
 
-                    // Check if group has any keys to visualize (in combination) or simulate drag if allowed
-                    const hasGroupKeys = last >= 0 && groups[last].keys.length > 0;
-                    const dragAllowed = state.filter != "custom" || (
-                        state.pressedMouseButton &&
-                        state.allowedKeys.includes(state.pressedMouseButton.toString()) &&
-                        state.allowedKeys.includes("Drag")
-                    );
-
-                    if (hasGroupKeys || dragAllowed) {
-                        // simulate drag as key press
-                        state.onKeyPress({ type: "KeyEvent", name: "Drag", pressed: true });
-                    }
+                    // simulate drag as key press
+                    state.onKeyPress({ type: "KeyEvent", name: "Drag", pressed: true });
                     return;
                 }
             }
@@ -289,7 +296,9 @@ const createKeyEventStore = createSyncedStore<KeyEventStore>(
             };
 
             // simulate mouse button press as key
-            state.onKeyPress({ type: "KeyEvent", name: event.button.toString(), pressed: true });
+            if (state.showMouseEvents) {
+                state.onKeyPress({ type: "KeyEvent", name: event.button.toString(), pressed: true });
+            }
 
             set({
                 pressedMouseButton: event.button,
@@ -304,14 +313,18 @@ const createKeyEventStore = createSyncedStore<KeyEventStore>(
                 dragging: false,
                 dragStart: undefined
             };
-            // check if was dragging
-            if (state.mouse.dragging) {
-                // simulate drag release as key
-                state.onKeyRelease({ type: "KeyEvent", name: "Drag", pressed: false });
-            } else {
-                // simulate mouse button release as key
-                state.onKeyRelease({ type: "KeyEvent", name: event.button.toString(), pressed: false });
+
+            if (state.showMouseEvents) {
+                // check if drag was visualized
+                if (state.mouse.dragging && state.pressedKeys.includes("Drag")) {
+                    // simulate drag release as key
+                    state.onKeyRelease({ type: "KeyEvent", name: "Drag", pressed: false });
+                } else {
+                    // simulate mouse button release as key
+                    state.onKeyRelease({ type: "KeyEvent", name: event.button.toString(), pressed: false });
+                }
             }
+
             set({
                 pressedMouseButton: null,
                 mouse

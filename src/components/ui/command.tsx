@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/input-group"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { SearchIcon, Tick02Icon } from "@hugeicons/core-free-icons"
+import i18next from 'i18next'
 
 function Command({
   className,
@@ -33,8 +34,8 @@ function Command({
 }
 
 function CommandDialog({
-  title = "Command Palette",
-  description = "Search for a command to run...",
+  title = i18next.t('commandPalette', 'Command Palette'),
+  description = i18next.t('searchForACommandToRun', 'Search for a command to run...'),
   children,
   className,
   showCloseButton = false,

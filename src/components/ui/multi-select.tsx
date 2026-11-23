@@ -18,6 +18,8 @@ import {
   CommandList,
   CommandSeparator,
 } from '@/components/ui/command';
+import { useTranslation } from 'react-i18next'
+import i18next from 'i18next'
 
 interface MultiSelectProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -48,7 +50,7 @@ const MultiSelect = React.forwardRef<
       options,
       onValueChange,
       defaultValue = [],
-      placeholder = 'Select options',
+      placeholder = i18next.t('selectOptions', 'Select options'),
       animation = 0,
       maxCount = 3,
       modalPopover = false,
@@ -60,6 +62,7 @@ const MultiSelect = React.forwardRef<
     },
     _
   ) => {
+    const { t } = useTranslation()
     const [selectedValues, setSelectedValues] =
       React.useState<string[]>(defaultValue);
     const [isPopoverOpen, setIsPopoverOpen] = React.useState(false);
@@ -164,7 +167,7 @@ const MultiSelect = React.forwardRef<
                       )}
                       style={{ animationDuration: `${animation}s` }}
                     >
-                      {`+ ${selectedValues.length - maxCount} more`}
+                      {t('valMore', '+ {{val}} more', { val: selectedValues.length - maxCount })}
                       <XCircle
                         className='ml-2 h-4 w-4 cursor-pointer'
                         onClick={(event) => {
@@ -203,11 +206,11 @@ const MultiSelect = React.forwardRef<
         >
           <Command>
             <CommandInput
-              placeholder='Search...'
+              placeholder={t('search', 'Search...')}
               onKeyDown={handleInputKeyDown}
             />
             <CommandList>
-              <CommandEmpty>No results found.</CommandEmpty>
+              <CommandEmpty>{t('noResultsFound', 'No results found.')}</CommandEmpty>
               <CommandGroup>
                 <CommandItem
                   key='all'
@@ -224,7 +227,7 @@ const MultiSelect = React.forwardRef<
                   >
                     <CheckIcon className='h-4 w-4' />
                   </div>
-                  <span>(Select All)</span>
+                  <span>{t('selectAll', '(Select All)')}</span>
                 </CommandItem>
                 {options.map((option) => {
                   const isSelected = selectedValues.includes(option.value);
@@ -271,7 +274,7 @@ const MultiSelect = React.forwardRef<
                         onSelect={handleClear}
                         className='flex-1 justify-center cursor-pointer border-r'
                       >
-                        Clear
+                        {t('clear', 'Clear')}
                       </CommandItem>
                     </>
                   )}
@@ -279,7 +282,7 @@ const MultiSelect = React.forwardRef<
                     onSelect={() => setIsPopoverOpen(false)}
                     className='flex-1 justify-center cursor-pointer max-w-full'
                   >
-                    Close
+                    {t('close', 'Close')}
                   </CommandItem>
                 </div>
               </CommandGroup>

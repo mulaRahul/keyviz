@@ -69,7 +69,7 @@ unsafe fn raw_callback(
                 usb_hid: 0,
                 extra_data: f_get_extra_data(lpdata),
             };
-            if let Some(callback) = &mut GLOBAL_CALLBACK {
+            if let Some(callback) = &mut *std::ptr::addr_of_mut!(GLOBAL_CALLBACK) {
                 if callback(event).is_none() {
                     // https://stackoverflow.com/questions/42756284/blocking-windows-mouse-click-using-setwindowshookex
                     // https://android.developreference.com/article/14560004/Blocking+windows+mouse+click+using+SetWindowsHookEx()

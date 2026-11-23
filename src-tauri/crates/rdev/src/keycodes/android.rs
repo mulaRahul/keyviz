@@ -67,7 +67,7 @@ decl_keycodes!(
     ScrollLock, 116,
     NumLock, 143,
     Pause, 121,
-    BackQuote, 75,
+    BackQuote, 68,
     Num1, 8,
     Num2, 9,
     Num3, 10,

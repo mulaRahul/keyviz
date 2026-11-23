@@ -2,6 +2,7 @@ import { cn } from "@/lib/utils";
 import { Alignment } from "@/types/style";
 import { ArrowDown02Icon, ArrowDownLeftIcon, ArrowDownRightIcon, ArrowLeft02Icon, ArrowRight02Icon, ArrowUp02Icon, ArrowUpLeftIcon, ArrowUpRightIcon, PlusSignIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { useTranslation } from 'react-i18next'
 
 
 interface AlignmentSelectorProps {
@@ -13,6 +14,7 @@ interface AlignmentSelectorProps {
 }
 
 const AlignmentSelector: React.FC<AlignmentSelectorProps> = ({ value, onChange, className, disabledOptions = [], iconStrokeWidth = 2 }) => {
+    const { t } = useTranslation()
 
     const items = [
         { value: 'top-left' as Alignment, icon: ArrowUpLeftIcon, },
@@ -37,7 +39,7 @@ const AlignmentSelector: React.FC<AlignmentSelectorProps> = ({ value, onChange, 
                                 key={pos}
                                 onClick={() => onChange(pos)}
                                 title={pos.replace('-', ' ')} // Tooltip on hover
-                                aria-label={`Align ${pos}`}
+                                aria-label={t('alignPos', 'Align {{pos}}', { pos })}
                                 aria-pressed={isSelected}
                                 className={`
                   relative rounded-md transition-all duration-200 ease-in-out

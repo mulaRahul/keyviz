@@ -1,6 +1,8 @@
 import { keymaps } from '@/lib/keymaps';
 import { RawKey } from '@/types/event';
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next'
+import i18next from 'i18next'
 
 
 // --- Types ---
@@ -48,8 +50,9 @@ const formatKey = (key: string) => {
 const ShortcutRecorder: React.FC<ShortcutInputProps> = ({
   value,
   onChange,
-  placeholder = "Click to set shortcut"
+  placeholder = i18next.t('clickToSetShortcut', 'Click to set shortcut')
 }) => {
+  const { t } = useTranslation()
   const [isRecording, setIsRecording] = useState(false);
   const inputRef = useRef<HTMLDivElement>(null);
 
@@ -135,7 +138,7 @@ const ShortcutRecorder: React.FC<ShortcutInputProps> = ({
       >
         {isRecording ? (
           <span className="text-primary font-medium ml-2">
-            Press your combination. Esc to cancel.
+            {t('pressYourCombinationEscToCancel', 'Press your combination. Esc to cancel.')}
           </span>
         ) : (
           <div className="flex gap-2">

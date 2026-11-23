@@ -77,7 +77,10 @@ export const keymaps: Record<string, DisplayData> = {
     },
     Tab: {
         label: "tab",
-        glyph: "⇆",
+        glyph: switchPlatform({
+            windows: "⇆",
+            macos: "⇥",
+        }),
         icon: ArrowLeftRightIcon,
         category: "special",
     },
@@ -419,6 +422,18 @@ export const keymaps: Record<string, DisplayData> = {
         label: "right click",
         shortLabel: "right",
         icon: MouseRightClickIcon,
+        category: "mouse",
+    },
+    Back: {
+        label: "mouse back",
+        shortLabel: "back",
+        icon: ArrowLeftIcon,
+        category: "mouse",
+    },
+    Forward: {
+        label: "mouse forward",
+        shortLabel: "forward",
+        icon: ArrowRightIcon,
         category: "mouse",
     },
     Drag: {

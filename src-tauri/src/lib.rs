@@ -9,14 +9,16 @@ use tauri::{
 };
 
 mod app;
-use app::commands::{log, set_main_window_monitor, set_toggle_shortcut};
+use app::commands::{log, set_locale, set_main_window_monitor, set_toggle_shortcut};
 use app::event::start_listener;
-use app::state::AppState;
+use app::state::{tray_labels, AppState, TrayMenuItems};
 use app::window::config_window;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    let app = tauri::Builder::default()
+    let app = tauri::Builder::default();
+    app //
+        .device_event_filter(tauri::DeviceEventFilter::Always)
         .plugin(tauri_plugin_single_instance::init(|_, __, ___| {}))
         .plugin(tauri_plugin_prevent_default::init())
         .plugin(tauri_plugin_fs::init())
@@ -31,13 +33,21 @@ pub fn run() {
             }
 
             let app_handle = app.handle();
-            // manage app state
-            app.manage(Mutex::new(AppState::new(&app_handle)));
+            let mut app_state = AppState::new(&app_handle);
+            let labels = tray_labels(&app_state.locale);
 
             // tray actions
-            let toggle_item = MenuItem::with_id(app, "toggle", "Stop", true, None::<&str>)?;
-            let settings_item = MenuItem::with_id(app, "settings", "Settings", true, None::<&str>)?;
-            let quit_item = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
+            let toggle_item = MenuItem::with_id(app, "toggle", labels.stop, true, None::<&str>)?;
+            let settings_item =
+                MenuItem::with_id(app, "settings", labels.settings, true, None::<&str>)?;
+            let quit_item = MenuItem::with_id(app, "quit", labels.quit, true, None::<&str>)?;
+
+            app_state.tray_menu_items = Some(TrayMenuItems {
+                toggle: toggle_item.clone(),
+                settings: settings_item.clone(),
+                quit: quit_item.clone(),
+            });
+            app.manage(Mutex::new(app_state));
 
             // start global input listener
             start_listener(app_handle.clone(), toggle_item.clone());
@@ -62,6 +72,7 @@ pub fn run() {
                         let webview_url = tauri::WebviewUrl::App("index.html#/settings".into());
                         WebviewWindowBuilder::new(app, "settings", webview_url.clone())
                             .title("Keyviz")
+                            .always_on_top(true)
                             .inner_size(800.0, 640.0)
                             .min_inner_size(640.0, 480.0)
                             .max_inner_size(1000.0, 800.0)
@@ -79,6 +90,11 @@ pub fn run() {
             Ok(())
         })
         .on_window_event(|window, event| {
+            #[cfg(target_os = "windows")]
+            if window.label() == "main" && matches!(event, tauri::WindowEvent::Destroyed) {
+                app::window::stop_keeping_on_top();
+            }
+
             if window.label() != "settings" {
                 return;
             }
@@ -94,6 +110,7 @@ pub fn run() {
         })
         .invoke_handler(tauri::generate_handler![
             log,
+            set_locale,
             set_toggle_shortcut,
             set_main_window_monitor
         ])
