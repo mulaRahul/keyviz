@@ -31,6 +31,16 @@ export default defineConfig(async () => ({
       ignored: ["**/src-tauri/**"],
     },
   },
+  build: {
+    rollupOptions: {
+      // the second entry is the page the browser source (OBS) loads: it shares
+      // the app's components and stores, so both views render identically
+      input: {
+        main: path.resolve(__dirname, "index.html"),
+        viewer: path.resolve(__dirname, "viewer.html"),
+      },
+    },
+  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),

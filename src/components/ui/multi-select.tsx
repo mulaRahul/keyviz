@@ -1,6 +1,6 @@
 'use client';
 import * as React from 'react';
-import { CheckIcon, XCircle, ChevronDown, XIcon } from 'lucide-react';
+import { CheckIcon, ChevronDown } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -16,7 +16,6 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-  CommandSeparator,
 } from '@/components/ui/command';
 import { useTranslation } from 'react-i18next'
 import i18next from 'i18next'
@@ -32,7 +31,6 @@ interface MultiSelectProps
   onValueChange: (value: string[]) => void;
   defaultValue?: string[];
   placeholder?: string;
-  animation?: number;
   maxCount?: number;
   modalPopover?: boolean;
   asChild?: boolean;
@@ -51,10 +49,8 @@ const MultiSelect = React.forwardRef<
       onValueChange,
       defaultValue = [],
       placeholder = i18next.t('selectOptions', 'Select options'),
-      animation = 0,
       maxCount = 3,
       modalPopover = false,
-      asChild = false,
       className,
       popoverClass,
       showall = false,
@@ -93,15 +89,6 @@ const MultiSelect = React.forwardRef<
       onValueChange([]);
     };
 
-    const handleTogglePopover = () => {
-      setIsPopoverOpen((prev) => !prev);
-    };
-
-    const clearExtraOptions = () => {
-      const newSelectedValues = selectedValues.slice(0, maxCount);
-      setSelectedValues(newSelectedValues);
-      onValueChange(newSelectedValues);
-    };
     const filteredOptions = options.filter((option) => !option.disable);
     const toggleAll = () => {
       if (selectedValues.length === filteredOptions.length) {
@@ -119,20 +106,21 @@ const MultiSelect = React.forwardRef<
         onOpenChange={setIsPopoverOpen}
         modal={modalPopover}
       >
-        {/* <PopoverTrigger asChild={asChild}> */}
-        <PopoverTrigger>
+        {/* The trigger has to be the button itself (asChild): wrapping one
+            button inside another made every click toggle the popover twice, so
+            it never stayed open. */}
+        <PopoverTrigger asChild>
           <Button
             // ref={ref}
             {...props}
-            onClick={handleTogglePopover}
             className={cn(
-              'flex w-full p-1 rounded-md border min-h-10 h-auto items-center justify-between bg-background hover:bg-background',
+              'flex w-full p-1 rounded-md border min-h-9 h-auto items-start justify-between gap-1 overflow-hidden bg-background hover:bg-background',
               className
             )}
           >
             {selectedValues.length > 0 ? (
-              <div className='flex justify-between items-center w-full'>
-                <div className='flex flex-wrap items-center  gap-1 p-1'>
+              <>
+                <div className='flex min-w-0 flex-1 flex-col items-stretch gap-1 py-0.5'>
                   {(showall
                     ? selectedValues
                     : selectedValues.slice(0, maxCount)
@@ -142,59 +130,29 @@ const MultiSelect = React.forwardRef<
                     return (
                       <div
                         key={value}
-                        className={cn(
-                          'inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-semibold  bg-primary text-primary-foreground  '
-                        )}
+                        className='flex h-7 w-full min-w-0 items-center gap-2 rounded-md border border-border bg-background px-2 text-xs font-medium text-foreground'
                       >
                         {IconComponent && (
-                          <IconComponent className='h-4 w-4 mr-2' />
+                          <IconComponent className='h-4 w-4 shrink-0' />
                         )}
-                        {option?.label}
-                        <XCircle
-                          className='ml-2 h-4 w-4 cursor-pointer'
-                          onClick={(event) => {
-                            event.stopPropagation();
-                            toggleOption(value);
-                          }}
-                        />
+                        <span className='truncate'>{option?.label}</span>
                       </div>
                     );
                   })}
                   {!showall && selectedValues.length > maxCount && (
-                    <div
-                      className={cn(
-                        'bg-primary-foreground inline-flex items-center border px-2 py-0.5  rounded-full text-foreground border-foreground/1 hover:bg-transparent'
-                      )}
-                      style={{ animationDuration: `${animation}s` }}
-                    >
+                    <div className='flex h-7 w-full items-center rounded-md border border-border bg-background px-2 text-xs text-muted-foreground'>
                       {t('valMore', '+ {{val}} more', { val: selectedValues.length - maxCount })}
-                      <XCircle
-                        className='ml-2 h-4 w-4 cursor-pointer'
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          clearExtraOptions();
-                        }}
-                      />
                     </div>
                   )}
                 </div>
-                <div className='flex items-center justify-between'>
-                  <XIcon
-                    className='h-4 mx-2 cursor-pointer text-muted-foreground'
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      handleClear();
-                    }}
-                  />
-                  <ChevronDown className='h-4 mx-2 cursor-pointer text-muted-foreground' />
-                </div>
-              </div>
+                <ChevronDown className='mt-2 h-4 w-4 shrink-0 text-muted-foreground' />
+              </>
             ) : (
-              <div className='flex items-center justify-between w-full mx-auto'>
-                <span className='text-sm text-muted-foreground mx-3'>
+              <div className='flex w-full items-center justify-between'>
+                <span className='mx-3 text-sm text-muted-foreground'>
                   {placeholder}
                 </span>
-                <ChevronDown className='h-4 cursor-pointer text-muted-foreground mx-2' />
+                <ChevronDown className='mx-2 h-4 w-4 text-muted-foreground' />
               </div>
             )}
           </Button>
@@ -264,27 +222,6 @@ const MultiSelect = React.forwardRef<
                     </CommandItem>
                   );
                 })}
-              </CommandGroup>
-              <CommandSeparator />
-              <CommandGroup>
-                <div className='flex items-center justify-between'>
-                  {selectedValues.length > 0 && (
-                    <>
-                      <CommandItem
-                        onSelect={handleClear}
-                        className='flex-1 justify-center cursor-pointer border-r'
-                      >
-                        {t('clear', 'Clear')}
-                      </CommandItem>
-                    </>
-                  )}
-                  <CommandItem
-                    onSelect={() => setIsPopoverOpen(false)}
-                    className='flex-1 justify-center cursor-pointer max-w-full'
-                  >
-                    {t('close', 'Close')}
-                  </CommandItem>
-                </div>
               </CommandGroup>
             </CommandList>
           </Command>

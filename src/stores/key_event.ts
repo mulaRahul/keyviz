@@ -1,5 +1,5 @@
 import { EventPayload, KeyEvent, MappedKeys, MODIFIERS, MouseButton, MouseButtonEvent, MouseMoveEvent, MouseWheelEvent, RawKey, RawKeyEvent } from "@/types/event";
-import { getCurrentWindow } from "@tauri-apps/api/window";
+import { windowLabel } from "@/lib/env";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { tauriStorage } from "./storage";
 import { createSyncedStore } from "./sync";
@@ -289,10 +289,16 @@ const createKeyEventStore = createSyncedStore<KeyEventStore>(
         },
         onMouseButtonPress(event: MouseButtonEvent) {
             const state = get();
+            if (event.button === "Other") return;
+            // Buttons carry their own position now: a click can be the first
+            // event a freshly created overlay window sees, and it must land at
+            // the clicked pixel instead of wherever the last move was.
             // set drag start position
             const mouse = {
                 ...state.mouse,
-                dragStart: { x: state.mouse.x, y: state.mouse.y },
+                x: event.x,
+                y: event.y,
+                dragStart: { x: event.x, y: event.y },
             };
 
             // simulate mouse button press as key
@@ -310,6 +316,8 @@ const createKeyEventStore = createSyncedStore<KeyEventStore>(
             // reset drag state
             const mouse = {
                 ...state.mouse,
+                x: event.x,
+                y: event.y,
                 dragging: false,
                 dragStart: undefined
             };
@@ -351,6 +359,8 @@ const createKeyEventStore = createSyncedStore<KeyEventStore>(
             // update mouse wheel state
             const mouse = {
                 ...state.mouse,
+                x: event.x,
+                y: event.y,
                 wheel, // -1 for down, 1 for up
                 lastScrollAt: Date.now()
             };
@@ -417,4 +427,4 @@ const createKeyEventStore = createSyncedStore<KeyEventStore>(
     }),
 );
 
-export const useKeyEvent = createKeyEventStore(getCurrentWindow().label === "settings");
+export const useKeyEvent = createKeyEventStore(windowLabel() === "settings");

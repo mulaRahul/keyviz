@@ -9,10 +9,15 @@ use tauri::{
 };
 
 mod app;
-use app::commands::{log, set_locale, set_main_window_monitor, set_toggle_shortcut};
+use app::browser_source::BrowserSource;
+use app::commands::{
+    browser_source_port, browser_source_start, browser_source_stop, browser_source_update, log,
+    resync_mouse_pointer, set_key_displays, set_locale, set_main_window_monitor, set_mouse_displays,
+    set_mouse_overlay_enabled, set_toggle_shortcut,
+};
 use app::event::start_listener;
 use app::state::{tray_labels, AppState, TrayMenuItems};
-use app::window::config_window;
+use app::window::{config_window, sync_overlay_windows};
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -47,6 +52,43 @@ pub fn run() {
                 quit: quit_item.clone(),
             });
             app.manage(Mutex::new(app_state));
+
+            // local page for OBS Browser Source, started on demand
+            app.manage(Mutex::new(BrowserSource::default()));
+
+            // Cache the monitor layout before the input listener starts, so the
+            // first mouse event can already be routed to the right display.
+            {
+                let state = app_handle.state::<Mutex<AppState>>();
+                state.lock().unwrap().refresh_monitors(app_handle);
+            }
+
+            // Displays can be plugged in, unplugged or rescaled while the app
+            // runs, and not every platform reports that as a window event.
+            // Re-reading the layout is cheap, so poll it while stage windows are
+            // needed and only rebuild when something actually changed.
+            let monitor_watcher = app_handle.clone();
+            std::thread::spawn(move || loop {
+                std::thread::sleep(std::time::Duration::from_secs(2));
+
+                let (enabled, changed) = {
+                    let Some(state) = monitor_watcher.try_state::<Mutex<AppState>>() else {
+                        return;
+                    };
+                    let mut state = state.lock().unwrap();
+                    let enabled = state.mouse_overlays
+                        || state
+                            .key_displays
+                            .as_ref()
+                            .is_some_and(|displays| !displays.is_empty());
+
+                    (enabled, enabled && state.refresh_monitors(&monitor_watcher))
+                };
+
+                if enabled && changed {
+                    let _ = sync_overlay_windows(&monitor_watcher);
+                }
+            });
 
             // start global input listener
             start_listener(app_handle.clone(), toggle_item.clone());
@@ -111,7 +153,15 @@ pub fn run() {
             log,
             set_locale,
             set_toggle_shortcut,
-            set_main_window_monitor
+            set_main_window_monitor,
+            set_key_displays,
+            set_mouse_displays,
+            set_mouse_overlay_enabled,
+            resync_mouse_pointer,
+            browser_source_start,
+            browser_source_stop,
+            browser_source_update,
+            browser_source_port
         ])
         .build(tauri::generate_context!())
         .expect("error while building tauri application");
