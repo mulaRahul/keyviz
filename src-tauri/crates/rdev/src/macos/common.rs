@@ -11,7 +11,7 @@ use lazy_static::lazy_static;
 use std::convert::TryInto;
 use std::os::raw::c_void;
 use std::sync::Mutex;
-use std::time::SystemTime;
+use std::time::{Duration, Instant, SystemTime};
 
 use crate::keycodes::macos::key_from_code;
 
@@ -53,6 +53,21 @@ pub enum CGEventTapOption {
 }
 
 pub static mut LAST_FLAGS: CGEventFlags = CGEventFlags::CGEventFlagNull;
+
+/// macOS reports a single physical Caps Lock press as a burst of
+/// `FlagsChanged` events (the keycode can be 57 or 255, and the Alpha Shift
+/// flag flips back and forth in between, see [QA1519]). Toggles that arrive
+/// closer together than this belong to the same physical press and are
+/// coalesced into one.
+///
+/// [QA1519]: https://developer.apple.com/library/archive/qa/qa1519/_index.html
+const CAPS_LOCK_TOGGLE_WINDOW: Duration = Duration::from_millis(150);
+
+/// Caps Lock events are not guaranteed to carry `kVK_CapsLock`: some macOS
+/// versions report them with keycode 255 instead.
+#[allow(non_upper_case_globals)]
+const kVK_CapsLockAlternate: CGKeyCode = 255;
+
 lazy_static! {
     pub static ref KEYBOARD_STATE: Mutex<Option<Keyboard>> = Mutex::new(Keyboard::new());
 }
@@ -159,11 +174,15 @@ unsafe fn get_code(cg_event: &CGEvent) -> Option<CGKeyCode> {
         .ok()
 }
 
+/// Turns a raw CoreGraphics event into the events to report.
+///
+/// Most raw events map to a single event, but Caps Lock (see the
+/// `FlagsChanged` handling below) maps to a press *and* a release.
 pub unsafe fn convert(
     _type: CGEventType,
     cg_event: &CGEvent,
     keyboard_state: &mut Keyboard,
-) -> Option<Event> {
+) -> Option<Vec<Event>> {
     let mut code = 0;
     let option_type = match _type {
         CGEventType::LeftMouseDown => Some(EventType::ButtonPress(Button::Left)),
@@ -207,11 +226,42 @@ pub unsafe fn convert(
         CGEventType::FlagsChanged => {
             code = get_code(cg_event)?;
             let flags = cg_event.get_flags();
-            if flags < LAST_FLAGS {
-                LAST_FLAGS = flags;
+            let previous_flags = LAST_FLAGS;
+            LAST_FLAGS = flags;
+
+            let caps_lock_mask = CGEventFlags::CGEventFlagAlphaShift;
+            let caps_lock_changed =
+                flags.contains(caps_lock_mask) != previous_flags.contains(caps_lock_mask);
+            // Caps Lock is a lock, not a regular modifier: macOS only reports
+            // that the lock state changed, and it never reports the key-up of
+            // the physical key. A single press can produce several events
+            // (whose keycode is 57 and/or 255), so they are coalesced into one
+            // press here.
+            let is_caps_lock_event =
+                code == kVK_CapsLock || code == kVK_CapsLockAlternate || caps_lock_changed;
+
+            if is_caps_lock_event {
+                if !caps_lock_changed {
+                    // Extra event of a burst, nothing changed for the lock.
+                    None
+                } else {
+                    let now = Instant::now();
+                    let in_same_burst = keyboard_state
+                        .last_caps_lock_toggle
+                        .is_some_and(|last| now.duration_since(last) < CAPS_LOCK_TOGGLE_WINDOW);
+                    keyboard_state.last_caps_lock_toggle = Some(now);
+                    if in_same_burst {
+                        None
+                    } else {
+                        // Whether the lock is turned on or off, the user did
+                        // press the key: report it as a press. The matching
+                        // release is added at the end of this function.
+                        Some(EventType::KeyPress(Key::CapsLock))
+                    }
+                }
+            } else if flags < previous_flags {
                 Some(EventType::KeyRelease(key_from_code(code)))
             } else {
-                LAST_FLAGS = flags;
                 Some(EventType::KeyPress(key_from_code(code)))
             }
         }
@@ -224,41 +274,54 @@ pub unsafe fn convert(
         }
         _ => None,
     };
-    if let Some(event_type) = option_type {
-        let unicode = match event_type {
-            EventType::KeyPress(..) => {
-                let code =
-                    cg_event.get_integer_value_field(EventField::KEYBOARD_EVENT_KEYCODE) as u32;
-                #[allow(non_upper_case_globals)]
-                let skip_unicode = match code as CGKeyCode {
-                    kVK_Shift | kVK_RightShift | kVK_ForwardDelete => true,
-                    _ => false,
-                };
-                if skip_unicode {
-                    None
-                } else {
-                    let flags = cg_event.get_flags();
-                    let s = keyboard_state.create_unicode_for_key(code, flags);
-                    // if s.is_none() {
-                    //     s = Some(key_to_name(_k).to_owned())
-                    // }
-                    s
-                }
+    let event_type = option_type?;
+
+    let unicode = match event_type {
+        EventType::KeyPress(..) => {
+            let code = cg_event.get_integer_value_field(EventField::KEYBOARD_EVENT_KEYCODE) as u32;
+            #[allow(non_upper_case_globals)]
+            let skip_unicode = match code as CGKeyCode {
+                kVK_Shift | kVK_RightShift | kVK_CapsLock | kVK_ForwardDelete => true,
+                _ => false,
+            };
+            if skip_unicode {
+                None
+            } else {
+                let flags = cg_event.get_flags();
+                let s = keyboard_state.create_unicode_for_key(code, flags);
+                // if s.is_none() {
+                //     s = Some(key_to_name(_k).to_owned())
+                // }
+                s
             }
-            EventType::KeyRelease(..) => None,
-            _ => None,
+        }
+        EventType::KeyRelease(..) => None,
+        _ => None,
+    };
+
+    let event = Event {
+        event_type,
+        time: SystemTime::now(),
+        unicode,
+        platform_code: code as _,
+        position_code: 0 as _,
+        usb_hid: 0,
+        extra_data: cg_event.get_integer_value_field(EventField::EVENT_SOURCE_USER_DATA),
+    };
+
+    // macOS never reports the key-up of Caps Lock, so pair the press with a
+    // release: the key is shown as pressed and then lingers exactly like any
+    // other key tap instead of staying pressed forever.
+    if let EventType::KeyPress(Key::CapsLock) = event.event_type {
+        let release = Event {
+            event_type: EventType::KeyRelease(Key::CapsLock),
+            unicode: None,
+            ..event.clone()
         };
-        return Some(Event {
-            event_type,
-            time: SystemTime::now(),
-            unicode,
-            platform_code: code as _,
-            position_code: 0 as _,
-            usb_hid: 0,
-            extra_data: cg_event.get_integer_value_field(EventField::EVENT_SOURCE_USER_DATA),
-        });
+        return Some(vec![event, release]);
     }
-    None
+
+    Some(vec![event])
 }
 
 #[allow(dead_code)]
@@ -320,6 +383,133 @@ fn key_to_name(key: Key) -> &'static str {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use core_graphics::event_source::{CGEventSource, CGEventSourceStateID};
+    use std::sync::Mutex;
+
+    /// `LAST_FLAGS` is global state, keep the tests using `convert` sequential.
+    static CONVERT_TEST_LOCK: Mutex<()> = Mutex::new(());
+
+    fn flags_changed_event(code: CGKeyCode, flags: CGEventFlags) -> CGEvent {
+        let source = CGEventSource::new(CGEventSourceStateID::HIDSystemState).unwrap();
+        let event = CGEvent::new_keyboard_event(source, code, true).unwrap();
+        event.set_type(CGEventType::FlagsChanged);
+        event.set_flags(flags);
+        event
+    }
+
+    /// Runs a flags-changed event through `convert`, like the event tap does.
+    fn convert_flags_changed(
+        code: CGKeyCode,
+        flags: CGEventFlags,
+        keyboard: &mut Keyboard,
+    ) -> Vec<EventType> {
+        unsafe {
+            convert(
+                CGEventType::FlagsChanged,
+                &flags_changed_event(code, flags),
+                keyboard,
+            )
+        }
+        .map(|events| events.into_iter().map(|event| event.event_type).collect())
+        .unwrap_or_default()
+    }
+
+    fn alpha_shift(on: bool) -> CGEventFlags {
+        if on {
+            CGEventFlags::CGEventFlagAlphaShift
+        } else {
+            CGEventFlags::CGEventFlagNull
+        }
+    }
+
+    #[test]
+    fn caps_lock_toggle_emits_a_press_and_a_release() {
+        let _guard = CONVERT_TEST_LOCK.lock().unwrap();
+        let mut keyboard = Keyboard::new().unwrap();
+        unsafe { LAST_FLAGS = alpha_shift(false) };
+
+        let events = convert_flags_changed(kVK_CapsLock, alpha_shift(true), &mut keyboard);
+
+        assert_eq!(
+            events,
+            vec![
+                EventType::KeyPress(Key::CapsLock),
+                EventType::KeyRelease(Key::CapsLock),
+            ]
+        );
+    }
+
+    #[test]
+    fn caps_lock_turning_off_is_also_a_press() {
+        let _guard = CONVERT_TEST_LOCK.lock().unwrap();
+        let mut keyboard = Keyboard::new().unwrap();
+        unsafe { LAST_FLAGS = alpha_shift(true) };
+
+        let events = convert_flags_changed(kVK_CapsLock, alpha_shift(false), &mut keyboard);
+
+        assert_eq!(
+            events,
+            vec![
+                EventType::KeyPress(Key::CapsLock),
+                EventType::KeyRelease(Key::CapsLock),
+            ]
+        );
+    }
+
+    #[test]
+    fn caps_lock_burst_is_coalesced_into_a_single_press() {
+        let _guard = CONVERT_TEST_LOCK.lock().unwrap();
+        let mut keyboard = Keyboard::new().unwrap();
+        unsafe { LAST_FLAGS = alpha_shift(false) };
+
+        // macOS 26 reports one physical press as e.g.
+        // (57, alpha shift on), (255, alpha shift off), (57, alpha shift off).
+        let on = convert_flags_changed(kVK_CapsLock, alpha_shift(true), &mut keyboard);
+        let off = convert_flags_changed(kVK_CapsLockAlternate, alpha_shift(false), &mut keyboard);
+        let echo = convert_flags_changed(kVK_CapsLock, alpha_shift(false), &mut keyboard);
+
+        assert_eq!(on.len(), 2);
+        assert!(off.is_empty());
+        assert!(echo.is_empty());
+    }
+
+    #[test]
+    fn caps_lock_press_after_the_coalescing_window_is_reported() {
+        let _guard = CONVERT_TEST_LOCK.lock().unwrap();
+        let mut keyboard = Keyboard::new().unwrap();
+        unsafe { LAST_FLAGS = alpha_shift(false) };
+        convert_flags_changed(kVK_CapsLock, alpha_shift(true), &mut keyboard);
+
+        // Pretend the previous toggle happened long ago.
+        keyboard.last_caps_lock_toggle = Some(Instant::now() - CAPS_LOCK_TOGGLE_WINDOW * 2);
+
+        let events =
+            convert_flags_changed(kVK_CapsLockAlternate, alpha_shift(false), &mut keyboard);
+
+        assert_eq!(
+            events,
+            vec![
+                EventType::KeyPress(Key::CapsLock),
+                EventType::KeyRelease(Key::CapsLock),
+            ]
+        );
+    }
+
+    #[test]
+    fn other_modifiers_still_report_press_then_release() {
+        let _guard = CONVERT_TEST_LOCK.lock().unwrap();
+        let mut keyboard = Keyboard::new().unwrap();
+        unsafe { LAST_FLAGS = CGEventFlags::CGEventFlagNull };
+
+        let pressed =
+            convert_flags_changed(kVK_Shift, CGEventFlags::CGEventFlagShift, &mut keyboard);
+        let released =
+            convert_flags_changed(kVK_Shift, CGEventFlags::CGEventFlagNull, &mut keyboard);
+
+        assert_eq!(pressed, vec![EventType::KeyPress(Key::ShiftLeft)]);
+        assert_eq!(released, vec![EventType::KeyRelease(Key::ShiftLeft)]);
+    }
+
     #[test]
     #[allow(non_snake_case)]
     fn test_KBGetLayoutType() {

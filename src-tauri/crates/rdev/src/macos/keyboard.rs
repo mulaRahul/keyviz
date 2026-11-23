@@ -8,6 +8,7 @@ use core_graphics::event::CGEventFlags;
 use std::convert::TryInto;
 use std::ffi::c_void;
 use std::os::raw::c_uint;
+use std::time::Instant;
 
 type TISInputSourceRef = *mut c_void;
 type ModifierState = u32;
@@ -89,6 +90,10 @@ pub struct Keyboard {
     shift: bool,
     alt: bool, // options
     caps_lock: bool,
+    /// When the last Caps Lock toggle was seen. macOS reports a single physical
+    /// Caps Lock press as a burst of flags-changed events, so events that are
+    /// close together are treated as one press (see `common::convert`).
+    pub(crate) last_caps_lock_toggle: Option<Instant>,
 }
 
 impl Keyboard {
@@ -99,6 +104,7 @@ impl Keyboard {
             shift: false,
             alt: false,
             caps_lock: false,
+            last_caps_lock_toggle: None,
         })
     }
 
