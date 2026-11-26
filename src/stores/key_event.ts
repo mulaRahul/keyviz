@@ -274,14 +274,29 @@ const createKeyEventStore = createSyncedStore<KeyEventStore>(
                     // replace mouse button with drag
                     const pressedKeys = state.pressedKeys.filter(keyName => keyName !== buttonName);
                     const groups = [...state.groups];
+
+                    const dragKeyIndex = last >= 0
+                        ? groups[last].keys.findIndex(key => key.name === buttonName)
+                        : -1;
+
+                    pressedKeys.push("Drag");
+
+                    const dragKey = new KeyEvent("Drag");
+
                     if (last >= 0) {
-                        groups[last].keys = groups[last].keys.filter(key => key.name !== buttonName);
+                        const updatedKeys = [...groups[last].keys];
+                        updatedKeys.splice(dragKeyIndex >= 0 ? dragKeyIndex : updatedKeys.length, 1, dragKey);
+
+                        groups[last] = {
+                            ...groups[last],
+                            keys: updatedKeys
+                        };
+                    } else {
+                        groups.push({ keys: [dragKey], createdAt: state.showEventHistory ? Date.now() : 0 });
                     }
 
-                    set({ pressedKeys, mouse, groups });
+                    set({ mouse, pressedKeys, groups, });
 
-                    // simulate drag as key press
-                    state.onKeyPress({ type: "KeyEvent", name: "Drag", pressed: true });
                     return;
                 }
             }
