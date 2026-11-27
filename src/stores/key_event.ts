@@ -11,6 +11,7 @@ const SCROLL_LINGER_MS = 300;
 interface KeyGroup {
     keys: KeyEvent[];
     createdAt: number;
+    archivedAt?: number;
 }
 
 export interface KeyEventState {
@@ -161,6 +162,7 @@ const createKeyEventStore = createSyncedStore<KeyEventStore>(
             if (existingKey) {
                 // history mode, add new group
                 if (state.showEventHistory && groups[last].keys.length > 1) {
+                    groups[last] = { ...groups[last], archivedAt: Date.now() };
                     const groupKeys: KeyEvent[] = [];
                     groups[last].keys.forEach(gKey => {
                         if (gKey.in(pressedKeys)) {
@@ -192,6 +194,9 @@ const createKeyEventStore = createSyncedStore<KeyEventStore>(
                 // add new group
                 if (pressedKeys.length === 1 || last < 0) {
                     if (state.showEventHistory) {
+                        if (last >= 0) {
+                            groups[last] = { ...groups[last], archivedAt: createdAt };
+                        }
                         groups.push({ keys: [key], createdAt });
                     } else {
                         groups = [{ keys: [key], createdAt }];
@@ -201,6 +206,7 @@ const createKeyEventStore = createSyncedStore<KeyEventStore>(
                 else {
                     if (state.showEventHistory && groups[last].keys.some(gKey => !gKey.in(pressedKeys))) {
                         // history mode, partial combination, add new group
+                        groups[last] = { ...groups[last], archivedAt: createdAt };
                         const groupKeys = groups[last].keys.filter(gKey => gKey.in(pressedKeys));
                         groupKeys.push(key);
                         groups.push({ keys: groupKeys, createdAt });
@@ -386,19 +392,19 @@ const createKeyEventStore = createSyncedStore<KeyEventStore>(
             // remove keys that have exceeded linger duration
             for (const group of state.groups) {
                 const updatedKeys = group.keys.filter((key) => {
-                    // keep key if
-                    return (
-                        // is pressed
-                        state.pressedKeys.includes(key.name) ||
-                        // within linger duration 
-                        now - key.lastPressedAt < state.lingerDurationMs
-                    );
-                })
+                    if (group.archivedAt === undefined && state.pressedKeys.includes(key.name)) {
+                        return true;
+                    }
+
+                    const lastActivity = Math.max(key.lastPressedAt, group.archivedAt ?? 0);
+                    return now - lastActivity < state.lingerDurationMs;
+                });
+
                 if (updatedKeys.length !== group.keys.length) {
                     notify = true;
                 }
                 if (updatedKeys.length > 0) {
-                    groups.push({ keys: updatedKeys, createdAt: group.createdAt });
+                    groups.push({ keys: updatedKeys, createdAt: group.createdAt, archivedAt: group.archivedAt });
                 }
             }
 
